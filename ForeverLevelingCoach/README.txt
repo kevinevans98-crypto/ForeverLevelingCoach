@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.8.7
+Forever Leveling Coach v0.8.8
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.8.7 highlights
+v0.8.8 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -154,3 +154,10 @@ Roadmap
 - Removed long notes, scoring details, and route explanations from the normal play window
 - Detailed diagnostics remain available in /flc export for testing
 - Travel hint spacing shortened so directions are quicker to read while moving
+
+- Flight-path learning: opening a flight master records flight destinations currently available to the character
+- Route steps can declare a flight destination such as Ratchet or Thunder Bluff
+- When the target is reachable at the open flight master, FLC attempts to select that flight automatically
+- If the WoW client blocks automated taxi selection, FLC falls back safely and tells you to click the matching destination
+- /flc autoflight toggles automatic flight selection
+- /flc export now shows AutoFlightTarget, AutoFlightStatus, CurrentFlightOptions, and learned KnownFlightPaths
