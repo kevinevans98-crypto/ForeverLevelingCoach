@@ -486,6 +486,15 @@ local function scoreRouteStep(step, active, clusterCounts)
     return score, reasons
 end
 
+local function getCurrentDungeonCluster()
+    for clusterID, cluster in pairs(Data.clusters or {}) do
+        if cluster.dungeon and zoneMatchesCluster(clusterID) then
+            return clusterID
+        end
+    end
+    return nil
+end
+
 local function chooseRouteStep(byID)
     local level = UnitLevel("player") or 1
     currentCluster = nil
@@ -495,7 +504,25 @@ local function chooseRouteStep(byID)
 
     local clusterCounts = getActiveClusterCounts(byID)
     local bestStep, bestActive, bestScore, bestReasons = nil, nil, -999999, nil
+    local insideDungeonCluster = getCurrentDungeonCluster()
 
+    if insideDungeonCluster then
+        for _, step in ipairs(Data.route or {}) do
+            local active = byID[step.questID]
+            local inRange = level >= (step.minLevel or 1) and level <= (step.maxLevel or 999)
+            if step.dungeon and step.cluster == insideDungeonCluster and active and inRange
+                and not active.isComplete and not isQuestCompleted(step.questID) then
+                local score, reasons = scoreRouteStep(step, active, clusterCounts)
+                score = score + 1000
+                reasons[#reasons + 1] = "inside this dungeon (+1000)"
+                if score > bestScore then
+                    bestStep, bestActive, bestScore, bestReasons = step, active, score, reasons
+                end
+            end
+        end
+    end
+
+    if not bestStep then
     for _, step in ipairs(Data.route or {}) do
         local active = byID[step.questID]
         local inRange = level >= (step.minLevel or 1) and level <= (step.maxLevel or 999)
@@ -509,6 +536,7 @@ local function chooseRouteStep(byID)
                 bestReasons = reasons
             end
         end
+    end
     end
 
     if bestStep then
@@ -1427,7 +1455,7 @@ local function render()
         end
     end
 
-    local insideDungeonRoute = step and step.dungeon and zoneMatchesAliases({ step.title == "Leaders of the Fang" and "Wailing Caverns" or "" })
+    local insideDungeonRoute = step and step.dungeon and step.cluster and zoneMatchesCluster(step.cluster)
     if insideDungeonRoute then
         currentObjectiveTarget = nil
         currentTravelTarget = nil
@@ -1468,7 +1496,7 @@ local function render()
         end
     end
 
-    if step and step.dungeon and zoneMatchesAliases({ "Wailing Caverns" }) then
+    if insideDungeonRoute then
         local nextObj = nextUnfinishedObjective(active)
         if nextObj then
             details[#details + 1] = "GO TO: " .. nextObj:gsub("^0/1%s*", "")
