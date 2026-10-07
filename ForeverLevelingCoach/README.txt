@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.4.5
+Forever Leveling Coach v0.4.6
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.4.5 highlights
+v0.4.6 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -36,6 +36,8 @@ v0.4.5 highlights
 - IMPORTANT class/unlock quests still override normal area clusters
 - Main window stays clean: it shows only the current quest plus a short "Area stack" count
 - Export button added directly to the main guide window for one-click /flc export access
+- Quest 220 (Call of Water) added as an IMPORTANT Water Totem-chain step after live discovery
+- First verified navigation waypoint added: Islen Waterseer in The Barrens
 
 Important routing rule
 ----------------------
