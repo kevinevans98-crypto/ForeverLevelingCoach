@@ -578,6 +578,23 @@ local function objectiveSummary(active)
     return table.concat(lines, "\n")
 end
 
+local function getWaypointDistanceMeters(mapID, px, py, tx, ty)
+    if C_Map and C_Map.GetWorldPosFromMapPos and CreateVector2D then
+        local playerVec = CreateVector2D(px, py)
+        local targetVec = CreateVector2D(tx, ty)
+        local playerContinent, playerWorld = C_Map.GetWorldPosFromMapPos(mapID, playerVec)
+        local targetContinent, targetWorld = C_Map.GetWorldPosFromMapPos(mapID, targetVec)
+
+        if playerWorld and targetWorld and playerContinent == targetContinent then
+            local wx1, wy1 = playerWorld:GetXY()
+            local wx2, wy2 = targetWorld:GetXY()
+            local yards = math.sqrt((wx2 - wx1) * (wx2 - wx1) + (wy2 - wy1) * (wy2 - wy1))
+            return yards * 0.9144
+        end
+    end
+    return nil
+end
+
 local function atan2Safe(y, x)
     if math.atan2 then return math.atan2(y, x) end
     if x > 0 then return math.atan(y / x) end
@@ -615,8 +632,18 @@ local function updateArrow()
     local targetAngle = atan2Safe(dx, -dy)
     local facing = GetPlayerFacing and GetPlayerFacing() or 0
     arrowTexture:SetRotation(targetAngle - facing)
-    local dist = math.sqrt(dx * dx + dy * dy) * 100
-    arrowLabel:SetText(string.format("%s  •  %.1f%%", waypoint.label or currentRouteStep.title or "Route target", dist))
+    local meters = getWaypointDistanceMeters(mapID, px, py, waypoint.x, waypoint.y)
+    local label = waypoint.label or currentRouteStep.title or "Route target"
+    if meters then
+        if meters >= 1000 then
+            arrowLabel:SetText(string.format("%s  •  %.2f km", label, meters / 1000))
+        else
+            arrowLabel:SetText(string.format("%s  •  %d m", label, math.floor(meters + 0.5)))
+        end
+    else
+        local dist = math.sqrt(dx * dx + dy * dy) * 100
+        arrowLabel:SetText(string.format("%s  •  %.1f%%", label, dist))
+    end
 end
 
 local arrowElapsed = 0
