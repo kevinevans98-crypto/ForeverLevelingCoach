@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.8.8",
+    version = "0.8.9",
     supported = {
         faction = "Horde",
         class = "SHAMAN",
@@ -25,6 +25,8 @@ ForeverLevelingCoach_Data = {
         [1483] = true, -- Ziz Fizziks (live-discovered in Forever)
         [6981] = true, -- The Glowing Shard
         [3369] = true, -- In Nightmares (live-discovered in Forever)
+        [914] = true,  -- Leaders of the Fang (live-discovered in Forever)
+        [1490] = true, -- Nara Wildmane (live-discovered in Forever)
     },
 
     -- Adaptive smart-route scoring. Higher score = better next step.
@@ -258,6 +260,7 @@ ForeverLevelingCoach_Data = {
         -- These are Classic-era quests present in Forever, not confirmed Forever-new quests.
         {
             questID = 6543,
+            flightTarget = "Splintertree Post",
             cluster = "ASHENVALE_SPLINTERTREE",
             clusterPriority = 1,
             title = "The Warsong Reports",
@@ -268,6 +271,7 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 6503,
+            flightTarget = "Splintertree Post",
             cluster = "ASHENVALE_SPLINTERTREE",
             clusterPriority = 2,
             title = "Ashenvale Outrunners",
@@ -278,6 +282,7 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 6441,
+            flightTarget = "Splintertree Post",
             cluster = "ASHENVALE_SPLINTERTREE",
             clusterPriority = 3,
             title = "Satyr Horns",
