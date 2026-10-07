@@ -94,3 +94,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Inside-dungeon cleanup: no stale entrance waypoint or taxi target once the player is already inside Wailing Caverns
 
 - Gear Advisor: hover equippable items for a simple Shaman leveling verdict instead of manually comparing every stat
+
+- Fixed Gear Advisor tooltip compatibility on Forever Beta and hardened export initialization
