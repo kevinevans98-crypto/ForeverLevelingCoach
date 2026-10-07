@@ -30,6 +30,7 @@ local defaults = {
     travelHintHeight = 90,
     autoFlight = false,
     gearAdvisor = true,
+    relicAdvisor = true,
     lazyMode = true,
     autoAccept = true,
     autoTurnIn = true,
@@ -1523,6 +1524,13 @@ local function render()
         details[#details + 1] = "SOON: Train Shaman — " .. tostring(currentTrainingTarget.city or currentTrainingTarget.zone or "nearest trainer")
     end
 
+    if DB and DB.relicAdvisor ~= false then
+        local _, relicName, relicState = flcRelicStatus()
+        if relicState == "known-relic-in-bags" and relicName then
+            details[#details + 1] = "SOON: Equip " .. tostring(relicName)
+        end
+    end
+
     detailText:SetText(table.concat(details, "\n"))
     refreshMainScroll()
 
@@ -1601,6 +1609,11 @@ exportSnapshot = function()
         "AutoTurnInEnabled=" .. tostring(DB and DB.autoTurnIn ~= false or false),
         "LazyTravelTarget=" .. tostring(currentTravelTarget and currentTravelTarget.name or "none"),
         "GearAdvisorEnabled=" .. tostring(DB and DB.gearAdvisor ~= false or false),
+        "WeaponPreference=" .. tostring(Data.weaponPreference and Data.weaponPreference.label or "none"),
+        "RelicAdvisorEnabled=" .. tostring(DB and DB.relicAdvisor ~= false or false),
+        "EquippedRelic=" .. tostring(select(1, flcRelicStatus()) or "none"),
+        "KnownRelicTarget=" .. tostring(select(2, flcRelicStatus()) or "none"),
+        "RelicStatus=" .. tostring(select(3, flcRelicStatus()) or "unknown"),
         "AutoFlightEnabled=" .. tostring(DB and DB.autoFlight ~= false or false),
         "AutoFlightTarget=" .. tostring(currentAutoFlightTarget or "none"),
         "AutoFlightStatus=" .. tostring(currentAutoFlightStatus or "none"),
@@ -1779,6 +1792,7 @@ local FLC_EQUIP_SLOTS = {
     INVTYPE_HOLDABLE = {17},
     INVTYPE_RANGED = {18},
     INVTYPE_RANGEDRIGHT = {18},
+    INVTYPE_RELIC = {18},
 }
 
 local flcGearScanTooltip = CreateFrame("GameTooltip", "ForeverLevelingCoachGearScanTooltip", UIParent, "GameTooltipTemplate")
@@ -1809,6 +1823,19 @@ local function flcTooltipWeaponDPS(tooltip)
     return 0
 end
 
+local function flcItemID(link)
+    if not link then return nil end
+    local id = string.match(link, "item:(%d+)")
+    return id and tonumber(id) or nil
+end
+
+local function flcKnownRelicScore(link)
+    local itemID = flcItemID(link)
+    local relic = itemID and Data.shamanRelics and Data.shamanRelics[itemID]
+    if relic then return tonumber(relic.score) or 0, relic end
+    return 0, nil
+end
+
 local function flcItemScore(link, tooltip)
     if not link then return 0 end
     local score = 0
@@ -1824,6 +1851,9 @@ local function flcItemScore(link, tooltip)
 
     local _, _, _, itemLevel, _, _, _, _, equipLoc = GetItemInfo(link)
     if itemLevel then score = score + (itemLevel * 0.08) end
+
+    local relicScore = flcKnownRelicScore(link)
+    score = score + (relicScore or 0)
 
     if equipLoc == "INVTYPE_WEAPON" or equipLoc == "INVTYPE_2HWEAPON"
         or equipLoc == "INVTYPE_WEAPONMAINHAND" or equipLoc == "INVTYPE_WEAPONOFFHAND"
@@ -1879,11 +1909,20 @@ end
 
 local function flcGearEvaluateItem(link, sourceTooltip)
     if not link or not GetItemInfo then return nil end
-    local _, _, _, _, requiredLevel, _, _, _, equipLoc = GetItemInfo(link)
+    local _, _, _, _, requiredLevel, itemType, itemSubType, _, equipLoc = GetItemInfo(link)
     if not equipLoc or equipLoc == "" then return nil end
 
     local slots = FLC_EQUIP_SLOTS[equipLoc]
     if not slots then return nil end
+
+    if Data.weaponPreference and Data.weaponPreference.mode == "2H_ONLY" and itemType == "Weapon" then
+        local allowed = equipLoc == "INVTYPE_2HWEAPON"
+            and Data.weaponPreference.allowedSubTypes
+            and Data.weaponPreference.allowedSubTypes[itemSubType]
+        if not allowed then
+            return "PREFERENCE", "Build target: " .. tostring(Data.weaponPreference.label or "2H Axe / 2H Mace")
+        end
+    end
 
     if requiredLevel and requiredLevel > (UnitLevel("player") or 1) then
         return "LOCKED", "Requires level " .. tostring(requiredLevel)
@@ -1942,6 +1981,7 @@ local function flcAddGearAdvice(tooltip, tooltipData)
 
     tooltip.__flcGearBusy = true
     local grade, reason = flcGearEvaluateItem(link, tooltip)
+    local _, knownRelic = flcKnownRelicScore(link)
     if grade then
         tooltip:AddLine(" ")
         if grade == "BETTER" then
@@ -1957,10 +1997,16 @@ local function flcAddGearAdvice(tooltip, tooltipData)
             tooltip:AddLine("FLC: NOT USABLE YET", 1.0, 0.55, 0.2)
         elseif grade == "UNUSABLE" then
             tooltip:AddLine("FLC: CANNOT USE", 1.0, 0.25, 0.25)
+        elseif grade == "PREFERENCE" then
+            tooltip:AddLine("FLC: NOT YOUR 2H TARGET", 1.0, 0.82, 0.2)
         else
             tooltip:AddLine("FLC: KEEP CURRENT ITEM", 1.0, 0.35, 0.35)
         end
         if reason then tooltip:AddLine(reason, 0.75, 0.75, 0.75) end
+        if knownRelic then
+            tooltip:AddLine("FLC RELIC: " .. tostring(knownRelic.name), 0.35, 0.8, 1.0)
+            tooltip:AddLine(tostring(knownRelic.effect or ""), 0.75, 0.75, 0.75)
+        end
         tooltip:Show()
         tooltip.__flcGearLink = link
     end
@@ -2002,6 +2048,26 @@ else
     if ItemRefTooltip then flcHookGearTooltipLegacy(ItemRefTooltip) end
 end
 -- End Gear Advisor -----------------------------------------------------------
+
+local function flcRelicStatus()
+    local equipped = GetInventoryItemLink and GetInventoryItemLink("player", 18)
+    local equippedID = flcItemID(equipped)
+    local known = equippedID and Data.shamanRelics and Data.shamanRelics[equippedID]
+    if known then
+        return equipped, known.name, "equipped-known"
+    end
+
+    if Data.shamanRelics and GetItemCount then
+        for itemID, relic in pairs(Data.shamanRelics) do
+            local ok, count = pcall(GetItemCount, itemID)
+            if ok and count and count > 0 then
+                return equipped, relic.name, "known-relic-in-bags"
+            end
+        end
+    end
+
+    return equipped, nil, equipped and "other-equipped" or "empty"
+end
 
 -- Lazy quest automation ------------------------------------------------------
 local function flcCurrentDialogQuestID()
@@ -2078,7 +2144,11 @@ SLASH_FOREVERLEVELINGCOACH1 = "/flc"
 SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
     msg = (msg or ""):lower()
 
-    if msg == "trained" then
+    if msg == "relic" then
+        DB.relicAdvisor = not DB.relicAdvisor
+        render()
+        print("|cff33ff99FLC:|r relic advisor " .. (DB.relicAdvisor and "enabled." or "disabled."))
+    elseif msg == "trained" then
         DB.lastClassTrainerLevel = UnitLevel("player") or DB.lastClassTrainerLevel or 0
         currentTrainingDue = false
         render()
@@ -2134,7 +2204,7 @@ SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
         syncQuests()
     else
         print("|cff33ff99Forever Leveling Coach v" .. tostring(Data.version) .. "|r")
-        print("/flc show, hide, go, lazy, trained, autoaccept, autoturnin, sync, export, gear, autoflight, arrow, lock, unlock, beginner")
+        print("/flc show, hide, go, lazy, relic, trained, autoaccept, autoturnin, sync, export, gear, autoflight, arrow, lock, unlock, beginner")
     end
 end
 
