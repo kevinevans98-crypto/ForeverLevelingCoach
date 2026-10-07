@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.9.9
+Forever Leveling Coach v0.10.0
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.9.9 highlights
+v0.10.0 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -211,3 +211,7 @@ Roadmap
 - Example: FLC: +12% better for leveling or FLC: -8% worse for leveling
 - Percentage is normalized against the stronger of the two item scores so it stays bounded and avoids exaggerated 200%+ results
 - Unusable and level-locked items still show CANNOT USE / NOT USABLE YET instead of a percentage
+
+- Clickable quest focus added: click the current quest title or the new Go button to track/open the recommended quest in Blizzard UI when the client supports it
+- /flc go provides the same action
+- Feature-detects quest APIs so unsupported Forever clients fail safely instead of throwing Lua errors
