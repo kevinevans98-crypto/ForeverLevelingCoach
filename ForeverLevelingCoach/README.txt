@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.5.3
+Forever Leveling Coach v0.5.4
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.5.3 highlights
+v0.5.4 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -76,3 +76,6 @@ Roadmap
 - Add beginner-friendly macros
 - Add gear scanning and upgrade recommendations
 - Add community feedback/export tools
+
+- Silverpine Water Totem cluster improves smart routing for Call of Water [63]
+- Export now hides historical unknown quests after they become classified
