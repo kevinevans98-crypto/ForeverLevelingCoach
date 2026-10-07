@@ -1514,21 +1514,15 @@ local function flcGearEvaluateItem(link, sourceTooltip)
     end
 
     local delta = candidateScore - equippedScore
-    local pct
-    if equippedScore > 0 then
-        pct = (delta / equippedScore) * 100
-    else
-        pct = delta > 0 and 100 or 0
-    end
+    local denom = math.max(candidateScore, equippedScore, 1)
+    local pct = (delta / denom) * 100
 
-    if pct >= 20 then
-        return "MAJOR", "Equip this"
-    elseif pct >= 5 then
-        return "UPGRADE", "Better for leveling"
-    elseif pct >= 1 then
-        return "SMALL", "Small improvement"
+    if pct >= 1 then
+        return "BETTER", string.format("+%d%% better for leveling", math.floor(pct + 0.5))
+    elseif pct <= -1 then
+        return "WORSE", string.format("%d%% worse for leveling", math.floor(pct - 0.5))
     end
-    return "KEEP", "Keep current item"
+    return "SAME", "About the same"
 end
 
 local function flcAddGearAdvice(tooltip, tooltipData)
@@ -1555,12 +1549,15 @@ local function flcAddGearAdvice(tooltip, tooltipData)
     local grade, reason = flcGearEvaluateItem(link, tooltip)
     if grade then
         tooltip:AddLine(" ")
-        if grade == "MAJOR" then
-            tooltip:AddLine("FLC: ★ MAJOR UPGRADE", 0.2, 1.0, 0.2)
-        elseif grade == "UPGRADE" then
-            tooltip:AddLine("FLC: UPGRADE", 0.2, 1.0, 0.2)
-        elseif grade == "SMALL" then
-            tooltip:AddLine("FLC: SMALL UPGRADE", 1.0, 0.82, 0.2)
+        if grade == "BETTER" then
+            tooltip:AddLine("FLC: " .. (reason or "BETTER"), 0.2, 1.0, 0.2)
+            reason = nil
+        elseif grade == "WORSE" then
+            tooltip:AddLine("FLC: " .. (reason or "WORSE"), 1.0, 0.35, 0.35)
+            reason = nil
+        elseif grade == "SAME" then
+            tooltip:AddLine("FLC: ABOUT THE SAME", 1.0, 0.82, 0.2)
+            reason = nil
         elseif grade == "LOCKED" then
             tooltip:AddLine("FLC: NOT USABLE YET", 1.0, 0.55, 0.2)
         elseif grade == "UNUSABLE" then
