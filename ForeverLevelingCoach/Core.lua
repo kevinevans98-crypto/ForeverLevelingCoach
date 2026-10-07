@@ -1015,6 +1015,8 @@ local function render()
 
     local step, active = chooseRouteStep(currentByID)
     currentRouteStep = step
+    currentAutoFlightTarget = step and step.flightTarget or nil
+    currentAutoFlightStatus = currentAutoFlightTarget and "waiting-for-flight-master" or "no-target"
     currentPersonTarget = step and step.personTarget or nil
     currentNextQuestPickup = nil
     if step and step.nextPickup then
