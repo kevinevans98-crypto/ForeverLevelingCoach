@@ -553,6 +553,36 @@ arrowLabel:SetJustifyH("CENTER")
 arrowLabel:SetShadowOffset(1, -1)
 arrowLabel:SetText("")
 
+local travelHintFrame = CreateFrame("Frame", "ForeverLevelingCoachTravelHintFrame", UIParent, "BackdropTemplate")
+travelHintFrame:SetSize(300, 74)
+travelHintFrame:SetPoint("TOP", arrowFrame, "BOTTOM", 0, -8)
+travelHintFrame:SetFrameStrata("HIGH")
+travelHintFrame:SetBackdrop({
+    bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+    edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+    tile = true,
+    tileSize = 16,
+    edgeSize = 12,
+    insets = { left = 5, right = 5, top = 5, bottom = 5 },
+})
+travelHintFrame:SetBackdropColor(0.03, 0.03, 0.03, 0.82)
+travelHintFrame:SetBackdropBorderColor(0.72, 0.55, 0.20, 0.95)
+
+local travelHintTitle = travelHintFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+travelHintTitle:SetPoint("TOPLEFT", 10, -8)
+travelHintTitle:SetPoint("TOPRIGHT", -10, -8)
+travelHintTitle:SetJustifyH("LEFT")
+travelHintTitle:SetText("Travel")
+
+local travelHintText = travelHintFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+travelHintText:SetPoint("TOPLEFT", travelHintTitle, "BOTTOMLEFT", 0, -4)
+travelHintText:SetPoint("TOPRIGHT", travelHintFrame, "TOPRIGHT", -10, -26)
+travelHintText:SetJustifyH("LEFT")
+travelHintText:SetJustifyV("TOP")
+travelHintText:SetWordWrap(true)
+travelHintText:SetText("")
+travelHintFrame:Hide()
+
 local function saveArrowPosition()
     local point, _, relativePoint, x, y = arrowFrame:GetPoint(1)
     DB.arrowPoint = point
@@ -652,11 +682,24 @@ end
 local currentArrowState = "hidden"
 local currentArrowDebug = {}
 
+local function updateTravelHint(message, state)
+    if not travelHintFrame then return end
+    if message and message ~= "" and state ~= "active-same-map" then
+        travelHintText:SetText(message)
+        local h = math.max(74, math.min(150, (travelHintText:GetStringHeight() or 40) + 34))
+        travelHintFrame:SetHeight(h)
+        travelHintFrame:Show()
+    else
+        travelHintFrame:Hide()
+    end
+end
+
 local function updateArrow()
     if not DB or DB.arrowVisible == false or not currentRouteStep then
         currentArrowState = "hidden-disabled"
         currentArrowDebug = {}
         arrowFrame:Hide()
+        updateTravelHint(currentTravelInstruction, currentArrowState)
         return
     end
 
@@ -668,6 +711,7 @@ local function updateArrow()
         currentArrowState = "hidden-no-waypoint"
         currentArrowDebug = {}
         arrowFrame:Hide()
+        updateTravelHint(currentTravelInstruction, currentArrowState)
         return
     end
 
@@ -676,6 +720,7 @@ local function updateArrow()
         currentArrowState = "hidden-no-player-map"
         currentArrowDebug = {}
         arrowFrame:Hide()
+        updateTravelHint(currentTravelInstruction, currentArrowState)
         return
     end
 
@@ -686,6 +731,7 @@ local function updateArrow()
         currentArrowState = "hidden-different-map"
         currentArrowDebug = {}
         arrowFrame:Hide()
+        updateTravelHint(currentTravelInstruction, currentArrowState)
         return
     end
 
@@ -694,6 +740,7 @@ local function updateArrow()
         currentArrowState = "hidden-no-position"
         currentArrowDebug = {}
         arrowFrame:Hide()
+        updateTravelHint(currentTravelInstruction, currentArrowState)
         return
     end
 
@@ -705,6 +752,7 @@ local function updateArrow()
 
     arrowFrame:Show()
     currentArrowState = "active-same-map"
+    updateTravelHint(nil, currentArrowState)
     arrowTexture:SetRotation(relativeAngle)
 
     currentArrowDebug = {
@@ -841,6 +889,7 @@ exportSnapshot = function()
         "NavigationStep=" .. tostring(currentNavigationStepIndex and (tostring(currentNavigationStepIndex) .. "/" .. tostring(currentNavigationStepCount or "?")) or "none"),
         "ArrowState=" .. tostring(currentArrowState or "unknown"),
         "ArrowMode=" .. tostring(currentArrowState == "active-same-map" and "same-map-safe" or "hidden"),
+        "TravelHintState=" .. tostring(currentArrowState ~= "active-same-map" and currentTravelInstruction and "shown" or "hidden"),
         "ArrowPlayerMapID=" .. tostring(currentArrowDebug.playerMapID or "none"),
         "ArrowPlayerXY=" .. (currentArrowDebug.playerX and string.format("%.4f,%.4f", currentArrowDebug.playerX, currentArrowDebug.playerY) or "none"),
         "ArrowTargetMapID=" .. tostring(currentArrowDebug.targetMapID or "none"),
