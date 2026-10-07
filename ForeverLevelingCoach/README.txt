@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.11.0
+Forever Leveling Coach v0.12.0
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.11.0 highlights
+v0.12.0 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -229,3 +229,11 @@ Roadmap
 - Orgrimmar flight-master local step uses the classic Doras location around 45,64
 - /flc lazy toggles Lazy Mode
 - Export now reports LazyModeEnabled and LazyTravelTarget
+
+- Auto Accept / Auto Turn-In added for Lazy Mode
+- Routed IMPORTANT / DO / OPTIONAL quests are auto-accepted; SKIP and unknown quests are left alone
+- Completed routed quests auto-progress and auto-turn-in when there is no reward choice
+- Reward-choice quests stop safely so FLC never guesses which reward to take
+- /flc autoaccept toggles automatic quest acceptance
+- /flc autoturnin toggles automatic quest completion/turn-in
+- Export reports AutoAcceptEnabled and AutoTurnInEnabled
