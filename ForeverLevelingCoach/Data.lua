@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.12.1",
+    version = "0.13.0",
     supported = {
         faction = "Horde",
         class = "SHAMAN",
@@ -28,6 +28,39 @@ ForeverLevelingCoach_Data = {
         [3369] = true, -- In Nightmares (live-discovered in Forever)
         [914] = true,  -- Leaders of the Fang (live-discovered in Forever)
         [1490] = true, -- Nara Wildmane (live-discovered in Forever)
+    },
+
+    shamanTrainers = {
+        names = {
+            ["Kardris Dreamseeker"] = true,
+            ["Sagorne Creststrider"] = true,
+            ["Sian'tsu"] = true,
+            ["Beram Skychaser"] = true,
+            ["Siln Skychaser"] = true,
+            ["Tigor Skychaser"] = true,
+            ["Swart"] = true,
+            ["Narm Skychaser"] = true,
+            ["Shikrik"] = true,
+            ["Meela Dawnstrider"] = true,
+        },
+        orgrimmar = {
+            city = "Orgrimmar",
+            name = "Kardris / Sagorne / Sian'tsu",
+            zone = "Valley of Wisdom, Orgrimmar",
+            coords = "38.9, 36.4",
+            mapID = 1454,
+            x = 0.389,
+            y = 0.364,
+        },
+        thunderBluff = {
+            city = "Thunder Bluff",
+            name = "Beram / Siln / Tigor Skychaser",
+            zone = "Spirit Rise, Thunder Bluff",
+            coords = "22.0, 18.8",
+            mapID = 1456,
+            x = 0.220,
+            y = 0.188,
+        },
     },
 
     -- Adaptive smart-route scoring. Higher score = better next step.
