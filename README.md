@@ -52,3 +52,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Live floating arrow updates while moving and turning
 
 - Arrow distance display uses meters/kilometers when world-position conversion is available
+
+- Navigation arrow uses same-map safety so unverified cross-zone math cannot misroute the player
