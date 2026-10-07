@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.4.3",
+    version = "0.4.4",
     supported = {
         faction = "Horde",
         class = "SHAMAN",
@@ -18,6 +18,31 @@ ForeverLevelingCoach_Data = {
         [6543] = true, -- The Warsong Reports
         [1489] = true, -- Hamuul Runetotem
         [6981] = true, -- The Glowing Shard
+    },
+
+    -- Quest clusters let the router keep you in one area and stack nearby
+    -- objectives instead of bouncing between zones after every quest.
+    clusters = {
+        ASHENVALE_SPLINTERTREE = {
+            name = "Ashenvale / Splintertree",
+            zoneAliases = { "Ashenvale", "Splintertree Post" },
+            note = "Stack the nearby Ashenvale objectives before leaving the area.",
+        },
+        STONETALON_GRIMTOTEM = {
+            name = "Stonetalon / Grimtotem",
+            zoneAliases = { "Stonetalon Mountains", "Stonetalon", "Camp Aparaje" },
+            note = "Finish the nearby Grimtotem and Venture Co. objectives together when you are already in Stonetalon.",
+        },
+        BARRENS_RATCHET = {
+            name = "Barrens / Ratchet",
+            zoneAliases = { "The Barrens", "Barrens", "Ratchet" },
+            note = "Handle Ratchet/Barrens hand-ins while passing through instead of making a special trip.",
+        },
+        THUNDER_BLUFF = {
+            name = "Thunder Bluff",
+            zoneAliases = { "Thunder Bluff" },
+            note = "Bundle Thunder Bluff hand-ins with trainer, bank, auction, or travel stops.",
+        },
     },
 
     -- Route classifications:
@@ -63,6 +88,8 @@ ForeverLevelingCoach_Data = {
         -- These are Classic-era quests present in Forever, not confirmed Forever-new quests.
         {
             questID = 6543,
+            cluster = "ASHENVALE_SPLINTERTREE",
+            clusterPriority = 1,
             title = "The Warsong Reports",
             tag = "DO",
             minLevel = 17,
@@ -71,6 +98,8 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 6503,
+            cluster = "ASHENVALE_SPLINTERTREE",
+            clusterPriority = 2,
             title = "Ashenvale Outrunners",
             tag = "DO",
             minLevel = 19,
@@ -79,6 +108,8 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 6441,
+            cluster = "ASHENVALE_SPLINTERTREE",
+            clusterPriority = 3,
             title = "Satyr Horns",
             tag = "DO",
             minLevel = 21,
@@ -87,6 +118,8 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 6981,
+            cluster = "BARRENS_RATCHET",
+            clusterPriority = 1,
             title = "The Glowing Shard",
             tag = "DO",
             minLevel = 15,
@@ -95,6 +128,8 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 6548,
+            cluster = "STONETALON_GRIMTOTEM",
+            clusterPriority = 1,
             title = "Avenge My Village",
             tag = "OPTIONAL",
             minLevel = 12,
@@ -103,6 +138,8 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 1062,
+            cluster = "STONETALON_GRIMTOTEM",
+            clusterPriority = 2,
             title = "Goblin Invaders",
             tag = "OPTIONAL",
             minLevel = 13,
@@ -111,6 +148,8 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 1489,
+            cluster = "THUNDER_BLUFF",
+            clusterPriority = 1,
             title = "Hamuul Runetotem",
             tag = "OPTIONAL",
             minLevel = 12,
