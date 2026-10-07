@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.14.1",
+    version = "0.14.2",
     supported = {
         faction = "Horde",
         class = "SHAMAN",
@@ -33,6 +33,9 @@ ForeverLevelingCoach_Data = {
         [1483] = true, -- Ziz Fizziks (live-discovered in Forever)
         [6981] = true, -- The Glowing Shard
         [3369] = true, -- In Nightmares (live-discovered in Forever)
+        [1098] = true, -- Deathstalkers in Shadowfang (live-discovered in Forever)
+        [1013] = true, -- The Book of Ur (live-discovered in Forever)
+        [1014] = true, -- Arugal Must Die (live-discovered in Forever)
         [914] = true,  -- Leaders of the Fang (live-discovered in Forever)
         [1490] = true, -- Nara Wildmane (live-discovered in Forever)
     },
@@ -147,8 +150,15 @@ ForeverLevelingCoach_Data = {
             zoneAliases = { "Thunder Bluff" },
             note = "Bundle Thunder Bluff hand-ins with trainer, bank, auction, or travel stops.",
         },
+        SHADOWFANG_KEEP = {
+            name = "Shadowfang Keep",
+            dungeon = true,
+            zoneAliases = { "Shadowfang Keep" },
+            note = "Dungeon cluster: while inside SFK, finish active SFK objectives before outside-world routing.",
+        },
         WAILING_CAVERNS = {
             name = "Wailing Caverns",
+            dungeon = true,
             zoneAliases = { "Wailing Caverns" },
             note = "Dungeon cluster: full area bonus only while inside Wailing Caverns; outside, entrance proximity is used instead.",
         },
@@ -332,6 +342,39 @@ ForeverLevelingCoach_Data = {
             },
         },
 
+        {
+            questID = 1013,
+            dungeon = true,
+            cluster = "SHADOWFANG_KEEP",
+            clusterPriority = 1,
+            title = "The Book of Ur",
+            tag = "DO",
+            minLevel = 18,
+            maxLevel = 30,
+            note = "Shadowfang Keep dungeon quest. Get The Book of Ur during the run before leaving the instance.",
+        },
+        {
+            questID = 1014,
+            dungeon = true,
+            cluster = "SHADOWFANG_KEEP",
+            clusterPriority = 2,
+            title = "Arugal Must Die",
+            tag = "DO",
+            minLevel = 18,
+            maxLevel = 30,
+            note = "Shadowfang Keep dungeon quest. Kill Arugal and loot his head before leaving.",
+        },
+        {
+            questID = 1098,
+            dungeon = true,
+            cluster = "SHADOWFANG_KEEP",
+            clusterPriority = 3,
+            title = "Deathstalkers in Shadowfang",
+            tag = "DO",
+            minLevel = 18,
+            maxLevel = 30,
+            note = "Shadowfang Keep dungeon quest. Keep it with the SFK quest bundle; once complete, finish the remaining in-instance objectives first.",
+        },
         {
             questID = 914,
             dungeon = true,
