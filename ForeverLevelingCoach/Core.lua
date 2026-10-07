@@ -22,6 +22,12 @@ local defaults = {
     arrowX = 0,
     arrowY = -90,
     arrowScale = 1,
+    travelHintPoint = "TOP",
+    travelHintRelativePoint = "TOP",
+    travelHintX = 0,
+    travelHintY = -190,
+    travelHintWidth = 300,
+    travelHintHeight = 90,
     lastUIVersion = "0.4.2",
     lastCluster = nil,
 }
@@ -554,9 +560,14 @@ arrowLabel:SetShadowOffset(1, -1)
 arrowLabel:SetText("")
 
 local travelHintFrame = CreateFrame("Frame", "ForeverLevelingCoachTravelHintFrame", UIParent, "BackdropTemplate")
-travelHintFrame:SetSize(300, 74)
-travelHintFrame:SetPoint("TOP", arrowFrame, "BOTTOM", 0, -8)
+travelHintFrame:SetSize(300, 90)
+travelHintFrame:SetPoint("TOP", UIParent, "TOP", 0, -190)
 travelHintFrame:SetFrameStrata("HIGH")
+travelHintFrame:SetMovable(true)
+travelHintFrame:SetResizable(true)
+travelHintFrame:EnableMouse(true)
+travelHintFrame:SetClampedToScreen(true)
+travelHintFrame:SetResizeBounds(220, 70, 560, 260)
 travelHintFrame:SetBackdrop({
     bgFile = "Interface/Tooltips/UI-Tooltip-Background",
     edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
@@ -581,6 +592,42 @@ travelHintText:SetJustifyH("LEFT")
 travelHintText:SetJustifyV("TOP")
 travelHintText:SetWordWrap(true)
 travelHintText:SetText("")
+
+local travelHintResizeGrip = CreateFrame("Button", nil, travelHintFrame)
+travelHintResizeGrip:SetSize(18, 18)
+travelHintResizeGrip:SetPoint("BOTTOMRIGHT", -3, 3)
+travelHintResizeGrip:SetNormalTexture("Interface/ChatFrame/UI-ChatIM-SizeGrabber-Up")
+travelHintResizeGrip:SetHighlightTexture("Interface/ChatFrame/UI-ChatIM-SizeGrabber-Highlight")
+travelHintResizeGrip:SetPushedTexture("Interface/ChatFrame/UI-ChatIM-SizeGrabber-Down")
+
+local function saveTravelHintPosition()
+    if not DB then return end
+    local point, _, relativePoint, x, y = travelHintFrame:GetPoint(1)
+    DB.travelHintPoint = point
+    DB.travelHintRelativePoint = relativePoint
+    DB.travelHintX = x
+    DB.travelHintY = y
+    DB.travelHintWidth = travelHintFrame:GetWidth()
+    DB.travelHintHeight = travelHintFrame:GetHeight()
+end
+
+travelHintFrame:RegisterForDrag("LeftButton")
+travelHintFrame:SetScript("OnDragStart", function(self)
+    if DB and not DB.locked then self:StartMoving() end
+end)
+travelHintFrame:SetScript("OnDragStop", function(self)
+    self:StopMovingOrSizing()
+    saveTravelHintPosition()
+end)
+
+travelHintResizeGrip:SetScript("OnMouseDown", function()
+    if DB and not DB.locked then travelHintFrame:StartSizing("BOTTOMRIGHT") end
+end)
+travelHintResizeGrip:SetScript("OnMouseUp", function()
+    travelHintFrame:StopMovingOrSizing()
+    saveTravelHintPosition()
+end)
+
 travelHintFrame:Hide()
 
 local function saveArrowPosition()
@@ -686,8 +733,6 @@ local function updateTravelHint(message, state)
     if not travelHintFrame then return end
     if message and message ~= "" and state ~= "active-same-map" then
         travelHintText:SetText(message)
-        local h = math.max(74, math.min(150, (travelHintText:GetStringHeight() or 40) + 34))
-        travelHintFrame:SetHeight(h)
         travelHintFrame:Show()
     else
         travelHintFrame:Hide()
@@ -860,6 +905,11 @@ local function applySettings()
     arrowFrame:ClearAllPoints()
     arrowFrame:SetPoint(DB.arrowPoint or "TOP", UIParent, DB.arrowRelativePoint or "TOP", DB.arrowX or 0, DB.arrowY or -90)
     arrowFrame:SetScale(DB.arrowScale or 1)
+
+    travelHintFrame:ClearAllPoints()
+    travelHintFrame:SetPoint(DB.travelHintPoint or "TOP", UIParent, DB.travelHintRelativePoint or "TOP", DB.travelHintX or 0, DB.travelHintY or -190)
+    travelHintFrame:SetSize(DB.travelHintWidth or 300, DB.travelHintHeight or 90)
+    travelHintResizeGrip:SetShown(not DB.locked)
     if DB.arrowVisible == false then
         arrowFrame:Hide()
     else
