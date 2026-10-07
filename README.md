@@ -47,3 +47,6 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 
 - Silverpine Water Totem cluster improves smart routing for Call of Water [63]
 - Export cleanup hides historical unknowns once they are classified
+
+- Step-by-step travel guidance with zone-aware instructions
+- Live floating arrow updates while moving and turning
