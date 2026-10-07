@@ -117,6 +117,8 @@ local currentRouteScore = nil
 local currentRouteReasons = {}
 local currentTravelInstruction = nil
 local currentNavigationWaypoint = nil
+local currentNavigationStepIndex = nil
+local currentNavigationStepCount = nil
 local exportSnapshot
 local syncQuests
 
@@ -205,22 +207,64 @@ local function zoneMatchesAliases(aliases)
     return false
 end
 
+local function waypointDistanceNormalized(waypoint)
+    if not waypoint or not waypoint.mapID or not waypoint.x or not waypoint.y then return nil end
+    if not C_Map or not C_Map.GetBestMapForUnit or not C_Map.GetPlayerMapPosition then return nil end
+    local mapID = C_Map.GetBestMapForUnit("player")
+    if mapID ~= waypoint.mapID then return nil end
+    local pos = C_Map.GetPlayerMapPosition(mapID, "player")
+    if not pos then return nil end
+    local px, py = pos:GetXY()
+    local dx, dy = waypoint.x - px, waypoint.y - py
+    return math.sqrt(dx * dx + dy * dy)
+end
+
+local function getNavigationStep(step, travel)
+    if not travel or not travel.steps or #travel.steps == 0 then
+        return travel and travel.instruction or nil, travel and travel.waypoint or nil, nil, nil
+    end
+
+    DB.navigationProgress = DB.navigationProgress or {}
+    local key = tostring(step.questID or step.title or "route")
+    local index = tonumber(DB.navigationProgress[key]) or 1
+    if index < 1 then index = 1 end
+    if index > #travel.steps then index = #travel.steps end
+
+    local nav = travel.steps[index]
+
+    -- Auto-advance only from a verified same-map proximity check.
+    if nav and nav.advanceWhenWithin and index < #travel.steps then
+        local distance = waypointDistanceNormalized(nav.advanceWhenWithin.waypoint)
+        if distance and distance <= (nav.advanceWhenWithin.distance or 0.03) then
+            index = index + 1
+            DB.navigationProgress[key] = index
+            nav = travel.steps[index]
+        end
+    end
+
+    DB.navigationProgress[key] = index
+    return nav and nav.instruction or travel.instruction,
+           nav and nav.waypoint or travel.waypoint,
+           index,
+           #travel.steps
+end
+
 local function getTravelInstruction(step)
-    if not step then return nil, nil end
+    if not step then return nil, nil, nil, nil end
     if step.travelGuide then
         local fallback
         for _, travel in ipairs(step.travelGuide) do
             if travel.zoneAliases then
                 if zoneMatchesAliases(travel.zoneAliases) then
-                    return travel.instruction, travel.waypoint
+                    return getNavigationStep(step, travel)
                 end
             else
                 fallback = travel
             end
         end
-        if fallback then return fallback.instruction, fallback.waypoint end
+        if fallback then return getNavigationStep(step, fallback) end
     end
-    return nil, step.waypoint
+    return nil, step.waypoint, nil, nil
 end
 
 local function getObjectiveProgress(active)
@@ -616,8 +660,10 @@ local function updateArrow()
         return
     end
 
-    local _, waypoint = getTravelInstruction(currentRouteStep)
+    local _, waypoint, navIndex, navCount = getTravelInstruction(currentRouteStep)
     currentNavigationWaypoint = waypoint
+    currentNavigationStepIndex = navIndex
+    currentNavigationStepCount = navCount
     if not waypoint or not waypoint.mapID or not waypoint.x or not waypoint.y then
         currentArrowState = "hidden-no-waypoint"
         currentArrowDebug = {}
@@ -792,6 +838,7 @@ exportSnapshot = function()
         "CurrentSubZone=" .. tostring((GetSubZoneText and GetSubZoneText()) or "?"),
         "CurrentTravelStep=" .. tostring(currentTravelInstruction or "none"),
         "NavigationTarget=" .. tostring(currentNavigationWaypoint and currentNavigationWaypoint.label or "none"),
+        "NavigationStep=" .. tostring(currentNavigationStepIndex and (tostring(currentNavigationStepIndex) .. "/" .. tostring(currentNavigationStepCount or "?")) or "none"),
         "ArrowState=" .. tostring(currentArrowState or "unknown"),
         "ArrowMode=" .. tostring(currentArrowState == "active-same-map" and "same-map-safe" or "hidden"),
         "ArrowPlayerMapID=" .. tostring(currentArrowDebug.playerMapID or "none"),
