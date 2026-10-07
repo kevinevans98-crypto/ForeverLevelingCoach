@@ -93,3 +93,7 @@ Roadmap
 - Removed unsafe Alterac -> Silverpine cross-zone arrow behavior after live test failure
 - Alterac/Misty Shore now shows an OFF ROUTE recovery instruction until the player returns to Silverpine
 - Export includes ArrowState for navigation debugging
+
+- Corrected WoW-facing math: GetPlayerFacing is counterclockwise from north, while map Y increases south
+- Switched the floating arrow to a native Blizzard up-arrow texture with a known zero-direction orientation
+- Export now includes arrow heading/rotation diagnostics for live verification
