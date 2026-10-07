@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.8.8
+Forever Leveling Coach v0.8.9
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.8.8 highlights
+v0.8.9 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -161,3 +161,8 @@ Roadmap
 - If the WoW client blocks automated taxi selection, FLC falls back safely and tells you to click the matching destination
 - /flc autoflight toggles automatic flight selection
 - /flc export now shows AutoFlightTarget, AutoFlightStatus, CurrentFlightOptions, and learned KnownFlightPaths
+
+- Fixed stale AutoFlightTarget values after the recommended route changes
+- Ashenvale route quests now target Splintertree Post as the preferred flight destination
+- At a flight master, FLC can now detect Splintertree Post as reachable and attempt to select it automatically
+- Live-discovered quest IDs 914 (Leaders of the Fang) and 1490 (Nara Wildmane) are now recognized as known
