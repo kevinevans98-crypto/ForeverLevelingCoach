@@ -128,6 +128,7 @@ local currentNavigationStepCount = nil
 local currentFastTravelSuggestion = nil
 local currentFastTravelMode = nil
 local currentNextQuestPickup = nil
+local currentPersonTarget = nil
 local exportSnapshot
 local syncQuests
 
@@ -821,6 +822,8 @@ local function updateArrow()
     local _, waypoint, navIndex, navCount = getTravelInstruction(currentRouteStep)
     if currentNextQuestPickup and currentNextQuestPickup.useArrow and currentNextQuestPickup.waypoint then
         waypoint = currentNextQuestPickup.waypoint
+    elseif currentPersonTarget and currentPersonTarget.useArrow and currentPersonTarget.waypoint then
+        waypoint = currentPersonTarget.waypoint
     end
     currentNavigationWaypoint = waypoint
     currentNavigationStepIndex = navIndex
@@ -929,10 +932,20 @@ local function render()
 
     local step, active = chooseRouteStep(currentByID)
     currentRouteStep = step
+    currentPersonTarget = step and step.personTarget or nil
     currentNextQuestPickup = nil
     if step and step.nextPickup then
         if step.nextPickup.showWhileActive or (active and active.isComplete) then
             currentNextQuestPickup = step.nextPickup
+            if step.nextPickup.waypoint then
+                currentPersonTarget = {
+                    role = step.nextPickup.role or "Quest giver",
+                    name = step.nextPickup.npc,
+                    zone = step.nextPickup.zone,
+                    coords = step.nextPickup.coords,
+                    waypoint = step.nextPickup.waypoint,
+                }
+            end
         end
     end
     local travelInstruction, navigationWaypoint = getTravelInstruction(step)
@@ -960,6 +973,13 @@ local function render()
         if currentNextQuestPickup.note then
             details[#details + 1] = currentNextQuestPickup.note
         end
+    end
+    if currentPersonTarget and currentPersonTarget.name then
+        local role = currentPersonTarget.role or "Quest person"
+        local personLine = role .. ": " .. currentPersonTarget.name
+        if currentPersonTarget.zone then personLine = personLine .. " — " .. currentPersonTarget.zone end
+        if currentPersonTarget.coords then personLine = personLine .. " (" .. currentPersonTarget.coords .. ")" end
+        details[#details + 1] = "Marked person: " .. personLine
     end
     if currentCluster and currentClusterCount > 1 then
         local cluster = Data.clusters and Data.clusters[currentCluster]
@@ -1044,6 +1064,10 @@ exportSnapshot = function()
         "NextQuestPickupNPC=" .. tostring(currentNextQuestPickup and currentNextQuestPickup.npc or "none"),
         "NextQuestPickupZone=" .. tostring(currentNextQuestPickup and currentNextQuestPickup.zone or "none"),
         "NextQuestPickupCoords=" .. tostring(currentNextQuestPickup and currentNextQuestPickup.coords or "none"),
+        "MarkedPersonRole=" .. tostring(currentPersonTarget and currentPersonTarget.role or "none"),
+        "MarkedPersonName=" .. tostring(currentPersonTarget and currentPersonTarget.name or "none"),
+        "MarkedPersonZone=" .. tostring(currentPersonTarget and currentPersonTarget.zone or "none"),
+        "MarkedPersonCoords=" .. tostring(currentPersonTarget and currentPersonTarget.coords or "none"),
         "ArrowPlayerMapID=" .. tostring(currentArrowDebug.playerMapID or "none"),
         "ArrowPlayerXY=" .. (currentArrowDebug.playerX and string.format("%.4f,%.4f", currentArrowDebug.playerX, currentArrowDebug.playerY) or "none"),
         "ArrowTargetMapID=" .. tostring(currentArrowDebug.targetMapID or "none"),
