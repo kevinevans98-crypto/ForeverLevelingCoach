@@ -9,6 +9,7 @@ Current development focus:
 - Live quest-log syncing
 - Unknown/new quest scanner
 - Navigation arrow foundation using verified waypoint data only
+- Compact semi-transparent Blizzard-style UI showing the current recommended quest only
 - Semi-fast leveling philosophy: strong XP/hour without turning the route into a hardcore speedrun
 
 ## Install
