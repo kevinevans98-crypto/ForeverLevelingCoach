@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.10.0
+Forever Leveling Coach v0.10.1
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.10.0 highlights
+v0.10.1 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -215,3 +215,9 @@ Roadmap
 - Clickable quest focus added: click the current quest title or the new Go button to track/open the recommended quest in Blizzard UI when the client supports it
 - /flc go provides the same action
 - Feature-detects quest APIs so unsupported Forever clients fail safely instead of throwing Lua errors
+
+- Objective-aware GPS routing added for multi-objective quests
+- The Warsong Reports now targets unfinished report NPCs individually with verified Ashenvale waypoints
+- While in Ashenvale, FLC prefers the closest unfinished report contact rather than blindly following quest-log objective order
+- Warsong Scout: ~71.1,68.4; Warsong Outrider patrol road: ~84,50; Warsong Runner: ~12.2,34.2
+- Arrow and GO TO / WHERE / DO lines update automatically as each report is completed
