@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.8.2
+Forever Leveling Coach v0.8.3
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.8.2 highlights
+v0.8.3 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -132,3 +132,7 @@ Roadmap
 - Main guide now labels the person, role, zone, and coordinates
 - Same-map arrow can point directly to a verified quest giver/contact
 - The Glowing Shard now marks Sputtervalve in Ratchet and records Falla Sagewind as the next quest giver after the Ratchet step
+
+- Fixed Travel Optimizer refresh bug: suggestions are now recalculated whenever the route renders
+- Fast travel advice now appears in the main guide as well as the travel hint window
+- Orgrimmar -> Ratchet flight advice now covers Call of Water 96/1103 and The Glowing Shard 6981
