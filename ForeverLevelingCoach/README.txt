@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.12.1
+Forever Leveling Coach v0.13.0
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.12.1 highlights
+v0.13.0 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -242,3 +242,14 @@ Roadmap
 - Classified OPTIONAL because the full quest includes a long multi-zone detour
 - Added local Lazy Mode targets for Warsong Oil, Logging Rope, and Pixel / Warsong Saw Blades
 - Fixed stale Splintertree AutoFlightTarget once the active objective is already on the player's current map
+
+- Class Trainer routing added for Horde Shaman
+- FLC now treats every even level from 4 onward as a Shaman training checkpoint until the trainer confirms no trainable abilities remain
+- When training is due, Lazy Mode temporarily prioritizes TRAIN SHAMAN over normal questing
+- Nearest trainer routing prefers Orgrimmar for Ashenvale/Durotar/Barrens routes and Thunder Bluff for Mulgore/Stonetalon routes
+- Orgrimmar trainers: Kardris Dreamseeker / Sagorne Creststrider / Sian'tsu in Valley of Wisdom around 38.9,36.4
+- Thunder Bluff trainers: Beram / Siln / Tigor Skychaser on Spirit Rise around 22.0,18.8
+- Ashenvale training travel uses the Splintertree Post flight master handoff, then AutoFlight targets Orgrimmar
+- TRAINER_SHOW/TRAINER_UPDATE scanning keeps the reminder active until no trainable services remain
+- /flc trained manually clears the current-level training reminder if the Forever trainer API cannot verify it
+- Export reports ClassTrainingDue, ClassTrainerTarget, LastClassTrainerLevel, and TrainerAvailableCount
