@@ -11,6 +11,7 @@ Write-Host "==============================" -ForegroundColor Cyan
 Write-Host ""
 
 $possibleAddonDirs = @(
+    "D:\Game Folder\World of Warcraft\_classic_beta_\Interface\AddOns",
     "C:\Program Files (x86)\World of Warcraft\_classic_beta_\Interface\AddOns",
     "C:\Program Files\World of Warcraft\_classic_beta_\Interface\AddOns",
     "C:\World of Warcraft\_classic_beta_\Interface\AddOns"
@@ -34,6 +35,9 @@ if (-not $AddOnsDir) {
         throw "That AddOns folder does not exist: $AddOnsDir"
     }
 }
+
+Write-Host "Using AddOns folder:" -ForegroundColor Cyan
+Write-Host "  $AddOnsDir" -ForegroundColor Cyan
 
 $TargetDir = Join-Path $AddOnsDir $AddonName
 $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
