@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.13.0",
+    version = "0.13.1",
     supported = {
         faction = "Horde",
         class = "SHAMAN",
@@ -22,6 +22,12 @@ ForeverLevelingCoach_Data = {
         [1062] = true, -- Goblin Invaders
         [6543] = true, -- The Warsong Reports
         [6571] = true, -- Warsong Supplies (live-discovered in Forever)
+        [6921] = true, -- Amongst the Ruins (live-discovered in Forever)
+        [6563] = true, -- The Essence of Aku'Mai (live-discovered in Forever)
+        [6462] = true, -- Troll Charm (live-discovered in Forever)
+        [216] = true, -- Between a Rock and a Thistlefur (live-discovered in Forever)
+        [6641] = true, -- Vorsha the Lasher (live-discovered in Forever)
+        [6442] = true, -- Naga at the Zoram Strand (live-discovered in Forever)
         [1489] = true, -- Hamuul Runetotem
         [1483] = true, -- Ziz Fizziks (live-discovered in Forever)
         [6981] = true, -- The Glowing Shard
@@ -85,6 +91,16 @@ ForeverLevelingCoach_Data = {
     -- Quest clusters let the router keep you in one area and stack nearby
     -- objectives instead of bouncing between zones after every quest.
     clusters = {
+        ASHENVALE_ZORAM = {
+            name = "Ashenvale / Zoram Strand",
+            zoneAliases = { "Ashenvale", "Zoram'gar Outpost", "Zoram Strand" },
+            note = "Bundle Zoram Strand naga/event quests while you are already on the west coast.",
+        },
+        ASHENVALE_THISTLEFUR = {
+            name = "Ashenvale / Thistlefur",
+            zoneAliases = { "Ashenvale", "Thistlefur Village", "Thistlefur Hold" },
+            note = "Bundle Thistlefur kills, Troll Charms, and Logging Rope when moving through central-west Ashenvale.",
+        },
         ASHENVALE_SPLINTERTREE = {
             name = "Ashenvale / Splintertree",
             zoneAliases = { "Ashenvale", "Splintertree Post" },
@@ -336,6 +352,126 @@ ForeverLevelingCoach_Data = {
 
         -- Verified from the player's live Forever quest log and current Forever databases.
         -- These are Classic-era quests present in Forever, not confirmed Forever-new quests.
+        {
+            questID = 6442,
+            title = "Naga at the Zoram Strand",
+            tag = "DO",
+            minLevel = 14,
+            maxLevel = 24,
+            cluster = "ASHENVALE_ZORAM",
+            clusterPriority = 1,
+            note = "Fast local kill quest while at Zoram'gar. Kill Wrathtail naga on the nearby coast.",
+            objectiveTargets = {
+                {
+                    objectiveContains = "Wrathtail Head",
+                    role = "Kill / loot",
+                    name = "Wrathtail Naga",
+                    zone = "Zoram Strand, Ashenvale",
+                    coords = "around 10, 21",
+                    locationType = "MOBS — along the coast",
+                    locationNote = "Kill nearby Wrathtail naga and loot their heads.",
+                    approach = "Ride north along the coast from Zoram'gar Outpost.",
+                    instruction = "Kill Wrathtail naga along Zoram Strand around 10, 21.",
+                    action = "LOOT 20 WRATHTAIL HEADS",
+                    useArrow = true,
+                    waypoint = { mapID = 1440, x = 0.10, y = 0.21, label = "Wrathtail Naga" },
+                },
+            },
+        },
+        {
+            questID = 6641,
+            title = "Vorsha the Lasher",
+            tag = "OPTIONAL",
+            minLevel = 20,
+            maxLevel = 27,
+            cluster = "ASHENVALE_ZORAM",
+            clusterPriority = 2,
+            note = "Elite escort/event. Good if you have help; skip if solo time is tight.",
+            objectiveTargets = {
+                {
+                    objectiveContains = "Vorsha the Lasher",
+                    role = "Escort / elite event",
+                    name = "Muglash",
+                    zone = "Zoram Strand, Ashenvale",
+                    coords = "around 12.1, 34.6",
+                    locationType = "ELITE EVENT — bring help if needed",
+                    locationNote = "Escort Muglash to the brazier, extinguish it, then defend against naga and Vorsha.",
+                    approach = "Start with Muglash at Zoram'gar and follow the escort north along the coast.",
+                    instruction = "Start Muglash's escort at Zoram'gar; defeat Vorsha when she appears.",
+                    action = "ESCORT MUGLASH / KILL VORSHA",
+                    useArrow = true,
+                    waypoint = { mapID = 1440, x = 0.121, y = 0.346, label = "Muglash — Vorsha event" },
+                },
+            },
+        },
+        {
+            questID = 216,
+            title = "Between a Rock and a Thistlefur",
+            tag = "DO",
+            minLevel = 21,
+            maxLevel = 28,
+            cluster = "ASHENVALE_THISTLEFUR",
+            clusterPriority = 1,
+            note = "Efficient kill quest that stacks with Troll Charm and Logging Rope.",
+            objectiveTargets = {
+                {
+                    objectiveContains = "Thistlefur",
+                    role = "Kill",
+                    name = "Thistlefur Village",
+                    zone = "Ashenvale",
+                    coords = "around 35, 39",
+                    locationType = "MOBS — furbolg village",
+                    locationNote = "Kill Thistlefur Avengers and Shamans here.",
+                    approach = "Travel east from Zoram'gar toward Thistlefur Village.",
+                    instruction = "Kill Thistlefur mobs around 35, 39.",
+                    action = "KILL THISTLEFUR AVENGERS / SHAMANS",
+                    useArrow = true,
+                    waypoint = { mapID = 1440, x = 0.35, y = 0.39, label = "Thistlefur Village" },
+                },
+            },
+        },
+        {
+            questID = 6462,
+            title = "Troll Charm",
+            tag = "DO",
+            minLevel = 19,
+            maxLevel = 29,
+            cluster = "ASHENVALE_THISTLEFUR",
+            clusterPriority = 2,
+            note = "Stacks with Thistlefur kills; collect charms from chests in Thistlefur Hold.",
+            objectiveTargets = {
+                {
+                    objectiveContains = "Troll Charm",
+                    role = "Loot",
+                    name = "Troll Charm chests",
+                    zone = "Thistlefur Hold, Ashenvale",
+                    coords = "around 41, 33",
+                    locationType = "CHESTS — inside Thistlefur Hold",
+                    locationNote = "Loot the troll charm chests in the cave.",
+                    approach = "Enter Thistlefur Hold at the end of the village and look for charm chests.",
+                    instruction = "Loot Troll Charms in Thistlefur Hold around 41, 33.",
+                    action = "LOOT 8 TROLL CHARMS",
+                    useArrow = true,
+                    waypoint = { mapID = 1440, x = 0.41, y = 0.33, label = "Thistlefur Hold" },
+                },
+            },
+        },
+        {
+            questID = 6563,
+            title = "The Essence of Aku'Mai",
+            tag = "OPTIONAL",
+            minLevel = 17,
+            maxLevel = 28,
+            note = "Blackfathom Deeps dungeon objective. Save it for a BFD run instead of making a standalone trip.",
+        },
+        {
+            questID = 6921,
+            title = "Amongst the Ruins",
+            tag = "OPTIONAL",
+            minLevel = 20,
+            maxLevel = 30,
+            note = "Blackfathom Deeps dungeon objective. Get the Fathom Core during the same BFD run as other dungeon work.",
+        },
         {
             questID = 6543,
             flightTarget = "Splintertree Post",
