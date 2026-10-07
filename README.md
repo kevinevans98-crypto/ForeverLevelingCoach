@@ -129,3 +129,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Splintertree local flight handoff and turn-in flight-target persistence fix
 
 - Relic Advisor and 2H Axe / 2H Mace weapon preference filtering for the Horde Shaman route
+
+- Fixed Relic Advisor render crash from function declaration order
