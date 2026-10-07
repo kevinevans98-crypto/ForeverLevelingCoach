@@ -133,3 +133,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Fixed Relic Advisor render crash from function declaration order
 
 - Shadowfang Keep dungeon awareness and generic inside-dungeon routing priority
+
+- Rogue character profile support with per-character state isolation and class-aware gear/relic logic
