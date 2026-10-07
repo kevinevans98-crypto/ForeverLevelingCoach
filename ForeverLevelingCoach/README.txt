@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.5.4
+Forever Leveling Coach v0.6.0
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.5.4 highlights
+v0.6.0 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -79,3 +79,9 @@ Roadmap
 
 - Silverpine Water Totem cluster improves smart routing for Call of Water [63]
 - Export now hides historical unknown quests after they become classified
+
+- Live 20 FPS-style arrow updates while moving/turning
+- Compatibility-safe angle math for Classic clients
+- Step-by-step travel guidance framework added
+- Call of Water [63] now guides Barrens -> Orgrimmar/Durotar -> Undercity/Tirisfal -> Silverpine
+- Arrow only appears when the current travel step has a verified same-map waypoint
