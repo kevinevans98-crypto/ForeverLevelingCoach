@@ -14,6 +14,8 @@ Current development focus:
 - One-click Export button in the main addon window
 - Verified navigation waypoint support now active for discovered route steps
 - Adaptive Smart Route Scoring with explainable recommendation reasons
+- Scrollable main guide window
+- Navigation arrow auto-shows only for verified current-step waypoints
 - Semi-fast leveling philosophy: strong XP/hour without turning the route into a hardcore speedrun
 
 ## Install
