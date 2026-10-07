@@ -771,6 +771,16 @@ resizeGrip:SetScript("OnMouseUp", function()
     savePosition()
 end)
 
+local function nextUnfinishedObjective(active)
+    if not active or not active.objectives then return nil end
+    for _, obj in ipairs(active.objectives) do
+        if not obj.finished and obj.text and obj.text ~= "" then
+            return obj.text
+        end
+    end
+    return nil
+end
+
 local function objectiveSummary(active)
     if not active then return nil end
     if active.isComplete then return "Quest objectives complete — turn it in." end
@@ -1083,6 +1093,13 @@ local function render()
 
     if active and active.isComplete then
         details[#details + 1] = "DO: Turn in " .. (step.title or "this quest")
+    elseif step and step.dungeon then
+        local nextObj = nextUnfinishedObjective(active)
+        if nextObj then
+            details[#details + 1] = "DO: " .. nextObj
+        else
+            details[#details + 1] = "DO: Complete remaining dungeon objectives"
+        end
     elseif obj then
         details[#details + 1] = "DO: " .. obj
     elseif currentNextQuestPickup and currentNextQuestPickup.title then
@@ -1144,6 +1161,7 @@ exportSnapshot = function()
         "Faction=" .. tostring(UnitFactionGroup("player") or "?"),
         "RecommendedStep=" .. tostring(currentRouteStep and currentRouteStep.title or "?"),
         "RecommendedQuestID=" .. tostring(currentRouteStep and currentRouteStep.questID or "none"),
+        "DungeonMode=" .. tostring(currentRouteStep and currentRouteStep.dungeon and "active" or "none"),
         "RecommendedCluster=" .. tostring(currentCluster or "none"),
         "ClusterActiveQuestCount=" .. tostring(currentClusterCount or 0),
         "RecommendedScore=" .. tostring(currentRouteScore or 0),
