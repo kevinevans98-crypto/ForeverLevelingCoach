@@ -117,3 +117,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 
 - Added Warsong Supplies [6571] as an OPTIONAL live-verified quest with local Ashenvale objective guidance
 - Clears stale flight targets after reaching the active objective map
+
+- Class Trainer routing: Lazy Mode now tells Horde Shamans when training is due and routes to the nearest practical Shaman trainer
