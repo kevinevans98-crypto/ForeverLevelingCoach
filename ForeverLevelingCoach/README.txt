@@ -99,3 +99,7 @@ Roadmap
 - Export now includes arrow heading/rotation diagnostics for live verification
 
 - Call of Water [63] Silverpine instructions expanded with the actual terrain route: Sepulcher backside -> trees/rocks -> hidden pool -> Water Sapta -> elemental -> bracers -> Brazier
+
+- Added live-discovered Call of Water quest IDs 96, 100, and 1103
+- Quest 96 is prioritized as the Water Totem turn-in at Islen Waterseer in The Barrens
+- Quest 1103 is recognized as the Water Sapta recovery step for Tiev Mordune
