@@ -70,3 +70,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Travel Optimizer foundation: Hearthstone readiness/bind awareness plus route-specific flight-path shortcuts
 
 - Next Quest Pickup guidance: shows the next quest name, giver, zone, coordinates, and optional arrow target
+
+- Marked Person guidance for verified quest givers/contacts, with same-map arrow targeting and next-chain pickup data
