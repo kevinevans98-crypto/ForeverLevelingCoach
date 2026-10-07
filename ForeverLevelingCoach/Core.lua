@@ -814,7 +814,7 @@ local function updateTravelHint(message, state)
         local hint = message
         if currentFastTravelSuggestion and currentFastTravelSuggestion ~= "" then
             if hint and hint ~= "" then
-                hint = currentFastTravelSuggestion .. "\n\n" .. hint
+                hint = currentFastTravelSuggestion .. "\n" .. hint
             else
                 hint = currentFastTravelSuggestion
             end
@@ -976,56 +976,53 @@ local function render()
     routeText:SetText(tag .. ": " .. (step.title or "Next step"))
 
     local details = {}
-    if step.questID then
-        details[#details + 1] = "Quest ID: " .. tostring(step.questID)
-    end
-    if step.note then
-        details[#details + 1] = step.note
-    end
-    if currentFastTravelSuggestion then
-        details[#details + 1] = "Fast travel: " .. currentFastTravelSuggestion
-    end
-    if currentTravelInstruction then
-        details[#details + 1] = "Travel step: " .. currentTravelInstruction
-    end
-    if currentNextQuestPickup then
-        local pickupText = formatNextQuestPickup(currentNextQuestPickup)
-        if pickupText then
-            details[#details + 1] = "Next quest pickup: " .. pickupText
-        end
-        if currentNextQuestPickup.note then
-            details[#details + 1] = currentNextQuestPickup.note
-        end
-    end
-    if currentPersonTarget and currentPersonTarget.name then
-        local role = currentPersonTarget.role or "Quest person"
-        local personLine = role .. ": " .. currentPersonTarget.name
-        if currentPersonTarget.zone then personLine = personLine .. " — " .. currentPersonTarget.zone end
-        if currentPersonTarget.coords then personLine = personLine .. " (" .. currentPersonTarget.coords .. ")" end
-        details[#details + 1] = "Marked person: " .. personLine
-        if currentPersonTarget.locationType then
-            details[#details + 1] = "Location type: " .. currentPersonTarget.locationType
-        end
-        if currentPersonTarget.locationNote then
-            details[#details + 1] = "Location: " .. currentPersonTarget.locationNote
-        end
-        if currentPersonTarget.approach then
-            details[#details + 1] = "How to get there: " .. currentPersonTarget.approach
-        end
-    end
-    if currentCluster and currentClusterCount > 1 then
-        local cluster = Data.clusters and Data.clusters[currentCluster]
-        local clusterName = cluster and cluster.name or currentCluster
-        details[#details + 1] = string.format("Area stack: %d active quests in %s. Stay in this area and let FLC advance through them.", currentClusterCount, clusterName)
-    end
-    if currentRouteScore then
-        details[#details + 1] = string.format("Smart score: %d", currentRouteScore)
-    end
     local obj = objectiveSummary(active)
-    if obj then
-        details[#details + 1] = obj
+    local person = currentPersonTarget
+    local where = nil
+    if person then
+        where = person.zone or person.locationType
+        if person.coords then
+            where = (where and (where .. " — ") or "") .. person.coords
+        end
+    elseif currentNextQuestPickup then
+        where = currentNextQuestPickup.zone
+        if currentNextQuestPickup.coords then
+            where = (where and (where .. " — ") or "") .. currentNextQuestPickup.coords
+        end
     end
-    detailText:SetText(table.concat(details, "\n\n"))
+
+    if person and person.name then
+        details[#details + 1] = "GO TO: " .. person.name
+    elseif currentNextQuestPickup and currentNextQuestPickup.npc then
+        details[#details + 1] = "GO TO: " .. currentNextQuestPickup.npc
+    end
+
+    if where then
+        details[#details + 1] = "WHERE: " .. where
+    end
+
+    if currentFastTravelSuggestion then
+        local fast = currentFastTravelSuggestion
+        fast = fast:gsub("^FASTEST:%s*", "")
+        fast = fast:gsub("^FAST TRAVEL:%s*", "")
+        fast = fast:gsub("^LOCAL ROUTE:%s*", "")
+        fast = fast:gsub("^HEARTH READY:%s*", "")
+        details[#details + 1] = "FASTEST: " .. fast
+    elseif currentTravelInstruction then
+        details[#details + 1] = "TRAVEL: " .. currentTravelInstruction
+    end
+
+    if active and active.isComplete then
+        details[#details + 1] = "DO: Turn in " .. (step.title or "this quest")
+    elseif obj then
+        details[#details + 1] = "DO: " .. obj
+    elseif currentNextQuestPickup and currentNextQuestPickup.title then
+        details[#details + 1] = "DO: Pick up " .. currentNextQuestPickup.title
+    else
+        details[#details + 1] = "DO: Follow the arrow / travel hint"
+    end
+
+    detailText:SetText(table.concat(details, "\n"))
     refreshMainScroll()
 
     -- Keep the visible guide uncluttered: only the current recommended step
