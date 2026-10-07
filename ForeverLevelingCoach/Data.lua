@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.5.0",
+    version = "0.5.1",
     supported = {
         faction = "Horde",
         class = "SHAMAN",
@@ -12,6 +12,7 @@ ForeverLevelingCoach_Data = {
         [1534] = true,
         [1536] = true,
         [220] = true,  -- Call of Water: Vial of Purest Water to Islen Waterseer
+        [63] = true,   -- Call of Water: Corrupt Manifestation's Bracers / Silverpine cleanse
         [6503] = true, -- Ashenvale Outrunners
         [6441] = true, -- Satyr Horns
         [6548] = true, -- Avenge My Village
@@ -113,6 +114,15 @@ ForeverLevelingCoach_Data = {
             clusterPriority = 0,
             note = "Bring the Vial of Purest Water to Islen Waterseer in the Barrens. This continues the Water Totem chain.",
             waypoint = { mapID = 1413, x = 0.658, y = 0.438, label = "Islen Waterseer" },
+        },
+        {
+            questID = 63,
+            title = "Call of Water",
+            tag = "IMPORTANT",
+            minLevel = 20,
+            maxLevel = 30,
+            note = "Defeat the Corrupt Manifestation of Water, then use the bracers and remaining pure water at the Brazier of Everfount in Silverpine Forest.",
+            waypoint = { mapID = 1421, x = 0.383, y = 0.446, label = "Brazier of Everfount" },
         },
 
         -- Verified from the player's live Forever quest log and current Forever databases.
