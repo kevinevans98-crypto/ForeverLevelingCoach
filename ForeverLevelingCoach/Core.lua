@@ -605,8 +605,11 @@ local function atan2Safe(y, x)
     return 0
 end
 
+local currentArrowState = "hidden"
+
 local function updateArrow()
     if not DB or DB.arrowVisible == false or not currentRouteStep then
+        currentArrowState = "hidden-disabled"
         arrowFrame:Hide()
         return
     end
@@ -614,47 +617,54 @@ local function updateArrow()
     local _, waypoint = getTravelInstruction(currentRouteStep)
     currentNavigationWaypoint = waypoint
     if not waypoint or not waypoint.mapID or not waypoint.x or not waypoint.y then
+        currentArrowState = "hidden-no-waypoint"
         arrowFrame:Hide()
         return
     end
 
     local playerMapID = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player")
-    if not playerMapID or not C_Map.GetPlayerMapPosition or not C_Map.GetWorldPosFromMapPos or not CreateVector2D then
+    if not playerMapID then
+        currentArrowState = "hidden-no-player-map"
         arrowFrame:Hide()
         return
     end
 
-    local playerMapPos = C_Map.GetPlayerMapPosition(playerMapID, "player")
-    if not playerMapPos then
+    -- Safety rule: never point across map/zone IDs. Cross-zone world-space
+    -- conversion proved unreliable in the Forever beta and can send the player
+    -- the wrong direction. Only point when player and target share a verified map.
+    if playerMapID ~= waypoint.mapID then
+        currentArrowState = "hidden-different-map"
         arrowFrame:Hide()
         return
     end
 
-    local px, py = playerMapPos:GetXY()
-    local playerContinent, playerWorld = C_Map.GetWorldPosFromMapPos(playerMapID, CreateVector2D(px, py))
-    local targetContinent, targetWorld = C_Map.GetWorldPosFromMapPos(waypoint.mapID, CreateVector2D(waypoint.x, waypoint.y))
-
-    if not playerWorld or not targetWorld or playerContinent ~= targetContinent then
+    local pos = C_Map.GetPlayerMapPosition and C_Map.GetPlayerMapPosition(playerMapID, "player")
+    if not pos then
+        currentArrowState = "hidden-no-position"
         arrowFrame:Hide()
         return
     end
 
-    local pwx, pwy = playerWorld:GetXY()
-    local twx, twy = targetWorld:GetXY()
-    local dx, dy = twx - pwx, twy - pwy
-
-    arrowFrame:Show()
+    local px, py = pos:GetXY()
+    local dx, dy = waypoint.x - px, waypoint.y - py
     local targetAngle = atan2Safe(dx, -dy)
     local facing = GetPlayerFacing and GetPlayerFacing() or 0
+
+    arrowFrame:Show()
+    currentArrowState = "active-same-map"
     arrowTexture:SetRotation(targetAngle - facing)
 
-    local yards = math.sqrt(dx * dx + dy * dy)
-    local meters = yards * 0.9144
+    local meters = getWaypointDistanceMeters(playerMapID, px, py, waypoint.x, waypoint.y)
     local label = waypoint.label or currentRouteStep.title or "Route target"
-    if meters >= 1000 then
-        arrowLabel:SetText(string.format("%s  •  %.2f km", label, meters / 1000))
+    if meters then
+        if meters >= 1000 then
+            arrowLabel:SetText(string.format("%s  •  %.2f km", label, meters / 1000))
+        else
+            arrowLabel:SetText(string.format("%s  •  %d m", label, math.floor(meters + 0.5)))
+        end
     else
-        arrowLabel:SetText(string.format("%s  •  %d m", label, math.floor(meters + 0.5)))
+        local mapDistance = math.sqrt(dx * dx + dy * dy) * 100
+        arrowLabel:SetText(string.format("%s  •  %.1f%%", label, mapDistance))
     end
 end
 
@@ -763,6 +773,7 @@ exportSnapshot = function()
         "CurrentSubZone=" .. tostring((GetSubZoneText and GetSubZoneText()) or "?"),
         "CurrentTravelStep=" .. tostring(currentTravelInstruction or "none"),
         "NavigationTarget=" .. tostring(currentNavigationWaypoint and currentNavigationWaypoint.label or "none"),
+        "ArrowState=" .. tostring(currentArrowState or "unknown"),
         "ArrowMode=" .. tostring(currentNavigationWaypoint and "world-space" or "hidden"),
     }
 
