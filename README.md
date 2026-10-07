@@ -13,6 +13,7 @@ Current development focus:
 - Area quest clustering so nearby objectives are stacked before leaving a zone
 - One-click Export button in the main addon window
 - Verified navigation waypoint support now active for discovered route steps
+- Adaptive Smart Route Scoring with explainable recommendation reasons
 - Semi-fast leveling philosophy: strong XP/hour without turning the route into a hardcore speedrun
 
 ## Install
