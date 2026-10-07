@@ -28,7 +28,7 @@ local defaults = {
     travelHintY = -190,
     travelHintWidth = 300,
     travelHintHeight = 90,
-    autoFlight = true,
+    autoFlight = false,
     gearAdvisor = true,
     lazyMode = true,
     autoAccept = true,
@@ -1050,7 +1050,7 @@ local function scanTaxiMapAndAutoFly()
 
     DB.knownFlightPaths = DB.knownFlightPaths or {}
     local count = NumTaxiNodes() or 0
-    local targetSlot = nil
+    local targetReachable = false
 
     for i = 1, count do
         local name = TaxiNodeName(i)
@@ -1062,7 +1062,7 @@ local function scanTaxiMapAndAutoFly()
                 DB.knownFlightPaths[name] = true
             end
             if currentAutoFlightTarget and nodeType == "REACHABLE" and taxiNameMatches(name, currentAutoFlightTarget) then
-                targetSlot = i
+                targetReachable = true
             end
         end
     end
@@ -1072,17 +1072,9 @@ local function scanTaxiMapAndAutoFly()
         return
     end
 
-    if targetSlot then
-        currentAutoFlightStatus = DB.autoFlight and "target-reachable-auto" or "target-reachable-manual"
-        if DB.autoFlight and TakeTaxiNode then
-            local ok = pcall(TakeTaxiNode, targetSlot)
-            if ok then
-                currentAutoFlightStatus = "auto-flight-requested"
-            else
-                currentAutoFlightStatus = "auto-flight-blocked"
-                print("|cffffcc00FLC:|r " .. currentAutoFlightTarget .. " is available. Click it on the flight map; the client blocked automatic selection.")
-            end
-        end
+    if targetReachable then
+        currentAutoFlightStatus = "target-reachable-click"
+        print("|cff33ff99FLC:|r Flight ready: click " .. tostring(currentAutoFlightTarget) .. ".")
     else
         currentAutoFlightStatus = "target-not-reachable-here"
     end
@@ -2092,7 +2084,7 @@ SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
         print("|cff33ff99FLC:|r gear advisor " .. (DB.gearAdvisor and "enabled." or "disabled."))
     elseif msg == "autoflight" then
         DB.autoFlight = not DB.autoFlight
-        print("|cff33ff99FLC:|r automatic flight selection " .. (DB.autoFlight and "enabled." or "disabled."))
+        print("|cff33ff99FLC:|r flight assist " .. (DB.autoFlight and "enabled." or "disabled.") .. " (assist only; never auto-clicks a route).")
     elseif msg == "arrow" then
         DB.arrowVisible = not DB.arrowVisible
         updateArrow()
