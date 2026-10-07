@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.8.1
+Forever Leveling Coach v0.8.2
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.8.1 highlights
+v0.8.2 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -127,3 +127,8 @@ Roadmap
 - Main guide shows the pickup separately from the current objective
 - Export includes NextQuestPickup fields
 - Call of Water recovery now shows Water Sapta from Islen Waterseer at 65.8, 43.8 without inventing an unknown quest ID
+
+- Marked Person guidance added for verified quest givers and quest contacts
+- Main guide now labels the person, role, zone, and coordinates
+- Same-map arrow can point directly to a verified quest giver/contact
+- The Glowing Shard now marks Sputtervalve in Ratchet and records Falla Sagewind as the next quest giver after the Ratchet step
