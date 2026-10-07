@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.8.4
+Forever Leveling Coach v0.8.5
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.8.4 highlights
+v0.8.5 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -140,3 +140,7 @@ Roadmap
 - Fixed completed Glowing Shard routing: once Sputtervalve is done, fast-travel guidance now targets Falla Sagewind instead of the stale Ratchet contact
 - When already near the Wailing Caverns mountain, FLC tells you to follow the local arrow instead of taking a flight
 - Live-discovered quest 1483 (Ziz Fizziks) is now recognized as known
+
+- Quest-person guidance now includes Location type, Location note, and How to get there
+- Falla Sagewind is explicitly marked OUTSIDE on top of the Wailing Caverns mountain, NOT inside the dungeon
+- Sputtervalve is explicitly marked beside the Ratchet flight master and may lack a normal quest marker
