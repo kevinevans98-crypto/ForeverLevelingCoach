@@ -98,3 +98,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Fixed Gear Advisor tooltip compatibility on Forever Beta and hardened export initialization
 
 - Fixed Gear Advisor ShoppingTooltip crash on Forever Beta; comparison tooltips are now safely ignored
+
+- Removed misleading Gear Advisor percentages; upgrade tooltips now use simple action-oriented verdicts
