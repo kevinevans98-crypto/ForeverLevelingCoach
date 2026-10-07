@@ -112,3 +112,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Objective-aware GPS routing for The Warsong Reports, including closest unfinished contact selection and verified Ashenvale waypoints
 
 - Lazy Mode: minimal NEXT / GO TO / DO UI for short play sessions, plus local travel handoffs instead of unsafe cross-zone arrows
+
+- Auto Accept / Auto Turn-In for routed quests, with reward-choice safety so the addon never guesses a reward
