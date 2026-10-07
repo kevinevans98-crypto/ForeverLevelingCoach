@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.4.5",
+    version = "0.4.6",
     supported = {
         faction = "Horde",
         class = "SHAMAN",
@@ -11,6 +11,7 @@ ForeverLevelingCoach_Data = {
         [2986] = true,
         [1534] = true,
         [1536] = true,
+        [220] = true,  -- Call of Water: Vial of Purest Water to Islen Waterseer
         [6503] = true, -- Ashenvale Outrunners
         [6441] = true, -- Satyr Horns
         [6548] = true, -- Avenge My Village
@@ -82,6 +83,17 @@ ForeverLevelingCoach_Data = {
             minLevel = 20,
             maxLevel = 30,
             note = "Continue the Water Totem class chain.",
+        },
+        {
+            questID = 220,
+            title = "Call of Water",
+            tag = "IMPORTANT",
+            minLevel = 20,
+            maxLevel = 30,
+            cluster = "BARRENS_RATCHET",
+            clusterPriority = 0,
+            note = "Bring the Vial of Purest Water to Islen Waterseer in the Barrens. This continues the Water Totem chain.",
+            waypoint = { mapID = 1413, x = 0.658, y = 0.438, label = "Islen Waterseer" },
         },
 
         -- Verified from the player's live Forever quest log and current Forever databases.
