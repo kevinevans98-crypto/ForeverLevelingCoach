@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.6.4",
+    version = "0.6.5",
     supported = {
         faction = "Horde",
         class = "SHAMAN",
@@ -150,8 +150,8 @@ ForeverLevelingCoach_Data = {
                 },
                 {
                     zoneAliases = { "Silverpine Forest", "Silverpine", "The Sepulcher" },
-                    instruction = "Head to the corrupted water shrine west of The Sepulcher. Defeat the Corrupt Manifestation, loot its bracers, then use them with the remaining pure water at the Brazier of Everfount.",
-                    waypoint = { mapID = 1421, x = 0.383, y = 0.446, label = "Brazier of Everfount" },
+                    instruction = "Go to The Sepulcher first. From the west/back side of the inn and catacomb area, look for the two large trees and the rocky ledge behind them. Climb/jump up the rocks, then carefully drop down to the hidden pool on the other side. Use your Water Sapta at the pool, kill the Corrupt Minor Manifestation of Water, loot the Corrupt Manifestation's Bracers, then click the Brazier of Everfount nearby and speak to the water elemental that appears.",
+                    waypoint = { mapID = 1421, x = 0.383, y = 0.446, label = "Hidden pool / Brazier of Everfount" },
                 },
                 {
                     instruction = "Travel to Silverpine Forest. Use the Orgrimmar to Undercity zeppelin if crossing from Kalimdor, then head west of The Sepulcher.",
