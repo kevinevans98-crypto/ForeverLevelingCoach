@@ -92,3 +92,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Dungeon route mode: entrance waypoints, proximity-aware scoring, short next-objective guidance, and Wailing Caverns cave-vs-instance instructions
 
 - Inside-dungeon cleanup: no stale entrance waypoint or taxi target once the player is already inside Wailing Caverns
+
+- Gear Advisor: hover equippable items for a simple Shaman leveling verdict instead of manually comparing every stat
