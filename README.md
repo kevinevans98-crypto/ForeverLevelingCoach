@@ -127,3 +127,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Smart Flight Assist: flight routes are detected and suggested, but FLC never auto-clicks a taxi destination
 
 - Splintertree local flight handoff and turn-in flight-target persistence fix
+
+- Relic Advisor and 2H Axe / 2H Mace weapon preference filtering for the Horde Shaman route
