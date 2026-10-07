@@ -1207,7 +1207,7 @@ exportSnapshot = function()
         "FastTravelSuggestion=" .. tostring(currentFastTravelSuggestion or "none"),
         "GearAdvisorEnabled=" .. tostring(DB and DB.gearAdvisor ~= false or false),
         "AutoFlightEnabled=" .. tostring(DB and DB.autoFlight ~= false or false),
-        "AutoFlightTarget=" .. tostring(currentAutoFlightTarget or (currentRouteStep and currentRouteStep.flightTarget) or "none"),
+        "AutoFlightTarget=" .. tostring(currentAutoFlightTarget or "none"),
         "AutoFlightStatus=" .. tostring(currentAutoFlightStatus or "none"),
         "CurrentFlightOptions=" .. (#currentTaxiOptions > 0 and table.concat(currentTaxiOptions, " | ") or "none"),
         "NextQuestPickup=" .. tostring(currentNextQuestPickup and currentNextQuestPickup.title or "none"),
