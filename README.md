@@ -68,3 +68,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Added a movable and resizable travel hint window with saved position and size
 
 - Travel Optimizer foundation: Hearthstone readiness/bind awareness plus route-specific flight-path shortcuts
+
+- Next Quest Pickup guidance: shows the next quest name, giver, zone, coordinates, and optional arrow target
