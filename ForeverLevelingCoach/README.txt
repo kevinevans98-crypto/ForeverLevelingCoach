@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.14.2
+Forever Leveling Coach v0.15.0
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.14.2 highlights
+v0.15.0 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -297,3 +297,10 @@ Roadmap
 - While physically inside a supported dungeon, FLC prioritizes unfinished quests for that dungeon over outside-world turn-ins
 - Completed dungeon quests no longer pull you out of the instance while unfinished same-dungeon objectives remain
 - Dungeon-mode detection is now cluster-based instead of hard-coded only for Wailing Caverns
+
+- Rogue character profile support added for Horde level 1-30
+- Shaman-only 2H Axe / 2H Mace filtering no longer applies to Rogue
+- Shaman Relic Advisor no longer mistakes a Rogue throwing weapon in slot 18 for a relic
+- Export now includes Race
+- Character progression state is separated per character: known flight paths, discovered quests, navigation progress, trainer level, and route cluster no longer leak from Shamm to Ms
+- Rogue route data is intentionally empty at level 1 until live Forever quest IDs are discovered; the addon can now collect those cleanly without Shaman profile contamination
