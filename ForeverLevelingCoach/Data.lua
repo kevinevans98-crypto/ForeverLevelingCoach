@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.8.5",
+    version = "0.8.6",
     supported = {
         faction = "Horde",
         class = "SHAMAN",
@@ -24,6 +24,7 @@ ForeverLevelingCoach_Data = {
         [1489] = true, -- Hamuul Runetotem
         [1483] = true, -- Ziz Fizziks (live-discovered in Forever)
         [6981] = true, -- The Glowing Shard
+        [3369] = true, -- In Nightmares (live-discovered in Forever)
     },
 
     -- Adaptive smart-route scoring. Higher score = better next step.
@@ -347,6 +348,41 @@ ForeverLevelingCoach_Data = {
             minLevel = 12,
             maxLevel = 23,
             note = "Short Wailing Caverns chain handoff. Turn it in when Thunder Bluff fits your travel route; do not make a large standalone trip solely for this step.",
+        },
+        {
+            questID = 3369,
+            cluster = "THUNDER_BLUFF",
+            clusterPriority = 0,
+            title = "In Nightmares",
+            tag = "DO",
+            minLevel = 18,
+            maxLevel = 30,
+            note = "Your live Forever quest log confirms this step is complete. Bring the Nightmare Shard to Hamuul Runetotem on Elder Rise in Thunder Bluff.",
+            personTarget = {
+                role = "Quest turn-in",
+                name = "Hamuul Runetotem",
+                zone = "Elder Rise, Thunder Bluff",
+                locationType = "CITY — Elder Rise, Thunder Bluff",
+                locationNote = "Hamuul Runetotem is on Elder Rise in Thunder Bluff. This is a city turn-in, not a dungeon objective.",
+                approach = "Travel to Thunder Bluff, enter the city lifts, then go to Elder Rise and find Hamuul Runetotem. Use a flight path to Thunder Bluff if your current flight master offers it.",
+            },
+            travelGuide = {
+                {
+                    zoneAliases = { "The Barrens", "Barrens", "Ratchet" },
+                    instruction = "FAST ROUTE: Use the nearest flight master and fly to Thunder Bluff if that destination is available. If not, travel southwest through The Barrens into Mulgore, enter Thunder Bluff by lift, then go to Elder Rise and turn In Nightmares in to Hamuul Runetotem.",
+                },
+                {
+                    zoneAliases = { "Mulgore" },
+                    instruction = "Head to Thunder Bluff, take a city lift up, then go to Elder Rise and find Hamuul Runetotem.",
+                },
+                {
+                    zoneAliases = { "Thunder Bluff" },
+                    instruction = "You are in Thunder Bluff. Go to Elder Rise and find Hamuul Runetotem to turn in In Nightmares.",
+                },
+                {
+                    instruction = "Travel to Thunder Bluff and go to Elder Rise. Turn In Nightmares in to Hamuul Runetotem.",
+                },
+            },
         },
     },
 
