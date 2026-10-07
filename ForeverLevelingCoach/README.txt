@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.14.0
+Forever Leveling Coach v0.14.1
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.14.0 highlights
+v0.14.1 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -288,3 +288,6 @@ Roadmap
 - /flc relic toggles the relic reminder
 - Shamm's weapon-upgrade preference is now hard-filtered to 2H Axe / 2H Mace; swords, staves, 1H weapons, and other weapon types are labeled NOT YOUR 2H TARGET
 - Call of Fire [1527] is recognized as the Horde Shaman source quest for the Forever Totem of Charged Flames reward
+
+- Fixed Relic Advisor startup/render crash caused by flcRelicStatus being declared after render()
+- Relic status helper is now forward-declared before the UI can call it
