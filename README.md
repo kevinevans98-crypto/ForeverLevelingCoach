@@ -66,3 +66,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Added a compact travel hint window for cross-zone travel when the arrow is intentionally hidden
 
 - Added a movable and resizable travel hint window with saved position and size
+
+- Travel Optimizer foundation: Hearthstone readiness/bind awareness plus route-specific flight-path shortcuts
