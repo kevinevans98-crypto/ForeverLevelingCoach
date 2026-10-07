@@ -110,6 +110,8 @@ end
 local currentQuests = {}
 local currentByID = {}
 local currentRouteStep = nil
+local currentCluster = nil
+local currentClusterCount = 0
 
 local function isKnownQuest(questID)
     if Data.knownQuestIDs and Data.knownQuestIDs[questID] then return true end
@@ -158,9 +160,107 @@ local function playerSupported()
         and level <= Data.supported.maxLevel
 end
 
-local function chooseRouteStep(byID)
+local function getStepByQuestID(questID)
+    for _, step in ipairs(Data.route or {}) do
+        if step.questID == questID then return step end
+    end
+    return nil
+end
+
+local function zoneMatchesCluster(clusterID)
+    local cluster = Data.clusters and Data.clusters[clusterID]
+    if not cluster then return false end
+
+    local zone = (GetZoneText and GetZoneText()) or ""
+    local subZone = (GetSubZoneText and GetSubZoneText()) or ""
+    zone = string.lower(zone or "")
+    subZone = string.lower(subZone or "")
+
+    for _, alias in ipairs(cluster.zoneAliases or {}) do
+        local a = string.lower(alias)
+        if zone == a or subZone == a or string.find(zone, a, 1, true) or string.find(subZone, a, 1, true) then
+            return true
+        end
+    end
+    return false
+end
+
+local function buildActiveClusters(byID)
+    local clusters = {}
     local level = UnitLevel("player") or 1
 
+    for _, step in ipairs(Data.route or {}) do
+        local active = byID[step.questID]
+        local inRange = level >= (step.minLevel or 1) and level <= (step.maxLevel or 999)
+        if active and inRange and step.cluster and not isQuestCompleted(step.questID) then
+            clusters[step.cluster] = clusters[step.cluster] or {}
+            table.insert(clusters[step.cluster], { step = step, active = active })
+        end
+    end
+
+    for _, entries in pairs(clusters) do
+        table.sort(entries, function(a, b)
+            local pa = a.step.clusterPriority or 99
+            local pb = b.step.clusterPriority or 99
+            if pa == pb then
+                return (a.step.questID or 0) < (b.step.questID or 0)
+            end
+            return pa < pb
+        end)
+    end
+
+    return clusters
+end
+
+local function chooseBestCluster(clusters)
+    local bestID, bestEntries, bestScore = nil, nil, -1
+
+    for clusterID, entries in pairs(clusters) do
+        local score = #entries
+        if zoneMatchesCluster(clusterID) then
+            score = score + 100
+        end
+
+        -- Prefer DO clusters over clusters containing only OPTIONAL steps.
+        for _, entry in ipairs(entries) do
+            if entry.step.tag == "DO" then score = score + 5 end
+        end
+
+        if score > bestScore then
+            bestScore = score
+            bestID = clusterID
+            bestEntries = entries
+        end
+    end
+
+    return bestID, bestEntries
+end
+
+local function chooseRouteStep(byID)
+    local level = UnitLevel("player") or 1
+    currentCluster = nil
+    currentClusterCount = 0
+
+    -- Class/unlock quests always stay above normal area clustering.
+    for _, step in ipairs(Data.route or {}) do
+        local inRange = level >= (step.minLevel or 1) and level <= (step.maxLevel or 999)
+        local active = byID[step.questID]
+        if inRange and active and step.tag == "IMPORTANT" and not isQuestCompleted(step.questID) then
+            return step, active
+        end
+    end
+
+    -- Group active quests by area. Prefer the cluster matching the player's
+    -- current zone; otherwise prefer the cluster with the most active work.
+    local clusters = buildActiveClusters(byID)
+    local clusterID, entries = chooseBestCluster(clusters)
+    if clusterID and entries and #entries > 0 then
+        currentCluster = clusterID
+        currentClusterCount = #entries
+        return entries[1].step, entries[1].active
+    end
+
+    -- Fall back to the normal verified route order for non-clustered steps.
     for _, step in ipairs(Data.route or {}) do
         local inRange = level >= (step.minLevel or 1) and level <= (step.maxLevel or 999)
         if inRange and not isQuestCompleted(step.questID) then
@@ -394,6 +494,11 @@ local function render()
     if step.note then
         details[#details + 1] = step.note
     end
+    if currentCluster and currentClusterCount > 1 then
+        local cluster = Data.clusters and Data.clusters[currentCluster]
+        local clusterName = cluster and cluster.name or currentCluster
+        details[#details + 1] = string.format("Area stack: %d active quests in %s. Stay in this area and let FLC advance through them.", currentClusterCount, clusterName)
+    end
     local obj = objectiveSummary(active)
     if obj then
         details[#details + 1] = obj
@@ -440,6 +545,8 @@ local function exportSnapshot()
         "Faction=" .. tostring(UnitFactionGroup("player") or "?"),
         "RecommendedStep=" .. tostring(currentRouteStep and currentRouteStep.title or "?"),
         "RecommendedQuestID=" .. tostring(currentRouteStep and currentRouteStep.questID or "none"),
+        "RecommendedCluster=" .. tostring(currentCluster or "none"),
+        "ClusterActiveQuestCount=" .. tostring(currentClusterCount or 0),
         "Quests:",
     }
 
@@ -556,6 +663,9 @@ FLC:RegisterEvent("QUEST_ACCEPTED")
 FLC:RegisterEvent("QUEST_REMOVED")
 FLC:RegisterEvent("QUEST_TURNED_IN")
 FLC:RegisterEvent("PLAYER_LEVEL_UP")
+FLC:RegisterEvent("ZONE_CHANGED_NEW_AREA")
+FLC:RegisterEvent("ZONE_CHANGED")
+FLC:RegisterEvent("ZONE_CHANGED_INDOORS")
 
 FLC:SetScript("OnEvent", function(_, event, arg1)
     if event == "ADDON_LOADED" and arg1 == ADDON_NAME then
