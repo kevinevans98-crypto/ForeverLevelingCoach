@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.8.6
+Forever Leveling Coach v0.8.7
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.8.6 highlights
+v0.8.7 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -149,3 +149,8 @@ Roadmap
 - Hamuul Runetotem is labeled as the turn-in person on Elder Rise
 - Barrens -> Thunder Bluff guidance now explicitly recommends using the flight path when available, with a ground-route fallback
 - No unverified Hamuul coordinates were invented; the addon gives city/landmark instructions until we verify a precise waypoint
+
+- GPS-style compact main window: GO TO / WHERE / FASTEST / DO
+- Removed long notes, scoring details, and route explanations from the normal play window
+- Detailed diagnostics remain available in /flc export for testing
+- Travel hint spacing shortened so directions are quicker to read while moving
