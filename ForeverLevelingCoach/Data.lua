@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.5.4",
+    version = "0.6.0",
     supported = {
         faction = "Horde",
         class = "SHAMAN",
@@ -130,6 +130,29 @@ ForeverLevelingCoach_Data = {
             maxLevel = 30,
             note = "Defeat the Corrupt Manifestation of Water, then use the bracers and remaining pure water at the Brazier of Everfount in Silverpine Forest.",
             waypoint = { mapID = 1421, x = 0.383, y = 0.446, label = "Brazier of Everfount" },
+            travelGuide = {
+                {
+                    zoneAliases = { "The Barrens", "Barrens", "Ratchet" },
+                    instruction = "Travel north toward Durotar and Orgrimmar. Your cross-continent route is the Orgrimmar to Undercity zeppelin.",
+                },
+                {
+                    zoneAliases = { "Durotar", "Orgrimmar" },
+                    instruction = "Go to the zeppelin tower east of the Orgrimmar entrance and take the zeppelin to Undercity.",
+                    waypoint = { mapID = 1411, x = 0.508, y = 0.136, label = "Undercity Zeppelin" },
+                },
+                {
+                    zoneAliases = { "Tirisfal Glades", "Undercity", "Ruins of Lordaeron" },
+                    instruction = "From Undercity/Tirisfal, travel southwest into Silverpine Forest. Continue toward the coast west of The Sepulcher.",
+                },
+                {
+                    zoneAliases = { "Silverpine Forest", "Silverpine", "The Sepulcher" },
+                    instruction = "Head to the corrupted water shrine west of The Sepulcher. Defeat the Corrupt Manifestation, loot its bracers, then use them with the remaining pure water at the Brazier of Everfount.",
+                    waypoint = { mapID = 1421, x = 0.383, y = 0.446, label = "Brazier of Everfount" },
+                },
+                {
+                    instruction = "Travel to Silverpine Forest. Use the Orgrimmar to Undercity zeppelin if crossing from Kalimdor, then head west of The Sepulcher.",
+                },
+            },
         },
 
         -- Verified from the player's live Forever quest log and current Forever databases.
