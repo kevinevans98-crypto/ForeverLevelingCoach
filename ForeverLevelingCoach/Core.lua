@@ -1270,18 +1270,21 @@ local function render()
     end
 
     currentTrainingDue = isClassTrainingDue()
-    currentTrainingTarget = nil
+    currentTrainingTarget = currentTrainingDue and getNearestShamanTrainer() or nil
 
-    local step, active
-    if currentTrainingDue and not zoneMatchesAliases({ "Wailing Caverns" }) then
+    local step, active = chooseRouteStep(currentByID)
+    local inTrainerCity = zoneMatchesAliases({ "Orgrimmar", "Thunder Bluff" })
+    local shouldTrainNow = currentTrainingDue
+        and not zoneMatchesAliases({ "Wailing Caverns" })
+        and (inTrainerCity or not step or (currentRouteScore or 0) < 250)
+
+    if shouldTrainNow then
         step, currentTrainingTarget = getTrainingStep()
         active = nil
         currentRouteScore = 2000
         currentRouteReasons = { "class training due at level " .. tostring(UnitLevel("player") or "?") }
         currentCluster = nil
         currentClusterCount = 0
-    else
-        step, active = chooseRouteStep(currentByID)
     end
     currentRouteStep = step
     currentAutoFlightTarget = step and step.flightTarget or nil
@@ -1450,6 +1453,10 @@ local function render()
         details[#details + 1] = "DO: Pick up " .. currentNextQuestPickup.title
     else
         details[#details + 1] = "DO: Follow the arrow / travel hint"
+    end
+
+    if currentTrainingDue and not (step and step.training) and currentTrainingTarget then
+        details[#details + 1] = "SOON: Train Shaman — " .. tostring(currentTrainingTarget.city or currentTrainingTarget.zone or "nearest trainer")
     end
 
     detailText:SetText(table.concat(details, "\n"))
