@@ -1179,6 +1179,7 @@ local function applySettings()
 end
 
 exportSnapshot = function()
+    if not DB then copyDefaults() end
     local _, classFile = UnitClass("player")
     local lines = {
         "Forever Leveling Coach Export",
@@ -1492,7 +1493,7 @@ local function flcGearEvaluateItem(link, sourceTooltip)
 end
 
 local function flcAddGearAdvice(tooltip)
-    if not DB or DB.gearAdvisor == false or not tooltip or tooltip.__flcGearBusy then return end
+    if not DB or DB.gearAdvisor == false or not tooltip or tooltip == flcGearScanTooltip or tooltip.__flcGearBusy then return end
     local _, link = tooltip:GetItem()
     if not link then return end
     if tooltip.__flcGearLink == link then return end
@@ -1520,22 +1521,35 @@ local function flcAddGearAdvice(tooltip)
     tooltip.__flcGearBusy = false
 end
 
-local function flcHookGearTooltip(tooltip)
+local function flcHookGearTooltipLegacy(tooltip)
     if not tooltip or tooltip.__flcGearHooked then return end
+    if tooltip.HasScript and not tooltip:HasScript("OnTooltipSetItem") then return end
     tooltip.__flcGearHooked = true
     if tooltip.HookScript then
         tooltip:HookScript("OnTooltipSetItem", function(self)
             self.__flcGearLink = nil
             flcAddGearAdvice(self)
         end)
-        tooltip:HookScript("OnTooltipCleared", function(self)
-            self.__flcGearLink = nil
-        end)
+        if not tooltip.HasScript or tooltip:HasScript("OnTooltipCleared") then
+            tooltip:HookScript("OnTooltipCleared", function(self)
+                self.__flcGearLink = nil
+            end)
+        end
     end
 end
 
-flcHookGearTooltip(GameTooltip)
-if ItemRefTooltip then flcHookGearTooltip(ItemRefTooltip) end
+if TooltipDataProcessor and TooltipDataProcessor.AddTooltipPostCall
+    and Enum and Enum.TooltipDataType and Enum.TooltipDataType.Item then
+    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(tooltip)
+        if tooltip and tooltip ~= flcGearScanTooltip then
+            tooltip.__flcGearLink = nil
+            flcAddGearAdvice(tooltip)
+        end
+    end)
+else
+    flcHookGearTooltipLegacy(GameTooltip)
+    if ItemRefTooltip then flcHookGearTooltipLegacy(ItemRefTooltip) end
+end
 -- End Gear Advisor -----------------------------------------------------------
 
 SLASH_FOREVERLEVELINGCOACH1 = "/flc"
