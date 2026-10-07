@@ -10,6 +10,7 @@ Current development focus:
 - Unknown/new quest scanner
 - Navigation arrow foundation using verified waypoint data only
 - Compact semi-transparent Blizzard-style UI showing the current recommended quest only
+- Area quest clustering so nearby objectives are stacked before leaving a zone
 - Semi-fast leveling philosophy: strong XP/hour without turning the route into a hardcore speedrun
 
 ## Install
