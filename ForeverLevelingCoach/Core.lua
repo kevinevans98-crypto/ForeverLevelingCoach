@@ -307,7 +307,14 @@ local function getFastTravelSuggestion(step, travelInstruction)
             end
         elseif zoneMatchesAliases({ "The Barrens", "Barrens", "Ratchet" }) then
             if step.questID == 6981 then
-                return "LOCAL ROUTE: You are already in The Barrens. If you are in Ratchet, stay here and go to Sputtervalve instead of taking another flight.", "local"
+                if currentNextQuestPickup and currentNextQuestPickup.npc == "Falla Sagewind" then
+                    local d = currentNextQuestPickup.waypoint and waypointDistanceNormalized(currentNextQuestPickup.waypoint)
+                    if d and d <= 0.08 then
+                        return "LOCAL ROUTE: You are already close to Falla Sagewind on the Wailing Caverns mountain. Follow the arrow to the next quest giver; do not return to Sputtervalve or take a flight.", "local-next-pickup"
+                    end
+                    return "LOCAL ROUTE: The Ratchet step is done. Head to Falla Sagewind on top of the Wailing Caverns mountain around 48.2, 32.8 for the next quest.", "local-next-pickup"
+                end
+                return "LOCAL ROUTE: If The Glowing Shard is not complete yet, stay in Ratchet and speak with Sputtervalve near the flight master.", "local"
             else
                 return "LOCAL ROUTE: If you are in Ratchet, head south along the coast. Islen Waterseer is around 65.8, 43.8.", "local"
             end
