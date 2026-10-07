@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.4.2",
+    version = "0.4.3",
     supported = {
         faction = "Horde",
         class = "SHAMAN",
@@ -11,6 +11,13 @@ ForeverLevelingCoach_Data = {
         [2986] = true,
         [1534] = true,
         [1536] = true,
+        [6503] = true, -- Ashenvale Outrunners
+        [6441] = true, -- Satyr Horns
+        [6548] = true, -- Avenge My Village
+        [1062] = true, -- Goblin Invaders
+        [6543] = true, -- The Warsong Reports
+        [1489] = true, -- Hamuul Runetotem
+        [6981] = true, -- The Glowing Shard
     },
 
     -- Route classifications:
@@ -50,6 +57,65 @@ ForeverLevelingCoach_Data = {
             minLevel = 20,
             maxLevel = 30,
             note = "Continue the Water Totem class chain.",
+        },
+
+        -- Verified from the player's live Forever quest log and current Forever databases.
+        -- These are Classic-era quests present in Forever, not confirmed Forever-new quests.
+        {
+            questID = 6543,
+            title = "The Warsong Reports",
+            tag = "DO",
+            minLevel = 17,
+            maxLevel = 25,
+            note = "Efficient while moving through Ashenvale: it naturally sends you through multiple Horde positions. Complete it alongside nearby Ashenvale quests.",
+        },
+        {
+            questID = 6503,
+            title = "Ashenvale Outrunners",
+            tag = "DO",
+            minLevel = 19,
+            maxLevel = 27,
+            note = "Good Splintertree-area kill quest. Pair it with other nearby Ashenvale objectives instead of making a separate trip.",
+        },
+        {
+            questID = 6441,
+            title = "Satyr Horns",
+            tag = "DO",
+            minLevel = 21,
+            maxLevel = 29,
+            note = "Worth doing while questing around Splintertree and the nearby satyr camps. Avoid a long standalone detour just for this quest.",
+        },
+        {
+            questID = 6981,
+            title = "The Glowing Shard",
+            tag = "DO",
+            minLevel = 15,
+            maxLevel = 30,
+            note = "Wailing Caverns follow-up. Speak with the Ratchet contact when your route brings you through the Barrens; strong value if you already have the shard.",
+        },
+        {
+            questID = 6548,
+            title = "Avenge My Village",
+            tag = "OPTIONAL",
+            minLevel = 12,
+            maxLevel = 23,
+            note = "Useful if you are already entering Stonetalon, especially because it leads into another short chain step. At level 21, do not travel far out of your way for it.",
+        },
+        {
+            questID = 1062,
+            title = "Goblin Invaders",
+            tag = "OPTIONAL",
+            minLevel = 13,
+            maxLevel = 23,
+            note = "Fine if you are already near the Venture Co. loggers in Stonetalon. Skip a dedicated travel detour at level 21.",
+        },
+        {
+            questID = 1489,
+            title = "Hamuul Runetotem",
+            tag = "OPTIONAL",
+            minLevel = 12,
+            maxLevel = 23,
+            note = "Short Wailing Caverns chain handoff. Turn it in when Thunder Bluff fits your travel route; do not make a large standalone trip solely for this step.",
         },
     },
 
