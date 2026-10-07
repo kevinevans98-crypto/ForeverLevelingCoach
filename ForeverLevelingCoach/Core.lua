@@ -406,20 +406,47 @@ routeText:SetPoint("TOPRIGHT", -94, -45)
 routeText:SetJustifyH("LEFT")
 routeText:SetText("Loading route...")
 
-local detailText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-detailText:SetPoint("TOPLEFT", routeText, "BOTTOMLEFT", 0, -12)
-detailText:SetPoint("TOPRIGHT", routeText, "BOTTOMRIGHT", 0, -12)
+local mainScroll = CreateFrame("ScrollFrame", "ForeverLevelingCoachMainScroll", frame, "UIPanelScrollFrameTemplate")
+mainScroll:SetPoint("TOPLEFT", routeText, "BOTTOMLEFT", 0, -10)
+mainScroll:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -28, 18)
+mainScroll:EnableMouseWheel(true)
+
+local mainScrollChild = CreateFrame("Frame", nil, mainScroll)
+mainScrollChild:SetSize(1, 1)
+mainScroll:SetScrollChild(mainScrollChild)
+
+local detailText = mainScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+detailText:SetPoint("TOPLEFT", 0, 0)
+detailText:SetPoint("TOPRIGHT", 0, 0)
 detailText:SetJustifyH("LEFT")
 detailText:SetJustifyV("TOP")
 detailText:SetText("")
 
-local questText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+local questText = mainScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 questText:SetPoint("TOPLEFT", detailText, "BOTTOMLEFT", 0, -14)
-questText:SetPoint("BOTTOMRIGHT", -14, 18)
+questText:SetPoint("TOPRIGHT", detailText, "BOTTOMRIGHT", 0, -14)
 questText:SetJustifyH("LEFT")
 questText:SetJustifyV("TOP")
 questText:SetText("")
 questText:Hide()
+
+local function refreshMainScroll()
+    local width = math.max(120, mainScroll:GetWidth())
+    mainScrollChild:SetWidth(width)
+    detailText:SetWidth(width)
+    local contentHeight = (detailText:GetStringHeight() or 0) + 18
+    mainScrollChild:SetHeight(math.max(mainScroll:GetHeight(), contentHeight))
+end
+
+mainScroll:SetScript("OnSizeChanged", refreshMainScroll)
+mainScroll:SetScript("OnMouseWheel", function(self, delta)
+    local current = self:GetVerticalScroll() or 0
+    local maxScroll = math.max(0, (mainScrollChild:GetHeight() or 0) - (self:GetHeight() or 0))
+    local nextScroll = current - (delta * 32)
+    if nextScroll < 0 then nextScroll = 0 end
+    if nextScroll > maxScroll then nextScroll = maxScroll end
+    self:SetVerticalScroll(nextScroll)
+end)
 
 local resizeGrip = CreateFrame("Button", nil, frame)
 resizeGrip:SetSize(18, 18)
@@ -519,16 +546,15 @@ local function updateArrow()
         return
     end
 
-    arrowFrame:Show()
     local step = currentRouteStep
     local waypoint = step and step.waypoint
 
     if not waypoint or not waypoint.mapID or not waypoint.x or not waypoint.y then
-        arrowTexture:SetRotation(0)
-        arrowTexture:SetAlpha(0.30)
-        arrowLabel:SetText("No verified waypoint\nfor this step yet")
+        arrowFrame:Hide()
         return
     end
+
+    arrowFrame:Show()
 
     arrowTexture:SetAlpha(1)
     local label = waypoint.label or step.title or "Route target"
@@ -591,6 +617,7 @@ local function render()
         details[#details + 1] = obj
     end
     detailText:SetText(table.concat(details, "\n\n"))
+    refreshMainScroll()
 
     -- Keep the visible guide uncluttered: only the current recommended step
     -- and its objective/instruction are shown. Full quest data remains available
@@ -618,7 +645,11 @@ local function applySettings()
     arrowFrame:ClearAllPoints()
     arrowFrame:SetPoint(DB.arrowPoint or "TOP", UIParent, DB.arrowRelativePoint or "TOP", DB.arrowX or 0, DB.arrowY or -90)
     arrowFrame:SetScale(DB.arrowScale or 1)
-    if DB.arrowVisible == false then arrowFrame:Hide() else arrowFrame:Show() end
+    if DB.arrowVisible == false then
+        arrowFrame:Hide()
+    else
+        updateArrow()
+    end
 end
 
 exportSnapshot = function()
