@@ -7,6 +7,8 @@ Current development focus:
 - Levels 1–30
 - Quest-ID-based automatic routing
 - Live quest-log syncing
+- Unknown/new quest scanner
+- Navigation arrow foundation using verified waypoint data only
 - Semi-fast leveling philosophy: strong XP/hour without turning the route into a hardcore speedrun
 
 ## Install
@@ -26,6 +28,7 @@ Then launch the game or run `/reload`.
 - `/flc hide`
 - `/flc sync`
 - `/flc export`
+- `/flc arrow`
 - `/flc lock`
 - `/flc unlock`
 - `/flc beginner`
