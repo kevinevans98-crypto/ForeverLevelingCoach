@@ -44,3 +44,6 @@ Then launch the game or run `/reload`.
 ## Development rule
 
 Do not invent Forever quest IDs or waypoint coordinates. Route data should be verified before being shipped.
+
+- Silverpine Water Totem cluster improves smart routing for Call of Water [63]
+- Export cleanup hides historical unknowns once they are classified
