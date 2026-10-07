@@ -1492,9 +1492,23 @@ local function flcGearEvaluateItem(link, sourceTooltip)
     return "KEEP", "Keep current item"
 end
 
-local function flcAddGearAdvice(tooltip)
+local function flcAddGearAdvice(tooltip, tooltipData)
     if not DB or DB.gearAdvisor == false or not tooltip or tooltip == flcGearScanTooltip or tooltip.__flcGearBusy then return end
-    local _, link = tooltip:GetItem()
+
+    -- Comparison/shopping tooltips on the Forever beta client do not always
+    -- implement GetItem(). Skip them safely; the primary item tooltip is enough
+    -- for the quick upgrade verdict.
+    local link = nil
+    if type(tooltip.GetItem) == "function" then
+        local _, itemLink = tooltip:GetItem()
+        link = itemLink
+    end
+    if not link and tooltipData then
+        link = tooltipData.hyperlink
+        if not link and tooltipData.id and C_Item and C_Item.GetItemLinkByID then
+            link = C_Item.GetItemLinkByID(tooltipData.id)
+        end
+    end
     if not link then return end
     if tooltip.__flcGearLink == link then return end
 
@@ -1540,10 +1554,15 @@ end
 
 if TooltipDataProcessor and TooltipDataProcessor.AddTooltipPostCall
     and Enum and Enum.TooltipDataType and Enum.TooltipDataType.Item then
-    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(tooltip)
+    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(tooltip, tooltipData)
         if tooltip and tooltip ~= flcGearScanTooltip then
-            tooltip.__flcGearLink = nil
-            flcAddGearAdvice(tooltip)
+            -- Do not process comparison shopping tooltips; they are missing
+            -- parts of the normal GameTooltip API on this client.
+            local tooltipName = tooltip.GetName and tooltip:GetName() or ""
+            if not string.find(tooltipName or "", "ShoppingTooltip", 1, true) then
+                tooltip.__flcGearLink = nil
+                flcAddGearAdvice(tooltip, tooltipData)
+            end
         end
     end)
 else
