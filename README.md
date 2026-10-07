@@ -119,3 +119,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Clears stale flight targets after reaching the active objective map
 
 - Class Trainer routing: Lazy Mode now tells Horde Shamans when training is due and routes to the nearest practical Shaman trainer
+
+- Training reminders no longer interrupt strong field routes; added live Ashenvale/Zoram/Thistlefur quest coverage and BFD quest recognition
