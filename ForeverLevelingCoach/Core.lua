@@ -33,6 +33,7 @@ local defaults = {
     lazyMode = true,
     autoAccept = true,
     autoTurnIn = true,
+    lastClassTrainerLevel = 0,
     lastUIVersion = "0.4.2",
     lastCluster = nil,
 }
@@ -137,6 +138,9 @@ local currentNextQuestPickup = nil
 local currentPersonTarget = nil
 local currentObjectiveTarget = nil
 local currentTravelTarget = nil
+local currentTrainingTarget = nil
+local currentTrainingDue = false
+local currentTrainerAvailableCount = nil
 local currentTaxiOptions = {}
 local currentAutoFlightTarget = nil
 local currentAutoFlightStatus = "idle"
@@ -1116,11 +1120,119 @@ local function getBestObjectiveTarget(step, active)
     return bestTarget
 end
 
+local function isClassTrainingDue()
+    if not DB then return false end
+    local _, classFile = UnitClass("player")
+    local level = UnitLevel("player") or 1
+    if classFile ~= "SHAMAN" or level < 4 then return false end
+
+    -- Classic Shaman trainer ranks begin at level 4 and then every even level.
+    if (level % 2) ~= 0 then return false end
+    return (tonumber(DB.lastClassTrainerLevel) or 0) < level
+end
+
+local function getNearestShamanTrainer()
+    local trainers = Data.shamanTrainers or {}
+
+    -- Prefer Thunder Bluff when already in/near Mulgore or Stonetalon.
+    if zoneMatchesAliases({ "Thunder Bluff", "Mulgore", "Stonetalon Mountains", "Stonetalon" }) then
+        return trainers.thunderBluff
+    end
+
+    -- Ashenvale, Durotar and The Barrens naturally feed into Orgrimmar.
+    return trainers.orgrimmar
+end
+
+local function getTrainingStep()
+    local trainer = getNearestShamanTrainer()
+    if not trainer then return nil end
+
+    local inTrainerCity = zoneMatchesAliases({ trainer.city })
+    return {
+        questID = nil,
+        training = true,
+        title = "Train Shaman",
+        tag = "IMPORTANT",
+        flightTarget = inTrainerCity and nil or trainer.city,
+        personTarget = {
+            role = "Class trainer",
+            name = trainer.name,
+            zone = trainer.zone,
+            coords = trainer.coords,
+            locationType = "SHAMAN TRAINER",
+            locationNote = "Buy your new Shaman abilities/ranks for this level.",
+            approach = "Go to the Shaman trainers and learn the available upgrades.",
+            useArrow = true,
+            waypoint = {
+                mapID = trainer.mapID,
+                x = trainer.x,
+                y = trainer.y,
+                label = "Shaman Trainer",
+            },
+        },
+        note = "Class training is due at this level.",
+    }, trainer
+end
+
+local function scanCurrentClassTrainer()
+    if not DB then return end
+    local npcName = UnitName and UnitName("npc")
+    local trainers = Data.shamanTrainers or {}
+    if not npcName or not trainers.names or not trainers.names[npcName] then return end
+
+    local available = 0
+    local level = UnitLevel("player") or 1
+
+    if type(GetNumTrainerServices) == "function" and type(GetTrainerServiceType) == "function" then
+        local okCount, count = pcall(GetNumTrainerServices)
+        if okCount and count then
+            for i = 1, count do
+                local okType, serviceType = pcall(GetTrainerServiceType, i)
+                local levelReq = 0
+                if type(GetTrainerServiceLevelReq) == "function" then
+                    local okReq, req = pcall(GetTrainerServiceLevelReq, i)
+                    if okReq and req then levelReq = req end
+                end
+                if okType and serviceType == "available" and levelReq <= level then
+                    available = available + 1
+                end
+            end
+
+            currentTrainerAvailableCount = available
+            if available == 0 then
+                DB.lastClassTrainerLevel = level
+                currentTrainingDue = false
+            end
+        end
+    end
+end
+
 local function getLazyTravelTarget(step)
     if not DB or DB.lazyMode == false or not step or not step.flightTarget then return nil end
 
     -- Lazy Mode never points an arrow blindly across maps. Instead it converts
     -- cross-zone travel into the next local action the player can actually do.
+    if zoneMatchesAliases({ "Ashenvale" }) and step.flightTarget == "Orgrimmar" then
+        return {
+            role = "Travel",
+            name = "Splintertree Flight Master",
+            zone = "Splintertree Post, Ashenvale",
+            coords = "around 74, 63",
+            locationType = "LOCAL TRAVEL STEP",
+            locationNote = "Use the Horde flight master at Splintertree Post.",
+            approach = "Follow the arrow to Splintertree Post, then fly to Orgrimmar.",
+            instruction = "Fly to Orgrimmar",
+            action = "FLY TO ORGRIMMAR",
+            useArrow = true,
+            waypoint = {
+                mapID = 1440,
+                x = 0.74,
+                y = 0.63,
+                label = "Splintertree Flight Master",
+            },
+        }
+    end
+
     if zoneMatchesAliases({ "Orgrimmar" }) then
         local mapID = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player")
         if mapID then
@@ -1157,7 +1269,20 @@ local function render()
         return
     end
 
-    local step, active = chooseRouteStep(currentByID)
+    currentTrainingDue = isClassTrainingDue()
+    currentTrainingTarget = nil
+
+    local step, active
+    if currentTrainingDue and not zoneMatchesAliases({ "Wailing Caverns" }) then
+        step, currentTrainingTarget = getTrainingStep()
+        active = nil
+        currentRouteScore = 2000
+        currentRouteReasons = { "class training due at level " .. tostring(UnitLevel("player") or "?") }
+        currentCluster = nil
+        currentClusterCount = 0
+    else
+        step, active = chooseRouteStep(currentByID)
+    end
     currentRouteStep = step
     currentAutoFlightTarget = step and step.flightTarget or nil
     currentAutoFlightStatus = currentAutoFlightTarget and "waiting-for-flight-master" or "no-target"
@@ -1306,6 +1431,8 @@ local function render()
 
     if currentTravelTarget and DB and DB.lazyMode ~= false then
         details[#details + 1] = "DO: " .. (currentTravelTarget.action or currentTravelTarget.instruction or "Travel")
+    elseif step and step.training then
+        details[#details + 1] = "DO: BUY NEW SHAMAN SPELLS"
     elseif active and active.isComplete then
         details[#details + 1] = "DO: Turn in " .. (step.title or "this quest")
     elseif step and step.dungeon then
@@ -1395,6 +1522,10 @@ exportSnapshot = function()
         "FastTravelMode=" .. tostring(currentFastTravelMode or "none"),
         "FastTravelSuggestion=" .. tostring(currentFastTravelSuggestion or "none"),
         "LazyModeEnabled=" .. tostring(DB and DB.lazyMode ~= false or false),
+        "ClassTrainingDue=" .. tostring(currentTrainingDue and true or false),
+        "ClassTrainerTarget=" .. tostring(currentTrainingTarget and currentTrainingTarget.name or "none"),
+        "LastClassTrainerLevel=" .. tostring(DB and DB.lastClassTrainerLevel or 0),
+        "TrainerAvailableCount=" .. tostring(currentTrainerAvailableCount or "unknown"),
         "AutoAcceptEnabled=" .. tostring(DB and DB.autoAccept ~= false or false),
         "AutoTurnInEnabled=" .. tostring(DB and DB.autoTurnIn ~= false or false),
         "LazyTravelTarget=" .. tostring(currentTravelTarget and currentTravelTarget.name or "none"),
@@ -1876,7 +2007,12 @@ SLASH_FOREVERLEVELINGCOACH1 = "/flc"
 SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
     msg = (msg or ""):lower()
 
-    if msg == "autoaccept" then
+    if msg == "trained" then
+        DB.lastClassTrainerLevel = UnitLevel("player") or DB.lastClassTrainerLevel or 0
+        currentTrainingDue = false
+        render()
+        print("|cff33ff99FLC:|r marked Shaman training complete for level " .. tostring(DB.lastClassTrainerLevel) .. ".")
+    elseif msg == "autoaccept" then
         DB.autoAccept = not DB.autoAccept
         print("|cff33ff99FLC:|r auto accept " .. (DB.autoAccept and "enabled." or "disabled."))
     elseif msg == "autoturnin" then
@@ -1927,7 +2063,7 @@ SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
         syncQuests()
     else
         print("|cff33ff99Forever Leveling Coach v" .. tostring(Data.version) .. "|r")
-        print("/flc show, hide, go, lazy, autoaccept, autoturnin, sync, export, gear, autoflight, arrow, lock, unlock, beginner")
+        print("/flc show, hide, go, lazy, trained, autoaccept, autoturnin, sync, export, gear, autoflight, arrow, lock, unlock, beginner")
     end
 end
 
@@ -1945,6 +2081,8 @@ FLC:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 FLC:RegisterEvent("ZONE_CHANGED")
 FLC:RegisterEvent("ZONE_CHANGED_INDOORS")
 FLC:RegisterEvent("TAXIMAP_OPENED")
+FLC:RegisterEvent("TRAINER_SHOW")
+FLC:RegisterEvent("TRAINER_UPDATE")
 
 FLC:SetScript("OnEvent", function(_, event, arg1)
     if event == "ADDON_LOADED" and arg1 == ADDON_NAME then
@@ -1955,6 +2093,9 @@ FLC:SetScript("OnEvent", function(_, event, arg1)
         if C_Timer and C_Timer.NewTicker then
             FLC.ticker = C_Timer.NewTicker(15, syncQuests)
         end
+    elseif event == "TRAINER_SHOW" or event == "TRAINER_UPDATE" then
+        scanCurrentClassTrainer()
+        syncQuests()
     elseif event == "QUEST_DETAIL" then
         flcHandleQuestDetail()
         syncQuests()
