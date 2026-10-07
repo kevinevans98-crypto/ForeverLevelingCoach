@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.8.1",
+    version = "0.8.2",
     supported = {
         faction = "Horde",
         class = "SHAMAN",
@@ -225,6 +225,7 @@ ForeverLevelingCoach_Data = {
             note = "Recovery step: bring a Water Sapta to Tiev Mordune in Silverpine Forest. The Sapta comes from Islen Waterseer in The Barrens.",
             nextPickup = {
                 title = "Water Sapta",
+                role = "Quest giver",
                 npc = "Islen Waterseer",
                 zone = "The Barrens",
                 coords = "65.8, 43.8",
@@ -289,7 +290,26 @@ ForeverLevelingCoach_Data = {
             tag = "DO",
             minLevel = 15,
             maxLevel = 30,
-            note = "Wailing Caverns follow-up. Speak with the Ratchet contact when your route brings you through the Barrens; strong value if you already have the shard.",
+            note = "Wailing Caverns follow-up. First speak with Sputtervalve beside the Ratchet flight master; he may not show a normal quest marker.",
+            personTarget = {
+                role = "Quest contact",
+                name = "Sputtervalve",
+                zone = "Ratchet, The Barrens",
+                coords = "63.0, 37.2",
+                useArrow = true,
+                waypoint = { mapID = 1413, x = 0.6298, y = 0.3720, label = "Quest contact: Sputtervalve" },
+            },
+            nextPickup = {
+                title = "In Nightmares",
+                role = "Quest giver",
+                npc = "Falla Sagewind",
+                zone = "Wailing Caverns mountain, The Barrens",
+                coords = "48.2, 32.8",
+                showWhileActive = false,
+                useArrow = true,
+                note = "After Sputtervalve advances The Glowing Shard, go to Falla Sagewind on top of the Wailing Caverns mountain for the next quest.",
+                waypoint = { mapID = 1413, x = 0.4818, y = 0.3282, label = "Next quest giver: Falla Sagewind" },
+            },
         },
         {
             questID = 6548,
