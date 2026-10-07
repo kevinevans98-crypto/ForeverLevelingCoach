@@ -23,6 +23,7 @@ local defaults = {
     arrowY = -90,
     arrowScale = 1,
     lastUIVersion = "0.4.2",
+    lastCluster = nil,
 }
 
 local TAG_LABELS = {
@@ -112,6 +113,8 @@ local currentByID = {}
 local currentRouteStep = nil
 local currentCluster = nil
 local currentClusterCount = 0
+local currentRouteScore = nil
+local currentRouteReasons = {}
 local exportSnapshot
 local syncQuests
 
@@ -187,94 +190,162 @@ local function zoneMatchesCluster(clusterID)
     return false
 end
 
-local function buildActiveClusters(byID)
-    local clusters = {}
+local function getObjectiveProgress(active)
+    if not active or not active.objectives or #active.objectives == 0 then
+        return 0
+    end
+
+    local finished = 0
+    for _, obj in ipairs(active.objectives) do
+        if obj.finished then finished = finished + 1 end
+    end
+    return finished / #active.objectives
+end
+
+local function getActiveClusterCounts(byID)
+    local counts = {}
     local level = UnitLevel("player") or 1
 
     for _, step in ipairs(Data.route or {}) do
         local active = byID[step.questID]
         local inRange = level >= (step.minLevel or 1) and level <= (step.maxLevel or 999)
         if active and inRange and step.cluster and not isQuestCompleted(step.questID) then
-            clusters[step.cluster] = clusters[step.cluster] or {}
-            table.insert(clusters[step.cluster], { step = step, active = active })
+            counts[step.cluster] = (counts[step.cluster] or 0) + 1
         end
     end
-
-    for _, entries in pairs(clusters) do
-        table.sort(entries, function(a, b)
-            local pa = a.step.clusterPriority or 99
-            local pb = b.step.clusterPriority or 99
-            if pa == pb then
-                return (a.step.questID or 0) < (b.step.questID or 0)
-            end
-            return pa < pb
-        end)
-    end
-
-    return clusters
+    return counts
 end
 
-local function chooseBestCluster(clusters)
-    local bestID, bestEntries, bestScore = nil, nil, -1
+local function getWaypointProximityBonus(step)
+    local weights = Data.scoring or {}
+    local maxBonus = weights.waypointNearMax or 0
+    local waypoint = step and step.waypoint
+    if not waypoint or not waypoint.mapID or not waypoint.x or not waypoint.y then
+        return 0, nil
+    end
+    if not C_Map or not C_Map.GetBestMapForUnit or not C_Map.GetPlayerMapPosition then
+        return 0, nil
+    end
 
-    for clusterID, entries in pairs(clusters) do
-        local score = #entries
-        if zoneMatchesCluster(clusterID) then
-            score = score + 100
-        end
+    local mapID = C_Map.GetBestMapForUnit("player")
+    if mapID ~= waypoint.mapID then
+        return 0, nil
+    end
 
-        -- Prefer DO clusters over clusters containing only OPTIONAL steps.
-        for _, entry in ipairs(entries) do
-            if entry.step.tag == "DO" then score = score + 5 end
-        end
+    local pos = C_Map.GetPlayerMapPosition(mapID, "player")
+    if not pos then return 0, nil end
 
-        if score > bestScore then
-            bestScore = score
-            bestID = clusterID
-            bestEntries = entries
+    local px, py = pos:GetXY()
+    local dx, dy = waypoint.x - px, waypoint.y - py
+    local distance = math.sqrt(dx * dx + dy * dy)
+    local normalized = math.max(0, 1 - math.min(distance / 0.35, 1))
+    local bonus = math.floor(maxBonus * normalized)
+    if bonus > 0 then
+        return bonus, string.format("verified target nearby (+%d)", bonus)
+    end
+    return 0, nil
+end
+
+local function scoreRouteStep(step, active, clusterCounts)
+    local weights = Data.scoring or {}
+    local score = 0
+    local reasons = {}
+
+    local tagScores = weights.tag or {}
+    local tagScore = tagScores[step.tag or "DO"] or 0
+    score = score + tagScore
+    reasons[#reasons + 1] = string.format("%s priority (%+d)", step.tag or "DO", tagScore)
+
+    if active and active.isComplete then
+        local bonus = weights.completedTurnIn or 0
+        score = score + bonus
+        reasons[#reasons + 1] = string.format("ready to turn in (+%d)", bonus)
+    else
+        local progress = getObjectiveProgress(active)
+        if progress > 0 then
+            local bonus = math.floor((weights.partialProgressMax or 0) * progress)
+            score = score + bonus
+            reasons[#reasons + 1] = string.format("partly complete (+%d)", bonus)
         end
     end
 
-    return bestID, bestEntries
+    if step.cluster then
+        local count = clusterCounts[step.cluster] or 1
+        if count > 1 then
+            local bonus = (count - 1) * (weights.clusterQuest or 0)
+            score = score + bonus
+            reasons[#reasons + 1] = string.format("%d nearby stacked quests (+%d)", count, bonus)
+        end
+
+        if zoneMatchesCluster(step.cluster) then
+            local bonus = weights.currentZoneCluster or 0
+            score = score + bonus
+            reasons[#reasons + 1] = string.format("you are in this area (+%d)", bonus)
+        elseif DB and DB.lastCluster == step.cluster then
+            local bonus = weights.rememberedCluster or 0
+            score = score + bonus
+            reasons[#reasons + 1] = string.format("stay with current route cluster (+%d)", bonus)
+        end
+    end
+
+    if step.clusterPriority then
+        local maxPriority = weights.clusterPriorityMax or 0
+        local bonus = math.max(0, maxPriority - ((step.clusterPriority - 1) * 5))
+        if bonus > 0 then
+            score = score + bonus
+            reasons[#reasons + 1] = string.format("good local order (+%d)", bonus)
+        end
+    end
+
+    local waypointBonus, waypointReason = getWaypointProximityBonus(step)
+    if waypointBonus > 0 then
+        score = score + waypointBonus
+        reasons[#reasons + 1] = waypointReason
+    end
+
+    return score, reasons
 end
 
 local function chooseRouteStep(byID)
     local level = UnitLevel("player") or 1
     currentCluster = nil
     currentClusterCount = 0
+    currentRouteScore = nil
+    currentRouteReasons = {}
 
-    -- Class/unlock quests always stay above normal area clustering.
+    local clusterCounts = getActiveClusterCounts(byID)
+    local bestStep, bestActive, bestScore, bestReasons = nil, nil, -999999, nil
+
     for _, step in ipairs(Data.route or {}) do
-        local inRange = level >= (step.minLevel or 1) and level <= (step.maxLevel or 999)
         local active = byID[step.questID]
-        if inRange and active and step.tag == "IMPORTANT" and not isQuestCompleted(step.questID) then
-            return step, active
-        end
-    end
-
-    -- Group active quests by area. Prefer the cluster matching the player's
-    -- current zone; otherwise prefer the cluster with the most active work.
-    local clusters = buildActiveClusters(byID)
-    local clusterID, entries = chooseBestCluster(clusters)
-    if clusterID and entries and #entries > 0 then
-        currentCluster = clusterID
-        currentClusterCount = #entries
-        return entries[1].step, entries[1].active
-    end
-
-    -- Fall back to the normal verified route order for non-clustered steps.
-    for _, step in ipairs(Data.route or {}) do
         local inRange = level >= (step.minLevel or 1) and level <= (step.maxLevel or 999)
-        if inRange and not isQuestCompleted(step.questID) then
-            local active = byID[step.questID]
-            if active then
-                return step, active
+
+        if active and inRange and not isQuestCompleted(step.questID) then
+            local score, reasons = scoreRouteStep(step, active, clusterCounts)
+            if score > bestScore then
+                bestStep = step
+                bestActive = active
+                bestScore = score
+                bestReasons = reasons
             end
         end
     end
 
+    if bestStep then
+        currentRouteScore = bestScore
+        currentRouteReasons = bestReasons or {}
+        currentCluster = bestStep.cluster
+        currentClusterCount = bestStep.cluster and (clusterCounts[bestStep.cluster] or 1) or 0
+        if DB and bestStep.cluster then
+            DB.lastCluster = bestStep.cluster
+        end
+        return bestStep, bestActive
+    end
+
     local fallback = Data.fallback and Data.fallback[level]
     if fallback then
+        currentRouteScore = 0
+        currentRouteReasons = { "fallback guidance: no scored verified active quest" }
         return {
             questID = nil,
             title = fallback.title,
@@ -283,6 +354,8 @@ local function chooseRouteStep(byID)
         }, nil
     end
 
+    currentRouteScore = 0
+    currentRouteReasons = { "fallback guidance: no scored verified active quest" }
     return {
         questID = nil,
         title = "Continue efficient leveling",
@@ -510,6 +583,9 @@ local function render()
         local clusterName = cluster and cluster.name or currentCluster
         details[#details + 1] = string.format("Area stack: %d active quests in %s. Stay in this area and let FLC advance through them.", currentClusterCount, clusterName)
     end
+    if currentRouteScore then
+        details[#details + 1] = string.format("Smart score: %d", currentRouteScore)
+    end
     local obj = objectiveSummary(active)
     if obj then
         details[#details + 1] = obj
@@ -558,9 +634,32 @@ exportSnapshot = function()
         "RecommendedQuestID=" .. tostring(currentRouteStep and currentRouteStep.questID or "none"),
         "RecommendedCluster=" .. tostring(currentCluster or "none"),
         "ClusterActiveQuestCount=" .. tostring(currentClusterCount or 0),
-        "Quests:",
+        "RecommendedScore=" .. tostring(currentRouteScore or 0),
+        "RecommendedReasons=" .. table.concat(currentRouteReasons or {}, " | "),
     }
 
+    lines[#lines + 1] = "ScoredCandidates:"
+    local clusterCounts = getActiveClusterCounts(currentByID)
+    local scored = {}
+    for _, step in ipairs(Data.route or {}) do
+        local active = currentByID[step.questID]
+        local level = UnitLevel("player") or 1
+        local inRange = level >= (step.minLevel or 1) and level <= (step.maxLevel or 999)
+        if active and inRange and not isQuestCompleted(step.questID) then
+            local score, reasons = scoreRouteStep(step, active, clusterCounts)
+            scored[#scored + 1] = { step = step, score = score, reasons = reasons }
+        end
+    end
+    table.sort(scored, function(a, b) return a.score > b.score end)
+    for _, item in ipairs(scored) do
+        lines[#lines + 1] = string.format("- %d | %s | score=%d | %s",
+            item.step.questID or 0,
+            item.step.title or "?",
+            item.score,
+            table.concat(item.reasons or {}, " | "))
+    end
+
+    lines[#lines + 1] = "Quests:"
     for _, q in ipairs(currentQuests) do
         local routeStatus = isKnownQuest(q.questID) and "KNOWN" or "NEW/UNVERIFIED"
         lines[#lines + 1] = string.format("- %d | %s | %s | %s", q.questID, q.title, q.isComplete and "complete" or "active", routeStatus)
