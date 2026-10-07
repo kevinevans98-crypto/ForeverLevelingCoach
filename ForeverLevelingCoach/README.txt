@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.9.1
+Forever Leveling Coach v0.9.2
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.9.1 highlights
+v0.9.2 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -177,3 +177,6 @@ Roadmap
 - Dungeon mode keeps the GPS UI short by showing only the next unfinished dungeon objective
 - Leaders of the Fang can use Ratchet as its preferred flight destination when approaching from another zone
 - Wailing Caverns travel guidance distinguishes the outside cave entrance from the dungeon portal inside
+
+- Inside-dungeon cleanup: once inside Wailing Caverns, FLC clears the outside cave waypoint, Ratchet taxi target, and entrance instructions
+- Dungeon GPS now uses GO TO for the next unfinished objective and keeps the travel hint hidden while already inside
