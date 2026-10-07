@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.5.2
+Forever Leveling Coach v0.5.3
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.5.2 highlights
+v0.5.3 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -48,6 +48,8 @@ v0.5.2 highlights
 - Verified Silverpine waypoint added for the Brazier of Everfount
 - Main guide window can now scroll with the mouse wheel when instructions are longer than the panel
 - Navigation arrow now appears automatically only when the current recommended step has a verified waypoint
+- Floating WoW-style navigation arrow: no extra window or background box
+- Uses a native WoW minimap-arrow texture with a small target/distance label
 - /flc arrow remains the master on/off toggle
 
 Important routing rule
