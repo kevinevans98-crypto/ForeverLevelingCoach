@@ -294,14 +294,23 @@ local function getFastTravelSuggestion(step, travelInstruction)
 
     -- Route-specific verified fast-travel advice. We only recommend shortcuts
     -- whose destination is known to be useful for the active route.
-    if step and step.questID == 96 then
+    local ratchetRoute = step and (step.questID == 96 or step.questID == 1103 or step.questID == 6981)
+    if ratchetRoute then
         if zoneMatchesAliases({ "Orgrimmar" }) then
             if hearth.ready and hearth.bind and string.find(string.lower(hearth.bind), "ratchet", 1, true) then
                 return "FASTEST: Hearthstone to Ratchet, then ride south along the coast to Islen Waterseer around 65.8, 43.8.", "hearth"
             end
-            return "FAST TRAVEL: If Ratchet is available on your flight master, fly to Ratchet instead of riding through all of Durotar/Barrens. From Ratchet, head south along the coast to Islen Waterseer around 65.8, 43.8.", "flight"
+            if step.questID == 6981 then
+                return "FASTEST: Use the Orgrimmar flight master and fly to Ratchet if the route is available. Your quest contact Sputtervalve is in Ratchet, so this skips the long ride through Durotar and The Barrens.", "flight"
+            else
+                return "FASTEST: Use the Orgrimmar flight master and fly to Ratchet if the route is available. From Ratchet, ride south along the coast to Islen Waterseer around 65.8, 43.8.", "flight"
+            end
         elseif zoneMatchesAliases({ "The Barrens", "Barrens", "Ratchet" }) then
-            return "LOCAL ROUTE: If you are in Ratchet, head south along the coast. Islen Waterseer is around 65.8, 43.8.", "local"
+            if step.questID == 6981 then
+                return "LOCAL ROUTE: You are already in The Barrens. If you are in Ratchet, stay here and go to Sputtervalve instead of taking another flight.", "local"
+            else
+                return "LOCAL ROUTE: If you are in Ratchet, head south along the coast. Islen Waterseer is around 65.8, 43.8.", "local"
+            end
         elseif hearth.ready then
             return string.format("HEARTH READY: Bound to %s. Use it only if that destination puts you closer to Ratchet/The Barrens than your current route.", hearth.bind or "Unknown"), "hearth-check"
         end
@@ -951,6 +960,7 @@ local function render()
     local travelInstruction, navigationWaypoint = getTravelInstruction(step)
     currentTravelInstruction = travelInstruction
     currentNavigationWaypoint = navigationWaypoint
+    currentFastTravelSuggestion, currentFastTravelMode = getFastTravelSuggestion(step, travelInstruction)
     local tag = TAG_LABELS[step.tag] or step.tag or "DO"
 
     routeText:SetText(tag .. ": " .. (step.title or "Next step"))
@@ -961,6 +971,9 @@ local function render()
     end
     if step.note then
         details[#details + 1] = step.note
+    end
+    if currentFastTravelSuggestion then
+        details[#details + 1] = "Fast travel: " .. currentFastTravelSuggestion
     end
     if currentTravelInstruction then
         details[#details + 1] = "Travel step: " .. currentTravelInstruction
