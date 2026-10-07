@@ -10,7 +10,7 @@ local defaults = {
     x = 0,
     y = 0,
     width = 430,
-    height = 310,
+    height = 185,
     scale = 1,
     alpha = 0.95,
     locked = false,
@@ -22,6 +22,7 @@ local defaults = {
     arrowX = 0,
     arrowY = -90,
     arrowScale = 1,
+    lastUIVersion = "0.4.2",
 }
 
 local TAG_LABELS = {
@@ -39,6 +40,15 @@ local function copyDefaults()
         end
     end
     ForeverLevelingCoachDB.discoveredQuests = ForeverLevelingCoachDB.discoveredQuests or {}
+
+    -- One-time v0.4.2 UI cleanup: compact, see-through current-step panel.
+    if ForeverLevelingCoachDB.lastUIVersion ~= "0.4.2" then
+        ForeverLevelingCoachDB.width = 410
+        ForeverLevelingCoachDB.height = 185
+        ForeverLevelingCoachDB.alpha = 1
+        ForeverLevelingCoachDB.lastUIVersion = "0.4.2"
+    end
+
     DB = ForeverLevelingCoachDB
 end
 
@@ -96,6 +106,10 @@ local function isQuestCompleted(questID)
     end
     return false
 end
+
+local currentQuests = {}
+local currentByID = {}
+local currentRouteStep = nil
 
 local function isKnownQuest(questID)
     if Data.knownQuestIDs and Data.knownQuestIDs[questID] then return true end
@@ -182,15 +196,17 @@ frame:SetMovable(true)
 frame:SetResizable(true)
 frame:EnableMouse(true)
 frame:SetClampedToScreen(true)
-frame:SetResizeBounds(340, 230, 700, 650)
+frame:SetResizeBounds(340, 150, 700, 420)
 frame:SetBackdrop({
-    bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-    edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+    bgFile = "Interface/DialogFrame/UI-DialogBox-Background-Dark",
+    edgeFile = "Interface/DialogFrame/UI-DialogBox-Border",
     tile = true,
-    tileSize = 16,
-    edgeSize = 16,
-    insets = { left = 4, right = 4, top = 4, bottom = 4 },
+    tileSize = 32,
+    edgeSize = 24,
+    insets = { left = 7, right = 7, top = 7, bottom = 7 },
 })
+frame:SetBackdropColor(0.05, 0.05, 0.05, 0.58)
+frame:SetBackdropBorderColor(0.72, 0.55, 0.20, 0.95)
 
 local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 title:SetPoint("TOPLEFT", 14, -12)
@@ -219,6 +235,7 @@ questText:SetPoint("BOTTOMRIGHT", -14, 18)
 questText:SetJustifyH("LEFT")
 questText:SetJustifyV("TOP")
 questText:SetText("")
+questText:Hide()
 
 local resizeGrip = CreateFrame("Button", nil, frame)
 resizeGrip:SetSize(18, 18)
@@ -233,13 +250,15 @@ arrowFrame:SetMovable(true)
 arrowFrame:EnableMouse(true)
 arrowFrame:SetClampedToScreen(true)
 arrowFrame:SetBackdrop({
-    bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-    edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+    bgFile = "Interface/DialogFrame/UI-DialogBox-Background-Dark",
+    edgeFile = "Interface/DialogFrame/UI-DialogBox-Border",
     tile = true,
-    tileSize = 16,
-    edgeSize = 12,
-    insets = { left = 3, right = 3, top = 3, bottom = 3 },
+    tileSize = 32,
+    edgeSize = 18,
+    insets = { left = 6, right = 6, top = 6, bottom = 6 },
 })
+arrowFrame:SetBackdropColor(0.05, 0.05, 0.05, 0.48)
+arrowFrame:SetBackdropBorderColor(0.72, 0.55, 0.20, 0.90)
 
 local arrowTexture = arrowFrame:CreateTexture(nil, "ARTWORK")
 arrowTexture:SetSize(58, 58)
@@ -296,10 +315,6 @@ resizeGrip:SetScript("OnMouseUp", function()
     frame:StopMovingOrSizing()
     savePosition()
 end)
-
-local currentQuests = {}
-local currentByID = {}
-local currentRouteStep = nil
 
 local function objectiveSummary(active)
     if not active then return nil end
@@ -361,7 +376,8 @@ local function render()
     if not playerSupported() then
         routeText:SetText("Current build: Horde Shaman levels 1–30")
         detailText:SetText("This character is outside the currently supported route.")
-        questText:SetText("The addon can still be expanded later for additional Horde classes.")
+        questText:SetText("")
+        questText:Hide()
         return
     end
 
@@ -384,21 +400,11 @@ local function render()
     end
     detailText:SetText(table.concat(details, "\n\n"))
 
-    local lines = {"Synced quest log:"}
-    local maxShown = DB.beginner and 8 or 4
-    for i, q in ipairs(currentQuests) do
-        if i > maxShown then
-            lines[#lines + 1] = "...and " .. tostring(#currentQuests - maxShown) .. " more"
-            break
-        end
-        local status = q.isComplete and "complete" or "active"
-        local verify = isKnownQuest(q.questID) and "" or " [NEW / UNVERIFIED]"
-        lines[#lines + 1] = string.format("• %s (%d) — %s%s", q.title, q.questID, status, verify)
-    end
-    if #currentQuests == 0 then
-        lines[#lines + 1] = "No active quests detected."
-    end
-    questText:SetText(table.concat(lines, "\n"))
+    -- Keep the visible guide uncluttered: only the current recommended step
+    -- and its objective/instruction are shown. Full quest data remains available
+    -- through /flc export and the background scanner.
+    questText:SetText("")
+    questText:Hide()
     updateArrow()
 end
 
@@ -432,6 +438,8 @@ local function exportSnapshot()
         "Level=" .. tostring(UnitLevel("player") or "?"),
         "Class=" .. tostring(classFile or "?"),
         "Faction=" .. tostring(UnitFactionGroup("player") or "?"),
+        "RecommendedStep=" .. tostring(currentRouteStep and currentRouteStep.title or "?"),
+        "RecommendedQuestID=" .. tostring(currentRouteStep and currentRouteStep.questID or "none"),
         "Quests:",
     }
 
