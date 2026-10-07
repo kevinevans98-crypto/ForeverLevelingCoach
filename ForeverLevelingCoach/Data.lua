@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.8.4",
+    version = "0.8.5",
     supported = {
         faction = "Horde",
         class = "SHAMAN",
@@ -297,6 +297,9 @@ ForeverLevelingCoach_Data = {
                 name = "Sputtervalve",
                 zone = "Ratchet, The Barrens",
                 coords = "63.0, 37.2",
+                locationType = "OUTSIDE — Ratchet",
+                locationNote = "Sputtervalve stands beside the Ratchet flight master and may not show a normal quest marker.",
+                approach = "Stay in Ratchet; go to the flight master area and speak directly to Sputtervalve.",
                 useArrow = true,
                 waypoint = { mapID = 1413, x = 0.6298, y = 0.3720, label = "Quest contact: Sputtervalve" },
             },
@@ -306,6 +309,9 @@ ForeverLevelingCoach_Data = {
                 npc = "Falla Sagewind",
                 zone = "Wailing Caverns mountain, The Barrens",
                 coords = "48.2, 32.8",
+                locationType = "OUTSIDE — on top of the Wailing Caverns mountain, NOT inside the dungeon",
+                locationNote = "Falla Sagewind is in a small hut on top of the mountain above Wailing Caverns.",
+                approach = "Do not enter the Wailing Caverns instance. Approach the mountain from the outside, climb up onto the top, then follow the arrow to Falla around 48.2, 32.8.",
                 showWhileActive = false,
                 useArrow = true,
                 note = "After Sputtervalve advances The Glowing Shard, go to Falla Sagewind on top of the Wailing Caverns mountain for the next quest.",
