@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.12.0",
+    version = "0.12.1",
     supported = {
         faction = "Horde",
         class = "SHAMAN",
@@ -21,6 +21,7 @@ ForeverLevelingCoach_Data = {
         [6548] = true, -- Avenge My Village
         [1062] = true, -- Goblin Invaders
         [6543] = true, -- The Warsong Reports
+        [6571] = true, -- Warsong Supplies (live-discovered in Forever)
         [1489] = true, -- Hamuul Runetotem
         [1483] = true, -- Ziz Fizziks (live-discovered in Forever)
         [6981] = true, -- The Glowing Shard
@@ -354,6 +355,58 @@ ForeverLevelingCoach_Data = {
                     action = "Deliver the Runner report",
                     useArrow = true,
                     waypoint = { mapID = 1440, x = 0.1221, y = 0.3420, label = "Warsong Runner" },
+                },
+            },
+        },
+        {
+            questID = 6571,
+            title = "Warsong Supplies",
+            tag = "OPTIONAL",
+            minLevel = 22,
+            maxLevel = 30,
+            note = "Long multi-zone supply quest. Do local Ashenvale pieces opportunistically; do not let it interrupt a stronger route.",
+            objectiveTargets = {
+                {
+                    objectiveContains = "Warsong Oil",
+                    role = "Quest object",
+                    name = "Warsong Oil",
+                    zone = "Night Run, Ashenvale",
+                    coords = "around 66, 55",
+                    locationType = "GROUND OBJECT — small green bottle",
+                    locationNote = "The oil is found in the satyr camps. Night Run is the preferred lower-risk location.",
+                    approach = "Search the Night Run satyr camp for the clickable oil bottle.",
+                    instruction = "Search Night Run around 66, 55 for Warsong Oil.",
+                    action = "LOOT WARSONG OIL",
+                    useArrow = true,
+                    waypoint = { mapID = 1440, x = 0.66, y = 0.55, label = "Warsong Oil — Night Run" },
+                },
+                {
+                    objectiveContains = "Logging Rope",
+                    role = "Kill / loot",
+                    name = "Foulweald Furbolgs",
+                    zone = "Greenpaw Village, Ashenvale",
+                    coords = "around 55, 61",
+                    locationType = "MOB DROP",
+                    locationNote = "Logging Rope drops from Ashenvale furbolgs.",
+                    approach = "Kill Foulweald furbolgs while nearby until Logging Rope drops.",
+                    instruction = "Kill Foulweald furbolgs around 55, 61 for Logging Rope.",
+                    action = "LOOT LOGGING ROPE",
+                    useArrow = true,
+                    waypoint = { mapID = 1440, x = 0.55, y = 0.61, label = "Logging Rope — Foulweald" },
+                },
+                {
+                    objectiveContains = "Warsong Saw Blades",
+                    role = "Supply exchange",
+                    name = "Pixel",
+                    zone = "Splintertree Post, Ashenvale",
+                    coords = "around 73, 61",
+                    locationType = "NPC — requires Deadly Blunderbuss",
+                    locationNote = "Pixel gives the saw blades in exchange for a Deadly Blunderbuss.",
+                    approach = "Bring a Deadly Blunderbuss to Pixel near Splintertree Post.",
+                    instruction = "Get a Deadly Blunderbuss, then bring it to Pixel near Splintertree Post.",
+                    action = "TRADE DEADLY BLUNDERBUSS FOR SAW BLADES",
+                    useArrow = true,
+                    waypoint = { mapID = 1440, x = 0.73, y = 0.61, label = "Pixel — Saw Blades" },
                 },
             },
         },
