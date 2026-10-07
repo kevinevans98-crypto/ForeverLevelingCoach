@@ -1,10 +1,16 @@
 ForeverLevelingCoach_Data = {
-    version = "0.4.0",
+    version = "0.4.1",
     supported = {
         faction = "Horde",
         class = "SHAMAN",
         minLevel = 1,
         maxLevel = 30,
+    },
+
+    knownQuestIDs = {
+        [2986] = true,
+        [1534] = true,
+        [1536] = true,
     },
 
     -- Route classifications:
@@ -15,6 +21,9 @@ ForeverLevelingCoach_Data = {
     --
     -- IMPORTANT: Route by quest ID, not quest title. Forever can contain
     -- several quests with the same title.
+    --
+    -- Optional waypoint format for VERIFIED coordinates only:
+    -- waypoint = { mapID = 123, x = 0.50, y = 0.50, label = "NPC / objective" }
     route = {
         -- Verified Horde Shaman Call of Water anchor IDs.
         -- These entries intentionally avoid invented coordinates.
