@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.6.5",
+    version = "0.6.6",
     supported = {
         faction = "Horde",
         class = "SHAMAN",
@@ -13,6 +13,9 @@ ForeverLevelingCoach_Data = {
         [1536] = true,
         [220] = true,  -- Call of Water: Vial of Purest Water to Islen Waterseer
         [63] = true,   -- Call of Water: Corrupt Manifestation's Bracers / Silverpine cleanse
+        [96] = true,   -- Call of Water: return Shard of Water to Islen Waterseer
+        [100] = true,  -- Call of Water: speak with Minor Manifestation of Water
+        [1103] = true, -- Call of Water recovery: bring Water Sapta to Tiev Mordune
         [6503] = true, -- Ashenvale Outrunners
         [6441] = true, -- Satyr Horns
         [6548] = true, -- Avenge My Village
@@ -155,6 +158,71 @@ ForeverLevelingCoach_Data = {
                 },
                 {
                     instruction = "Travel to Silverpine Forest. Use the Orgrimmar to Undercity zeppelin if crossing from Kalimdor, then head west of The Sepulcher.",
+                },
+            },
+        },
+
+        {
+            questID = 96,
+            cluster = "BARRENS_RATCHET",
+            clusterPriority = 0,
+            title = "Call of Water",
+            tag = "IMPORTANT",
+            minLevel = 20,
+            maxLevel = 30,
+            note = "Final Water Totem hand-in: bring the Shard of Water back to Islen Waterseer in The Barrens. Turn this in before normal leveling quests.",
+            waypoint = { mapID = 1413, x = 0.658, y = 0.438, label = "Islen Waterseer - Water Totem turn-in" },
+            travelGuide = {
+                {
+                    zoneAliases = { "Silverpine Forest", "Silverpine", "Tirisfal Glades", "Undercity", "Ruins of Lordaeron" },
+                    instruction = "Return to Undercity/Tirisfal and take the zeppelin back to Orgrimmar. Then travel south into The Barrens and return to Islen Waterseer at about 65.8, 43.8.",
+                },
+                {
+                    zoneAliases = { "Durotar", "Orgrimmar" },
+                    instruction = "From Orgrimmar, travel south through Durotar into The Barrens, then head to Islen Waterseer at about 65.8, 43.8.",
+                },
+                {
+                    zoneAliases = { "The Barrens", "Barrens", "Ratchet" },
+                    instruction = "Go to Islen Waterseer at about 65.8, 43.8 and turn in the Shard of Water. This awards your Water Totem and completes this major class-quest payoff.",
+                    waypoint = { mapID = 1413, x = 0.658, y = 0.438, label = "Islen Waterseer - Water Totem turn-in" },
+                },
+                {
+                    instruction = "Return to Islen Waterseer in The Barrens at about 65.8, 43.8 and turn in the Shard of Water.",
+                },
+            },
+        },
+        {
+            questID = 100,
+            cluster = "SILVERPINE_WATER",
+            clusterPriority = 2,
+            title = "Call of Water",
+            tag = "IMPORTANT",
+            minLevel = 20,
+            maxLevel = 30,
+            note = "Speak with the Minor Manifestation of Water at the purified Silverpine shrine. This is part of the Water Totem chain.",
+            waypoint = { mapID = 1421, x = 0.383, y = 0.446, label = "Minor Manifestation of Water" },
+        },
+        {
+            questID = 1103,
+            cluster = "SILVERPINE_WATER",
+            clusterPriority = 3,
+            title = "Call of Water",
+            tag = "IMPORTANT",
+            minLevel = 20,
+            maxLevel = 30,
+            note = "Recovery step: bring a Water Sapta to Tiev Mordune in Silverpine Forest. The Sapta comes from Islen Waterseer in The Barrens.",
+            travelGuide = {
+                {
+                    zoneAliases = { "The Barrens", "Barrens", "Ratchet" },
+                    instruction = "Get the Water Sapta from Islen Waterseer around 65.8, 43.8, then return to Tiev Mordune in Silverpine Forest.",
+                    waypoint = { mapID = 1413, x = 0.658, y = 0.438, label = "Islen Waterseer - Water Sapta" },
+                },
+                {
+                    zoneAliases = { "Silverpine Forest", "Silverpine" },
+                    instruction = "You need a Water Sapta for Tiev Mordune. If you do not have one, return to Islen Waterseer in The Barrens around 65.8, 43.8. After obtaining it, come back to Tiev Mordune around 37.3, 44.2 in Silverpine.",
+                },
+                {
+                    instruction = "Obtain a Water Sapta from Islen Waterseer in The Barrens, then bring it to Tiev Mordune in Silverpine Forest around 37.3, 44.2.",
                 },
             },
         },
