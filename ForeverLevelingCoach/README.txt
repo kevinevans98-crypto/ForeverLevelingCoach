@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.9.8
+Forever Leveling Coach v0.9.9
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.9.8 highlights
+v0.9.9 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -206,3 +206,8 @@ Roadmap
 - Gear Advisor now checks whether the character can actually use the item before scoring it
 - Weapon/armor proficiency and class restrictions can no longer be labeled as upgrades when the game reports the item unusable
 - Added FLC: CANNOT USE verdict with red-tooltip fallback for Forever Beta restrictions
+
+- Gear Advisor now shows a percentage-based verdict instead of MAJOR/SMALL upgrade labels
+- Example: FLC: +12% better for leveling or FLC: -8% worse for leveling
+- Percentage is normalized against the stronger of the two item scores so it stays bounded and avoids exaggerated 200%+ results
+- Unusable and level-locked items still show CANNOT USE / NOT USABLE YET instead of a percentage
