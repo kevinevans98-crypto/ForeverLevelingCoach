@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.13.5",
+    version = "0.14.0",
     supported = {
         faction = "Horde",
         class = "SHAMAN",
@@ -8,6 +8,7 @@ ForeverLevelingCoach_Data = {
     },
 
     knownQuestIDs = {
+        [1527] = true,  -- Call of Fire: Horde Shaman Fire Totem / Totem of Charged Flames
         [2986] = true,
         [1534] = true,
         [1536] = true,
@@ -34,6 +35,26 @@ ForeverLevelingCoach_Data = {
         [3369] = true, -- In Nightmares (live-discovered in Forever)
         [914] = true,  -- Leaders of the Fang (live-discovered in Forever)
         [1490] = true, -- Nara Wildmane (live-discovered in Forever)
+    },
+
+    weaponPreference = {
+        mode = "2H_ONLY",
+        allowedSubTypes = {
+            ["Two-Handed Axes"] = true,
+            ["Two-Handed Maces"] = true,
+        },
+        label = "2H Axe / 2H Mace",
+    },
+
+    shamanRelics = {
+        [263412] = {
+            name = "Totem of Charged Flames",
+            slot = 18,
+            score = 25,
+            effect = "Reduces the mana cost of Flame Shock and Lightning Bolt by 5 Mana.",
+            sourceQuestIDs = { 1527 },
+            note = "Forever-specific Shaman relic. Equip it in the Totem/Relic slot.",
+        },
     },
 
     shamanTrainers = {
