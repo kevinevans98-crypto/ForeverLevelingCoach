@@ -74,3 +74,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Marked Person guidance for verified quest givers/contacts, with same-map arrow targeting and next-chain pickup data
 
 - Travel Optimizer refresh fix: active routes now surface flight-path shortcuts in the main guide
+
+- Fixed stale Sputtervalve guidance after The Glowing Shard completes; next-pickup routing now follows Falla Sagewind
