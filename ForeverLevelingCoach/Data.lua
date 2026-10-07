@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.8.7",
+    version = "0.8.8",
     supported = {
         faction = "Horde",
         class = "SHAMAN",
@@ -178,6 +178,7 @@ ForeverLevelingCoach_Data = {
 
         {
             questID = 96,
+            flightTarget = "Ratchet",
             cluster = "BARRENS_RATCHET",
             clusterPriority = 0,
             title = "Call of Water",
@@ -218,6 +219,7 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 1103,
+            flightTarget = "Ratchet",
             cluster = "SILVERPINE_WATER",
             clusterPriority = 3,
             title = "Call of Water",
@@ -286,6 +288,7 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 6981,
+            flightTarget = "Ratchet",
             cluster = "BARRENS_RATCHET",
             clusterPriority = 1,
             title = "The Glowing Shard",
@@ -341,6 +344,7 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 1489,
+            flightTarget = "Thunder Bluff",
             cluster = "THUNDER_BLUFF",
             clusterPriority = 1,
             title = "Hamuul Runetotem",
@@ -351,6 +355,7 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 3369,
+            flightTarget = "Thunder Bluff",
             cluster = "THUNDER_BLUFF",
             clusterPriority = 0,
             title = "In Nightmares",
