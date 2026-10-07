@@ -46,25 +46,64 @@ local TAG_LABELS = {
     SKIP = "SKIP",
 }
 
+local function getClassProfile()
+    local _, classFile = UnitClass("player")
+    if classFile == "SHAMAN" then
+        return {
+            classFile = classFile,
+            weaponPreference = Data.shamanWeaponPreference,
+            usesRelics = true,
+        }
+    elseif classFile == "ROGUE" then
+        return {
+            classFile = classFile,
+            weaponPreference = nil,
+            usesRelics = false,
+        }
+    end
+    return {
+        classFile = classFile,
+        weaponPreference = nil,
+        usesRelics = false,
+    }
+end
+
 local function copyDefaults()
     ForeverLevelingCoachDB = ForeverLevelingCoachDB or {}
+    ForeverLevelingCoachDB.characters = ForeverLevelingCoachDB.characters or {}
+
+    local charName = UnitName("player") or "Unknown"
+    local realmName = GetRealmName and GetRealmName() or "Realm"
+    local charKey = charName .. "-" .. realmName
+    local charDB = ForeverLevelingCoachDB.characters[charKey] or {}
+    ForeverLevelingCoachDB.characters[charKey] = charDB
+
     for k, v in pairs(defaults) do
-        if ForeverLevelingCoachDB[k] == nil then
-            ForeverLevelingCoachDB[k] = v
+        if charDB[k] == nil then
+            -- Preserve existing UI/user toggles for the first migrated character,
+            -- but never inherit character progression state such as flight paths.
+            if ForeverLevelingCoachDB[k] ~= nil
+                and k ~= "lastClassTrainerLevel"
+                and k ~= "lastCluster" then
+                charDB[k] = ForeverLevelingCoachDB[k]
+            else
+                charDB[k] = v
+            end
         end
     end
-    ForeverLevelingCoachDB.discoveredQuests = ForeverLevelingCoachDB.discoveredQuests or {}
-    ForeverLevelingCoachDB.knownFlightPaths = ForeverLevelingCoachDB.knownFlightPaths or {}
 
-    -- One-time v0.4.2 UI cleanup: compact, see-through current-step panel.
-    if ForeverLevelingCoachDB.lastUIVersion ~= "0.4.2" then
-        ForeverLevelingCoachDB.width = 410
-        ForeverLevelingCoachDB.height = 185
-        ForeverLevelingCoachDB.alpha = 1
-        ForeverLevelingCoachDB.lastUIVersion = "0.4.2"
+    charDB.discoveredQuests = charDB.discoveredQuests or {}
+    charDB.knownFlightPaths = charDB.knownFlightPaths or {}
+    charDB.navigationProgress = charDB.navigationProgress or {}
+
+    if charDB.lastUIVersion ~= "0.4.2" then
+        charDB.width = 410
+        charDB.height = 185
+        charDB.alpha = 1
+        charDB.lastUIVersion = "0.4.2"
     end
 
-    DB = ForeverLevelingCoachDB
+    DB = charDB
 end
 
 local function safeQuestTitle(info)
@@ -192,7 +231,8 @@ local function playerSupported()
     local level = UnitLevel("player") or 1
 
     return faction == Data.supported.faction
-        and classFile == Data.supported.class
+        and Data.supported.classes
+        and Data.supported.classes[classFile] == true
         and level >= Data.supported.minLevel
         and level <= Data.supported.maxLevel
 end
@@ -1330,7 +1370,7 @@ end
 
 local function render()
     if not playerSupported() then
-        routeText:SetText("Current build: Horde Shaman levels 1–30")
+        routeText:SetText("Current build: Horde Shaman + Rogue levels 1–30")
         detailText:SetText("This character is outside the currently supported route.")
         questText:SetText("")
         questText:Hide()
@@ -1553,7 +1593,8 @@ local function render()
         details[#details + 1] = "SOON: Train Shaman — " .. tostring(currentTrainingTarget.city or currentTrainingTarget.zone or "nearest trainer")
     end
 
-    if DB and DB.relicAdvisor ~= false then
+    local classProfile = getClassProfile()
+    if DB and DB.relicAdvisor ~= false and classProfile and classProfile.usesRelics then
         local _, relicName, relicState = flcRelicStatus()
         if relicState == "known-relic-in-bags" and relicName then
             details[#details + 1] = "SOON: Equip " .. tostring(relicName)
@@ -1638,10 +1679,10 @@ exportSnapshot = function()
         "AutoTurnInEnabled=" .. tostring(DB and DB.autoTurnIn ~= false or false),
         "LazyTravelTarget=" .. tostring(currentTravelTarget and currentTravelTarget.name or "none"),
         "GearAdvisorEnabled=" .. tostring(DB and DB.gearAdvisor ~= false or false),
-        "WeaponPreference=" .. tostring(Data.weaponPreference and Data.weaponPreference.label or "none"),
+        "WeaponPreference=" .. tostring((getClassProfile().weaponPreference and getClassProfile().weaponPreference.label) or "class-default"),
         "RelicAdvisorEnabled=" .. tostring(DB and DB.relicAdvisor ~= false or false),
-        "EquippedRelic=" .. tostring(select(1, flcRelicStatus()) or "none"),
-        "KnownRelicTarget=" .. tostring(select(2, flcRelicStatus()) or "none"),
+        "EquippedRelic=" .. tostring(select(1, flcRelicStatus()) or (select(3, flcRelicStatus()) == "not-applicable" and "not-applicable" or "none")),
+        "KnownRelicTarget=" .. tostring(select(2, flcRelicStatus()) or (select(3, flcRelicStatus()) == "not-applicable" and "not-applicable" or "none")),
         "RelicStatus=" .. tostring(select(3, flcRelicStatus()) or "unknown"),
         "AutoFlightEnabled=" .. tostring(DB and DB.autoFlight ~= false or false),
         "AutoFlightTarget=" .. tostring(currentAutoFlightTarget or "none"),
@@ -1859,6 +1900,8 @@ local function flcItemID(link)
 end
 
 local function flcKnownRelicScore(link)
+    local classProfile = getClassProfile()
+    if not classProfile or not classProfile.usesRelics then return 0, nil end
     local itemID = flcItemID(link)
     local relic = itemID and Data.shamanRelics and Data.shamanRelics[itemID]
     if relic then return tonumber(relic.score) or 0, relic end
@@ -1944,12 +1987,14 @@ local function flcGearEvaluateItem(link, sourceTooltip)
     local slots = FLC_EQUIP_SLOTS[equipLoc]
     if not slots then return nil end
 
-    if Data.weaponPreference and Data.weaponPreference.mode == "2H_ONLY" and itemType == "Weapon" then
+    local classProfile = getClassProfile()
+    local weaponPreference = classProfile and classProfile.weaponPreference
+    if weaponPreference and weaponPreference.mode == "2H_ONLY" and itemType == "Weapon" then
         local allowed = equipLoc == "INVTYPE_2HWEAPON"
-            and Data.weaponPreference.allowedSubTypes
-            and Data.weaponPreference.allowedSubTypes[itemSubType]
+            and weaponPreference.allowedSubTypes
+            and weaponPreference.allowedSubTypes[itemSubType]
         if not allowed then
-            return "PREFERENCE", "Build target: " .. tostring(Data.weaponPreference.label or "2H Axe / 2H Mace")
+            return "PREFERENCE", "Build target: " .. tostring(weaponPreference.label or "2H Axe / 2H Mace")
         end
     end
 
@@ -2079,6 +2124,10 @@ end
 -- End Gear Advisor -----------------------------------------------------------
 
 flcRelicStatus = function()
+    local classProfile = getClassProfile()
+    if not classProfile or not classProfile.usesRelics then
+        return nil, nil, "not-applicable"
+    end
     local equipped = GetInventoryItemLink and GetInventoryItemLink("player", 18)
     local equippedID = flcItemID(equipped)
     local known = equippedID and Data.shamanRelics and Data.shamanRelics[equippedID]
