@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.13.0
+Forever Leveling Coach v0.13.1
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.13.0 highlights
+v0.13.1 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -253,3 +253,10 @@ Roadmap
 - TRAINER_SHOW/TRAINER_UPDATE scanning keeps the reminder active until no trainable services remain
 - /flc trained manually clears the current-level training reminder if the Forever trainer API cannot verify it
 - Export reports ClassTrainingDue, ClassTrainerTarget, LastClassTrainerLevel, and TrainerAvailableCount
+
+- Training reminders no longer yank you out of a strong field route; FLC shows SOON: Train Shaman while questing and hard-prioritizes training once you reach a trainer city or the current route is weak
+- Added live-discovered Ashenvale quests 6442, 6641, 216, 6462, 6563, and 6921 to the known database
+- Added Zoram Strand and Thistlefur quest clusters so nearby objectives can be stacked instead of ignored
+- Naga at the Zoram Strand, Between a Rock and a Thistlefur, and Troll Charm now have local GPS targets
+- Vorsha the Lasher is OPTIONAL because it is an elite escort/event and may cost time while solo
+- Blackfathom Deeps quests The Essence of Aku'Mai and Amongst the Ruins are recognized as OPTIONAL dungeon work for a future BFD run
