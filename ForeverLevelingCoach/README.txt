@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.10.1
+Forever Leveling Coach v0.11.0
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.10.1 highlights
+v0.11.0 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -221,3 +221,11 @@ Roadmap
 - While in Ashenvale, FLC prefers the closest unfinished report contact rather than blindly following quest-log objective order
 - Warsong Scout: ~71.1,68.4; Warsong Outrider patrol road: ~84,50; Warsong Runner: ~12.2,34.2
 - Arrow and GO TO / WHERE / DO lines update automatically as each report is completed
+
+- Lazy Mode is now enabled by default for short play sessions
+- Main panel is reduced to the immediate NEXT / GO TO / DO decision instead of route explanations
+- Cross-zone navigation no longer leaves the player with a dead arrow: when in Orgrimmar and the route needs a known flight destination, FLC points locally to the flight master first
+- After reaching the flight master, existing AutoFlight can attempt to choose the route destination
+- Orgrimmar flight-master local step uses the classic Doras location around 45,64
+- /flc lazy toggles Lazy Mode
+- Export now reports LazyModeEnabled and LazyTravelTarget
