@@ -102,3 +102,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Removed misleading Gear Advisor percentages; upgrade tooltips now use simple action-oriented verdicts
 
 - Fixed stale AutoFlightTarget export while inside a dungeon
+
+- Gear Advisor now rejects unusable items before scoring, preventing false MAJOR UPGRADE labels on gear the character cannot equip
