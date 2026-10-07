@@ -1207,12 +1207,34 @@ local function scanCurrentClassTrainer()
     end
 end
 
-local function getLazyTravelTarget(step)
-    if not DB or DB.lazyMode == false or not step or not step.flightTarget then return nil end
+local function getLazyTravelTarget(step, flightTarget)
+    flightTarget = flightTarget or (step and step.flightTarget)
+    if not DB or DB.lazyMode == false or not step or not flightTarget then return nil end
 
     -- Lazy Mode never points an arrow blindly across maps. Instead it converts
     -- cross-zone travel into the next local action the player can actually do.
-    if zoneMatchesAliases({ "Ashenvale" }) and step.flightTarget == "Orgrimmar" then
+    if zoneMatchesAliases({ "Zoram'gar Outpost" }) and flightTarget ~= "Splintertree Post" then
+        return {
+            role = "Travel",
+            name = "Zoram'gar Flight Master",
+            zone = "Zoram'gar Outpost, Ashenvale",
+            coords = "around 12.2, 33.8",
+            locationType = "LOCAL TRAVEL STEP",
+            locationNote = "Use the Horde flight master at Zoram'gar Outpost.",
+            approach = "The flight master is inside Zoram'gar Outpost near the Warsong Runner.",
+            instruction = "Fly to " .. tostring(flightTarget),
+            action = "FLY TO " .. string.upper(tostring(flightTarget)),
+            useArrow = true,
+            waypoint = {
+                mapID = 1440,
+                x = 0.122,
+                y = 0.338,
+                label = "Zoram'gar Flight Master",
+            },
+        }
+    end
+
+    if zoneMatchesAliases({ "Ashenvale" }) and flightTarget == "Orgrimmar" then
         return {
             role = "Travel",
             name = "Splintertree Flight Master",
@@ -1244,8 +1266,8 @@ local function getLazyTravelTarget(step)
                 locationType = "LOCAL TRAVEL STEP",
                 locationNote = "Go to Doras, then fly directly to the route destination.",
                 approach = "Follow the arrow to the Orgrimmar flight master.",
-                instruction = "Fly to " .. tostring(step.flightTarget),
-                action = "FLY TO " .. string.upper(tostring(step.flightTarget)),
+                instruction = "Fly to " .. tostring(flightTarget),
+                action = "FLY TO " .. string.upper(tostring(flightTarget)),
                 useArrow = true,
                 waypoint = {
                     mapID = mapID,
@@ -1287,9 +1309,16 @@ local function render()
         currentClusterCount = 0
     end
     currentRouteStep = step
-    currentAutoFlightTarget = step and step.flightTarget or nil
+    local routeFlightTarget = step and step.flightTarget or nil
+    if active and active.isComplete and step and step.turnInFlightTarget then
+        routeFlightTarget = step.turnInFlightTarget
+    end
+    currentAutoFlightTarget = routeFlightTarget
     currentAutoFlightStatus = currentAutoFlightTarget and "waiting-for-flight-master" or "no-target"
     currentPersonTarget = step and step.personTarget or nil
+    if active and active.isComplete and step and step.turnInTarget then
+        currentPersonTarget = step.turnInTarget
+    end
     currentObjectiveTarget = nil
     currentTravelTarget = nil
     currentNextQuestPickup = nil
@@ -1315,14 +1344,25 @@ local function render()
     currentNavigationWaypoint = navigationWaypoint
     currentFastTravelSuggestion, currentFastTravelMode = getFastTravelSuggestion(step, travelInstruction)
 
-    currentObjectiveTarget = getBestObjectiveTarget(step, active)
-    currentTravelTarget = getLazyTravelTarget(step)
+    if active and active.isComplete then
+        currentObjectiveTarget = nil
+    else
+        currentObjectiveTarget = getBestObjectiveTarget(step, active)
+    end
+    currentTravelTarget = getLazyTravelTarget(step, routeFlightTarget)
 
     if currentObjectiveTarget and currentObjectiveTarget.waypoint
         and C_Map and C_Map.GetBestMapForUnit
         and C_Map.GetBestMapForUnit("player") == currentObjectiveTarget.waypoint.mapID then
         currentAutoFlightTarget = nil
         currentAutoFlightStatus = "local-objective"
+    elseif active and active.isComplete and step and step.turnInTarget and step.turnInTarget.waypoint
+        and C_Map and C_Map.GetBestMapForUnit
+        and C_Map.GetBestMapForUnit("player") == step.turnInTarget.waypoint.mapID then
+        currentAutoFlightTarget = nil
+        currentAutoFlightStatus = "local-turn-in"
+        currentNavigationWaypoint = step.turnInTarget.waypoint
+        currentTravelInstruction = step.turnInTarget.instruction
     end
 
     if currentTravelTarget then
@@ -1341,6 +1381,14 @@ local function render()
         currentNavigationWaypoint = currentTravelTarget.waypoint
         currentFastTravelSuggestion = nil
         currentFastTravelMode = "lazy-local-travel"
+    elseif active and active.isComplete and step and step.turnInTarget then
+        currentPersonTarget = step.turnInTarget
+        if step.turnInTarget.instruction then
+            currentTravelInstruction = step.turnInTarget.instruction
+        end
+        if step.turnInTarget.waypoint then
+            currentNavigationWaypoint = step.turnInTarget.waypoint
+        end
     elseif currentObjectiveTarget then
         currentPersonTarget = {
             role = currentObjectiveTarget.role or "Quest objective",
