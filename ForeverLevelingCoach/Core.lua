@@ -112,6 +112,8 @@ local currentByID = {}
 local currentRouteStep = nil
 local currentCluster = nil
 local currentClusterCount = 0
+local exportSnapshot
+local syncQuests
 
 local function isKnownQuest(questID)
     if Data.knownQuestIDs and Data.knownQuestIDs[questID] then return true end
@@ -316,9 +318,18 @@ local versionText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSma
 versionText:SetPoint("TOPRIGHT", -14, -15)
 versionText:SetText("v" .. tostring(Data.version or "?"))
 
+local exportButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+exportButton:SetSize(72, 22)
+exportButton:SetPoint("TOPRIGHT", -12, -38)
+exportButton:SetText("Export")
+exportButton:SetScript("OnClick", function()
+    syncQuests()
+    exportSnapshot()
+end)
+
 local routeText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 routeText:SetPoint("TOPLEFT", 14, -45)
-routeText:SetPoint("TOPRIGHT", -14, -45)
+routeText:SetPoint("TOPRIGHT", -94, -45)
 routeText:SetJustifyH("LEFT")
 routeText:SetText("Loading route...")
 
@@ -513,7 +524,7 @@ local function render()
     updateArrow()
 end
 
-local function syncQuests()
+syncQuests = function()
     currentQuests, currentByID = getQuestLogSnapshot()
     scanUnknownQuests()
     render()
@@ -534,7 +545,7 @@ local function applySettings()
     if DB.arrowVisible == false then arrowFrame:Hide() else arrowFrame:Show() end
 end
 
-local function exportSnapshot()
+exportSnapshot = function()
     local _, classFile = UnitClass("player")
     local lines = {
         "Forever Leveling Coach Export",
