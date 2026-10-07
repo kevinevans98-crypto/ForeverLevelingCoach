@@ -132,6 +132,7 @@ local currentFastTravelSuggestion = nil
 local currentFastTravelMode = nil
 local currentNextQuestPickup = nil
 local currentPersonTarget = nil
+local currentObjectiveTarget = nil
 local currentTaxiOptions = {}
 local currentAutoFlightTarget = nil
 local currentAutoFlightStatus = "idle"
@@ -1079,6 +1080,38 @@ local function scanTaxiMapAndAutoFly()
     end
 end
 
+local function getBestObjectiveTarget(step, active)
+    if not step or not active or not step.objectiveTargets or not active.objectives then return nil end
+
+    local playerMapID = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player")
+    local bestTarget, bestDistance
+
+    for _, obj in ipairs(active.objectives) do
+        if not obj.finished and obj.text and obj.text ~= "" then
+            local objectiveLower = string.lower(obj.text)
+            for _, target in ipairs(step.objectiveTargets) do
+                local match = target.objectiveContains and string.lower(target.objectiveContains)
+                if match and string.find(objectiveLower, match, 1, true) then
+                    local distance = nil
+                    if target.waypoint and playerMapID and target.waypoint.mapID == playerMapID then
+                        distance = waypointDistanceNormalized(target.waypoint)
+                    end
+
+                    -- On the same map, prefer the closest unfinished verified objective.
+                    -- Otherwise preserve the route-data order.
+                    if not bestTarget
+                        or (distance and (not bestDistance or distance < bestDistance)) then
+                        bestTarget = target
+                        bestDistance = distance
+                    end
+                end
+            end
+        end
+    end
+
+    return bestTarget
+end
+
 local function render()
     if not playerSupported() then
         routeText:SetText("Current build: Horde Shaman levels 1–30")
@@ -1093,6 +1126,7 @@ local function render()
     currentAutoFlightTarget = step and step.flightTarget or nil
     currentAutoFlightStatus = currentAutoFlightTarget and "waiting-for-flight-master" or "no-target"
     currentPersonTarget = step and step.personTarget or nil
+    currentObjectiveTarget = nil
     currentNextQuestPickup = nil
     if step and step.nextPickup then
         if step.nextPickup.showWhileActive or (active and active.isComplete) then
@@ -1116,8 +1150,30 @@ local function render()
     currentNavigationWaypoint = navigationWaypoint
     currentFastTravelSuggestion, currentFastTravelMode = getFastTravelSuggestion(step, travelInstruction)
 
+    currentObjectiveTarget = getBestObjectiveTarget(step, active)
+    if currentObjectiveTarget then
+        currentPersonTarget = {
+            role = currentObjectiveTarget.role or "Quest objective",
+            name = currentObjectiveTarget.name,
+            zone = currentObjectiveTarget.zone,
+            coords = currentObjectiveTarget.coords,
+            locationType = currentObjectiveTarget.locationType,
+            locationNote = currentObjectiveTarget.locationNote,
+            approach = currentObjectiveTarget.approach,
+            useArrow = currentObjectiveTarget.useArrow ~= false,
+            waypoint = currentObjectiveTarget.waypoint,
+        }
+        if currentObjectiveTarget.instruction then
+            currentTravelInstruction = currentObjectiveTarget.instruction
+        end
+        if currentObjectiveTarget.waypoint then
+            currentNavigationWaypoint = currentObjectiveTarget.waypoint
+        end
+    end
+
     local insideDungeonRoute = step and step.dungeon and zoneMatchesAliases({ step.title == "Leaders of the Fang" and "Wailing Caverns" or "" })
     if insideDungeonRoute then
+        currentObjectiveTarget = nil
         currentNavigationWaypoint = nil
         currentFastTravelSuggestion = nil
         currentFastTravelMode = nil
@@ -1188,6 +1244,8 @@ local function render()
         else
             details[#details + 1] = "DO: Complete remaining dungeon objectives"
         end
+    elseif currentObjectiveTarget and currentObjectiveTarget.action then
+        details[#details + 1] = "DO: " .. currentObjectiveTarget.action
     elseif obj then
         details[#details + 1] = "DO: " .. obj
     elseif currentNextQuestPickup and currentNextQuestPickup.title then
