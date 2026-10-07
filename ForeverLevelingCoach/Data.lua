@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.5.3",
+    version = "0.5.4",
     supported = {
         faction = "Horde",
         class = "SHAMAN",
@@ -53,6 +53,11 @@ ForeverLevelingCoach_Data = {
             name = "Stonetalon / Grimtotem",
             zoneAliases = { "Stonetalon Mountains", "Stonetalon", "Camp Aparaje" },
             note = "Finish the nearby Grimtotem and Venture Co. objectives together when you are already in Stonetalon.",
+        },
+        SILVERPINE_WATER = {
+            name = "Silverpine / Water Totem",
+            zoneAliases = { "Silverpine Forest", "Silverpine" },
+            note = "Stay on the Water Totem objective while you are in Silverpine.",
         },
         BARRENS_RATCHET = {
             name = "Barrens / Ratchet",
@@ -117,6 +122,8 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 63,
+            cluster = "SILVERPINE_WATER",
+            clusterPriority = 1,
             title = "Call of Water",
             tag = "IMPORTANT",
             minLevel = 20,
