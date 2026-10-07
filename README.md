@@ -56,3 +56,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Navigation arrow uses same-map safety so unverified cross-zone math cannot misroute the player
 
 - Corrected arrow heading math and added live rotation diagnostics
+
+- Added terrain-aware quest instructions for tricky objectives like Call of Water [63]
