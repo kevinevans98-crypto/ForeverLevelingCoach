@@ -82,3 +82,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Added live-verified Quest 3369 (In Nightmares) with Hamuul Runetotem / Elder Rise turn-in guidance and flight-path-first travel instructions
 
 - GPS-style compact play UI: GO TO / WHERE / FASTEST / DO, while verbose diagnostics stay in exports
+
+- Flight-path learning and route-aware taxi selection: FLC records usable destinations at flight masters and can attempt to choose the route target automatically
