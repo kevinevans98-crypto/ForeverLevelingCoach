@@ -90,3 +90,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Added Leaders of the Fang [914] to the Wailing Caverns dungeon route so it competes against Ashenvale recommendations instead of being ignored
 
 - Dungeon route mode: entrance waypoints, proximity-aware scoring, short next-objective guidance, and Wailing Caverns cave-vs-instance instructions
+
+- Inside-dungeon cleanup: no stale entrance waypoint or taxi target once the player is already inside Wailing Caverns
