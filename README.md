@@ -11,6 +11,7 @@ Current development focus:
 - Navigation arrow foundation using verified waypoint data only
 - Compact semi-transparent Blizzard-style UI showing the current recommended quest only
 - Area quest clustering so nearby objectives are stacked before leaving a zone
+- One-click Export button in the main addon window
 - Semi-fast leveling philosophy: strong XP/hour without turning the route into a hardcore speedrun
 
 ## Install
