@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.6.6",
+    version = "0.7.0",
     supported = {
         faction = "Horde",
         class = "SHAMAN",
@@ -153,8 +153,20 @@ ForeverLevelingCoach_Data = {
                 },
                 {
                     zoneAliases = { "Silverpine Forest", "Silverpine", "The Sepulcher" },
-                    instruction = "Go to The Sepulcher first. From the west/back side of the inn and catacomb area, look for the two large trees and the rocky ledge behind them. Climb/jump up the rocks, then carefully drop down to the hidden pool on the other side. Use your Water Sapta at the pool, kill the Corrupt Minor Manifestation of Water, loot the Corrupt Manifestation's Bracers, then click the Brazier of Everfount nearby and speak to the water elemental that appears.",
-                    waypoint = { mapID = 1421, x = 0.383, y = 0.446, label = "Hidden pool / Brazier of Everfount" },
+                    instruction = "Follow the terrain route to the hidden pool.",
+                    steps = {
+                        {
+                            instruction = "STEP 1/2: Get to The Sepulcher and move to the west/back side of the inn and catacomb area. Look for the two large trees and rocky ledge. The arrow stays off during this approach so it cannot point you through the cliff.",
+                            advanceWhenWithin = {
+                                waypoint = { mapID = 1421, x = 0.383, y = 0.446, label = "Hidden pool / Brazier of Everfount" },
+                                distance = 0.055,
+                            },
+                        },
+                        {
+                            instruction = "STEP 2/2: You are close enough for local guidance. Use the trees/rock ledge to climb over, carefully drop to the hidden pool, use Water Sapta, kill the Corrupt Minor Manifestation of Water, loot the bracers, then click the Brazier and speak to the water elemental.",
+                            waypoint = { mapID = 1421, x = 0.383, y = 0.446, label = "Hidden pool / Brazier of Everfount" },
+                        },
+                    },
                 },
                 {
                     instruction = "Travel to Silverpine Forest. Use the Orgrimmar to Undercity zeppelin if crossing from Kalimdor, then head west of The Sepulcher.",
