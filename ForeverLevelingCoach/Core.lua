@@ -30,6 +30,7 @@ local defaults = {
     travelHintHeight = 90,
     autoFlight = true,
     gearAdvisor = true,
+    lazyMode = true,
     lastUIVersion = "0.4.2",
     lastCluster = nil,
 }
@@ -133,6 +134,7 @@ local currentFastTravelMode = nil
 local currentNextQuestPickup = nil
 local currentPersonTarget = nil
 local currentObjectiveTarget = nil
+local currentTravelTarget = nil
 local currentTaxiOptions = {}
 local currentAutoFlightTarget = nil
 local currentAutoFlightStatus = "idle"
@@ -1112,6 +1114,38 @@ local function getBestObjectiveTarget(step, active)
     return bestTarget
 end
 
+local function getLazyTravelTarget(step)
+    if not DB or DB.lazyMode == false or not step or not step.flightTarget then return nil end
+
+    -- Lazy Mode never points an arrow blindly across maps. Instead it converts
+    -- cross-zone travel into the next local action the player can actually do.
+    if zoneMatchesAliases({ "Orgrimmar" }) then
+        local mapID = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player")
+        if mapID then
+            return {
+                role = "Travel",
+                name = "Flight Master",
+                zone = "Orgrimmar",
+                coords = "45, 64",
+                locationType = "LOCAL TRAVEL STEP",
+                locationNote = "Go to Doras, then fly directly to the route destination.",
+                approach = "Follow the arrow to the Orgrimmar flight master.",
+                instruction = "Fly to " .. tostring(step.flightTarget),
+                action = "FLY TO " .. string.upper(tostring(step.flightTarget)),
+                useArrow = true,
+                waypoint = {
+                    mapID = mapID,
+                    x = 0.45,
+                    y = 0.64,
+                    label = "Flight Master",
+                },
+            }
+        end
+    end
+
+    return nil
+end
+
 local function render()
     if not playerSupported() then
         routeText:SetText("Current build: Horde Shaman levels 1–30")
@@ -1127,6 +1161,7 @@ local function render()
     currentAutoFlightStatus = currentAutoFlightTarget and "waiting-for-flight-master" or "no-target"
     currentPersonTarget = step and step.personTarget or nil
     currentObjectiveTarget = nil
+    currentTravelTarget = nil
     currentNextQuestPickup = nil
     if step and step.nextPickup then
         if step.nextPickup.showWhileActive or (active and active.isComplete) then
@@ -1151,7 +1186,25 @@ local function render()
     currentFastTravelSuggestion, currentFastTravelMode = getFastTravelSuggestion(step, travelInstruction)
 
     currentObjectiveTarget = getBestObjectiveTarget(step, active)
-    if currentObjectiveTarget then
+    currentTravelTarget = getLazyTravelTarget(step)
+
+    if currentTravelTarget then
+        currentPersonTarget = {
+            role = currentTravelTarget.role,
+            name = currentTravelTarget.name,
+            zone = currentTravelTarget.zone,
+            coords = currentTravelTarget.coords,
+            locationType = currentTravelTarget.locationType,
+            locationNote = currentTravelTarget.locationNote,
+            approach = currentTravelTarget.approach,
+            useArrow = currentTravelTarget.useArrow,
+            waypoint = currentTravelTarget.waypoint,
+        }
+        currentTravelInstruction = currentTravelTarget.instruction
+        currentNavigationWaypoint = currentTravelTarget.waypoint
+        currentFastTravelSuggestion = nil
+        currentFastTravelMode = "lazy-local-travel"
+    elseif currentObjectiveTarget then
         currentPersonTarget = {
             role = currentObjectiveTarget.role or "Quest objective",
             name = currentObjectiveTarget.name,
@@ -1174,6 +1227,7 @@ local function render()
     local insideDungeonRoute = step and step.dungeon and zoneMatchesAliases({ step.title == "Leaders of the Fang" and "Wailing Caverns" or "" })
     if insideDungeonRoute then
         currentObjectiveTarget = nil
+        currentTravelTarget = nil
         currentNavigationWaypoint = nil
         currentFastTravelSuggestion = nil
         currentFastTravelMode = nil
@@ -1189,7 +1243,11 @@ local function render()
     end
     local tag = TAG_LABELS[step.tag] or step.tag or "DO"
 
-    routeText:SetText(tag .. ": " .. (step.title or "Next step"))
+    if DB and DB.lazyMode ~= false then
+        routeText:SetText("NEXT: " .. (step.title or "Next step"))
+    else
+        routeText:SetText(tag .. ": " .. (step.title or "Next step"))
+    end
 
     local details = {}
     local obj = objectiveSummary(active)
@@ -1220,11 +1278,13 @@ local function render()
         details[#details + 1] = "GO TO: " .. currentNextQuestPickup.npc
     end
 
-    if where then
+    if where and (not DB or DB.lazyMode == false) then
         details[#details + 1] = "WHERE: " .. where
     end
 
-    if currentFastTravelSuggestion then
+    if currentTravelTarget and DB and DB.lazyMode ~= false then
+        -- Keep Lazy Mode to one immediate travel action; no paragraph to read.
+    elseif currentFastTravelSuggestion then
         local fast = currentFastTravelSuggestion
         fast = fast:gsub("^FASTEST:%s*", "")
         fast = fast:gsub("^FAST TRAVEL:%s*", "")
@@ -1235,7 +1295,9 @@ local function render()
         details[#details + 1] = "TRAVEL: " .. currentTravelInstruction
     end
 
-    if active and active.isComplete then
+    if currentTravelTarget and DB and DB.lazyMode ~= false then
+        details[#details + 1] = "DO: " .. (currentTravelTarget.action or currentTravelTarget.instruction or "Travel")
+    elseif active and active.isComplete then
         details[#details + 1] = "DO: Turn in " .. (step.title or "this quest")
     elseif step and step.dungeon then
         local nextObj = nextUnfinishedObjective(active)
@@ -1323,6 +1385,8 @@ exportSnapshot = function()
         "TravelHintState=" .. tostring(currentRouteStep and currentRouteStep.dungeon and zoneMatchesAliases({ "Wailing Caverns" }) and "hidden" or (currentArrowState ~= "active-same-map" and currentTravelInstruction and "shown" or "hidden")),
         "FastTravelMode=" .. tostring(currentFastTravelMode or "none"),
         "FastTravelSuggestion=" .. tostring(currentFastTravelSuggestion or "none"),
+        "LazyModeEnabled=" .. tostring(DB and DB.lazyMode ~= false or false),
+        "LazyTravelTarget=" .. tostring(currentTravelTarget and currentTravelTarget.name or "none"),
         "GearAdvisorEnabled=" .. tostring(DB and DB.gearAdvisor ~= false or false),
         "AutoFlightEnabled=" .. tostring(DB and DB.autoFlight ~= false or false),
         "AutoFlightTarget=" .. tostring(currentAutoFlightTarget or "none"),
@@ -1730,7 +1794,11 @@ SLASH_FOREVERLEVELINGCOACH1 = "/flc"
 SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
     msg = (msg or ""):lower()
 
-    if msg == "go" then
+    if msg == "lazy" then
+        DB.lazyMode = not DB.lazyMode
+        render()
+        print("|cff33ff99FLC:|r Lazy Mode " .. (DB.lazyMode and "enabled." or "disabled."))
+    elseif msg == "go" then
         focusCurrentQuest()
     elseif msg == "sync" then
         syncQuests()
@@ -1771,7 +1839,7 @@ SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
         syncQuests()
     else
         print("|cff33ff99Forever Leveling Coach v" .. tostring(Data.version) .. "|r")
-        print("/flc show, hide, go, sync, export, gear, autoflight, arrow, lock, unlock, beginner")
+        print("/flc show, hide, go, lazy, sync, export, gear, autoflight, arrow, lock, unlock, beginner")
     end
 end
 
