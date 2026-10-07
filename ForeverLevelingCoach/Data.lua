@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.6.1",
+    version = "0.6.2",
     supported = {
         faction = "Horde",
         class = "SHAMAN",
@@ -143,6 +143,11 @@ ForeverLevelingCoach_Data = {
                 {
                     zoneAliases = { "Tirisfal Glades", "Undercity", "Ruins of Lordaeron" },
                     instruction = "From Undercity/Tirisfal, travel southwest into Silverpine Forest. Continue toward the coast west of The Sepulcher.",
+                },
+                {
+                    zoneAliases = { "Alterac Mountains", "Misty Shore" },
+                    instruction = "You went past Silverpine into Alterac Mountains. Turn back west/northwest toward Silverpine Forest; the arrow will keep pointing toward the Brazier across the zone border.",
+                    waypoint = { mapID = 1421, x = 0.383, y = 0.446, label = "Brazier of Everfount" },
                 },
                 {
                     zoneAliases = { "Silverpine Forest", "Silverpine", "The Sepulcher" },
