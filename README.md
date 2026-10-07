@@ -58,3 +58,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Corrected arrow heading math and added live rotation diagnostics
 
 - Added terrain-aware quest instructions for tricky objectives like Call of Water [63]
+
+- Added verified live Call of Water steps 96, 100, and 1103 so the class chain remains prioritized after the Silverpine cleanse
