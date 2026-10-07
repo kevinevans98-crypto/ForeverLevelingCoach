@@ -86,3 +86,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Flight-path learning and route-aware taxi selection: FLC records usable destinations at flight masters and can attempt to choose the route target automatically
 
 - Ashenvale routes now use Splintertree Post as the preferred flight destination and stale taxi targets are cleared on route changes
+
+- Added Leaders of the Fang [914] to the Wailing Caverns dungeon route so it competes against Ashenvale recommendations instead of being ignored
