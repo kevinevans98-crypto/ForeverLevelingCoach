@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.5.1
+Forever Leveling Coach v0.5.2
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.5.1 highlights
+v0.5.2 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -46,6 +46,9 @@ v0.5.1 highlights
 - /flc export now shows the winning score, reasons, and all scored candidate quests
 - Quest 63 (Call of Water) added as an IMPORTANT Water Totem-chain step
 - Verified Silverpine waypoint added for the Brazier of Everfount
+- Main guide window can now scroll with the mouse wheel when instructions are longer than the panel
+- Navigation arrow now appears automatically only when the current recommended step has a verified waypoint
+- /flc arrow remains the master on/off toggle
 
 Important routing rule
 ----------------------
