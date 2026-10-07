@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.4.0
+Forever Leveling Coach v0.4.1
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.4.0 highlights
+v0.4.1 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -18,6 +18,12 @@ v0.4.0 highlights
 - Movable and resizable guide window
 - Saved UI settings
 - Beginner Mode
+- Unknown/new quest scanner with NEW / UNVERIFIED labels
+- Unknown quest history saved in SavedVariables
+- /flc export includes unknown quest IDs and objectives
+- Navigation arrow window foundation
+- /flc arrow toggles the arrow
+- Arrow uses route waypoints only when Forever-specific coordinates are verified
 
 Important routing rule
 ----------------------
