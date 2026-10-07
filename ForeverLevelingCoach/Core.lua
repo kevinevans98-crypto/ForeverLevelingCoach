@@ -115,6 +115,8 @@ local currentCluster = nil
 local currentClusterCount = 0
 local currentRouteScore = nil
 local currentRouteReasons = {}
+local currentTravelInstruction = nil
+local currentNavigationWaypoint = nil
 local exportSnapshot
 local syncQuests
 
@@ -188,6 +190,37 @@ local function zoneMatchesCluster(clusterID)
         end
     end
     return false
+end
+
+local function zoneMatchesAliases(aliases)
+    if not aliases then return false end
+    local zone = string.lower((GetZoneText and GetZoneText()) or "")
+    local subZone = string.lower((GetSubZoneText and GetSubZoneText()) or "")
+    for _, alias in ipairs(aliases) do
+        local a = string.lower(alias)
+        if zone == a or subZone == a or string.find(zone, a, 1, true) or string.find(subZone, a, 1, true) then
+            return true
+        end
+    end
+    return false
+end
+
+local function getTravelInstruction(step)
+    if not step then return nil, nil end
+    if step.travelGuide then
+        local fallback
+        for _, travel in ipairs(step.travelGuide) do
+            if travel.zoneAliases then
+                if zoneMatchesAliases(travel.zoneAliases) then
+                    return travel.instruction, travel.waypoint
+                end
+            else
+                fallback = travel
+            end
+        end
+        if fallback then return fallback.instruction, fallback.waypoint end
+    end
+    return nil, step.waypoint
 end
 
 local function getObjectiveProgress(active)
@@ -545,47 +578,55 @@ local function objectiveSummary(active)
     return table.concat(lines, "\n")
 end
 
+local function atan2Safe(y, x)
+    if math.atan2 then return math.atan2(y, x) end
+    if x > 0 then return math.atan(y / x) end
+    if x < 0 and y >= 0 then return math.atan(y / x) + math.pi end
+    if x < 0 and y < 0 then return math.atan(y / x) - math.pi end
+    if x == 0 and y > 0 then return math.pi / 2 end
+    if x == 0 and y < 0 then return -math.pi / 2 end
+    return 0
+end
+
 local function updateArrow()
-    if not DB or DB.arrowVisible == false then
+    if not DB or DB.arrowVisible == false or not currentRouteStep then
         arrowFrame:Hide()
         return
     end
-
-    local step = currentRouteStep
-    local waypoint = step and step.waypoint
-
+    local _, waypoint = getTravelInstruction(currentRouteStep)
+    currentNavigationWaypoint = waypoint
     if not waypoint or not waypoint.mapID or not waypoint.x or not waypoint.y then
         arrowFrame:Hide()
         return
     end
-
-    arrowFrame:Show()
-
-    arrowTexture:SetAlpha(1)
-    local label = waypoint.label or step.title or "Route target"
     local mapID = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player")
-    if not mapID or mapID ~= waypoint.mapID then
-        arrowTexture:SetRotation(0)
-        arrowLabel:SetText(label .. " - travel to target zone")
+    if mapID ~= waypoint.mapID then
+        arrowFrame:Hide()
         return
     end
-
-    local pos = C_Map.GetPlayerMapPosition and C_Map.GetPlayerMapPosition(waypoint.mapID, "player")
+    local pos = C_Map.GetPlayerMapPosition and C_Map.GetPlayerMapPosition(mapID, "player")
     if not pos then
-        arrowTexture:SetRotation(0)
-        arrowLabel:SetText(label)
+        arrowFrame:Hide()
         return
     end
-
+    arrowFrame:Show()
     local px, py = pos:GetXY()
     local dx, dy = waypoint.x - px, waypoint.y - py
-    local targetAngle = math.atan2 and math.atan2(dx, -dy) or 0
+    local targetAngle = atan2Safe(dx, -dy)
     local facing = GetPlayerFacing and GetPlayerFacing() or 0
     arrowTexture:SetRotation(targetAngle - facing)
-
-    local mapDistance = math.sqrt(dx * dx + dy * dy) * 100
-    arrowLabel:SetText(string.format("%s  •  %.1f%%", label, mapDistance))
+    local dist = math.sqrt(dx * dx + dy * dy) * 100
+    arrowLabel:SetText(string.format("%s  •  %.1f%%", waypoint.label or currentRouteStep.title or "Route target", dist))
 end
+
+local arrowElapsed = 0
+arrowFrame:SetScript("OnUpdate", function(_, elapsed)
+    arrowElapsed = arrowElapsed + elapsed
+    if arrowElapsed >= 0.05 then
+        arrowElapsed = 0
+        updateArrow()
+    end
+end)
 
 local function render()
     if not playerSupported() then
@@ -598,6 +639,9 @@ local function render()
 
     local step, active = chooseRouteStep(currentByID)
     currentRouteStep = step
+    local travelInstruction, navigationWaypoint = getTravelInstruction(step)
+    currentTravelInstruction = travelInstruction
+    currentNavigationWaypoint = navigationWaypoint
     local tag = TAG_LABELS[step.tag] or step.tag or "DO"
 
     routeText:SetText(tag .. ": " .. (step.title or "Next step"))
@@ -608,6 +652,9 @@ local function render()
     end
     if step.note then
         details[#details + 1] = step.note
+    end
+    if currentTravelInstruction then
+        details[#details + 1] = "Travel step: " .. currentTravelInstruction
     end
     if currentCluster and currentClusterCount > 1 then
         local cluster = Data.clusters and Data.clusters[currentCluster]
@@ -673,6 +720,10 @@ exportSnapshot = function()
         "ClusterActiveQuestCount=" .. tostring(currentClusterCount or 0),
         "RecommendedScore=" .. tostring(currentRouteScore or 0),
         "RecommendedReasons=" .. table.concat(currentRouteReasons or {}, " | "),
+        "CurrentZone=" .. tostring((GetZoneText and GetZoneText()) or "?"),
+        "CurrentSubZone=" .. tostring((GetSubZoneText and GetSubZoneText()) or "?"),
+        "CurrentTravelStep=" .. tostring(currentTravelInstruction or "none"),
+        "NavigationTarget=" .. tostring(currentNavigationWaypoint and currentNavigationWaypoint.label or "none"),
     }
 
     lines[#lines + 1] = "ScoredCandidates:"
