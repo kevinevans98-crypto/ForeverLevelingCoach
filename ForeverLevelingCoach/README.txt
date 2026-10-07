@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.9.0
+Forever Leveling Coach v0.9.1
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.9.0 highlights
+v0.9.1 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -170,3 +170,10 @@ Roadmap
 - Leaders of the Fang [914] is now a routed Wailing Caverns dungeon quest
 - Dungeon quests can now compete with zone quests instead of being ignored just because they are newly discovered
 - Leaders of the Fang is labeled DUNGEON — inside Wailing Caverns with a short one-run objective note
+
+- Dungeon entrance waypoint added for Wailing Caverns at the classic/Forever cave entrance around 46.0, 36.0
+- Wailing Caverns no longer gets the full current-area bonus merely because the player is somewhere in The Barrens
+- Entrance proximity now helps score the dungeon while outside; being inside Wailing Caverns gives the full area bonus
+- Dungeon mode keeps the GPS UI short by showing only the next unfinished dungeon objective
+- Leaders of the Fang can use Ratchet as its preferred flight destination when approaching from another zone
+- Wailing Caverns travel guidance distinguishes the outside cave entrance from the dungeon portal inside
