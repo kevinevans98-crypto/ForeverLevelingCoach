@@ -16,6 +16,7 @@ Current development focus:
 - Adaptive Smart Route Scoring with explainable recommendation reasons
 - Scrollable main guide window
 - Navigation arrow auto-shows only for verified current-step waypoints
+- Floating WoW-style navigation arrow with no background window
 - Semi-fast leveling philosophy: strong XP/hour without turning the route into a hardcore speedrun
 
 ## Install
