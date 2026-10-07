@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.7.2
+Forever Leveling Coach v0.8.0
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.7.2 highlights
+v0.8.0 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -115,3 +115,9 @@ Roadmap
 - Travel hint window is now movable and resizable
 - Travel hint size and position persist between sessions
 - /flc lock also locks the travel hint window and hides its resize grip
+
+- Travel Optimizer foundation added
+- Detects Hearthstone ownership, cooldown/readiness, and bind location
+- Route-specific fast-travel suggestions can prefer Hearthstone or flight paths over long rides
+- Quest 96 now suggests a Ratchet flight from Orgrimmar when useful, with a Ratchet-bound ready Hearthstone taking priority
+- Export includes FastTravelMode and FastTravelSuggestion
