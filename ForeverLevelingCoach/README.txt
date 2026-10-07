@@ -88,3 +88,8 @@ Roadmap
 
 - Floating navigation arrow now shows distance in meters/kilometers when world-position conversion is available
 - Falls back to map-percent distance if the client cannot provide world coordinates
+
+- Arrow same-map safety rule: never points across a zone/map boundary
+- Removed unsafe Alterac -> Silverpine cross-zone arrow behavior after live test failure
+- Alterac/Misty Shore now shows an OFF ROUTE recovery instruction until the player returns to Silverpine
+- Export includes ArrowState for navigation debugging
