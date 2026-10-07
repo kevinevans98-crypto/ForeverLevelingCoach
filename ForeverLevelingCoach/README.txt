@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.8.3
+Forever Leveling Coach v0.8.4
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.8.3 highlights
+v0.8.4 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -136,3 +136,7 @@ Roadmap
 - Fixed Travel Optimizer refresh bug: suggestions are now recalculated whenever the route renders
 - Fast travel advice now appears in the main guide as well as the travel hint window
 - Orgrimmar -> Ratchet flight advice now covers Call of Water 96/1103 and The Glowing Shard 6981
+
+- Fixed completed Glowing Shard routing: once Sputtervalve is done, fast-travel guidance now targets Falla Sagewind instead of the stale Ratchet contact
+- When already near the Wailing Caverns mountain, FLC tells you to follow the local arrow instead of taking a flight
+- Live-discovered quest 1483 (Ziz Fizziks) is now recognized as known
