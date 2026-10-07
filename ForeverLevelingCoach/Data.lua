@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.8.3",
+    version = "0.8.4",
     supported = {
         faction = "Horde",
         class = "SHAMAN",
@@ -22,6 +22,7 @@ ForeverLevelingCoach_Data = {
         [1062] = true, -- Goblin Invaders
         [6543] = true, -- The Warsong Reports
         [1489] = true, -- Hamuul Runetotem
+        [1483] = true, -- Ziz Fizziks (live-discovered in Forever)
         [6981] = true, -- The Glowing Shard
     },
 
