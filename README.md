@@ -125,3 +125,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Level 22 Shaman training false-positive fixed; current 22-30 reminders begin at level 24 from live Forever Beta data
 
 - Smart Flight Assist: flight routes are detected and suggested, but FLC never auto-clicks a taxi destination
+
+- Splintertree local flight handoff and turn-in flight-target persistence fix
