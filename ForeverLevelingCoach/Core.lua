@@ -141,6 +141,7 @@ local currentObjectiveTarget = nil
 local currentTravelTarget = nil
 local currentTrainingTarget = nil
 local currentTrainingDue = false
+local flcRelicStatus
 local currentTrainerAvailableCount = nil
 local currentTaxiOptions = {}
 local currentAutoFlightTarget = nil
@@ -2049,7 +2050,7 @@ else
 end
 -- End Gear Advisor -----------------------------------------------------------
 
-local function flcRelicStatus()
+flcRelicStatus = function()
     local equipped = GetInventoryItemLink and GetInventoryItemLink("player", 18)
     local equippedID = flcItemID(equipped)
     local known = equippedID and Data.shamanRelics and Data.shamanRelics[equippedID]
