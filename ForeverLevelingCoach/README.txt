@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.6.1
+Forever Leveling Coach v0.7.0
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.6.1 highlights
+v0.7.0 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -103,3 +103,8 @@ Roadmap
 - Added live-discovered Call of Water quest IDs 96, 100, and 1103
 - Quest 96 is prioritized as the Water Totem turn-in at Islen Waterseer in The Barrens
 - Quest 1103 is recognized as the Water Sapta recovery step for Tiev Mordune
+
+- Multi-step navigation engine added
+- Route steps can now advance automatically using verified same-map proximity checks
+- Arrow can stay intentionally hidden during unsafe terrain approaches, then activate only for the final local segment
+- /flc export now reports NavigationStep=x/y
