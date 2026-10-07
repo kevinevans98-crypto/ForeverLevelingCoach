@@ -826,6 +826,10 @@ local currentArrowDebug = {}
 
 local function updateTravelHint(message, state)
     if not travelHintFrame then return end
+    if currentRouteStep and currentRouteStep.dungeon and zoneMatchesAliases({ "Wailing Caverns" }) then
+        travelHintFrame:Hide()
+        return
+    end
     if message and message ~= "" and state ~= "active-same-map" then
         local hint = message
         if currentFastTravelSuggestion and currentFastTravelSuggestion ~= "" then
@@ -1050,6 +1054,22 @@ local function render()
     currentTravelInstruction = travelInstruction
     currentNavigationWaypoint = navigationWaypoint
     currentFastTravelSuggestion, currentFastTravelMode = getFastTravelSuggestion(step, travelInstruction)
+
+    local insideDungeonRoute = step and step.dungeon and zoneMatchesAliases({ step.title == "Leaders of the Fang" and "Wailing Caverns" or "" })
+    if insideDungeonRoute then
+        currentNavigationWaypoint = nil
+        currentFastTravelSuggestion = nil
+        currentFastTravelMode = nil
+        currentAutoFlightTarget = nil
+        currentAutoFlightStatus = "inside-dungeon"
+        currentPersonTarget = {
+            role = "Dungeon objective",
+            name = "Current boss/objective",
+            zone = (GetZoneText and GetZoneText()) or "Dungeon",
+            locationType = "INSIDE DUNGEON",
+            locationNote = "Stay inside and complete the next unfinished objective.",
+        }
+    end
     local tag = TAG_LABELS[step.tag] or step.tag or "DO"
 
     routeText:SetText(tag .. ": " .. (step.title or "Next step"))
@@ -1070,7 +1090,14 @@ local function render()
         end
     end
 
-    if person and person.name then
+    if step and step.dungeon and zoneMatchesAliases({ "Wailing Caverns" }) then
+        local nextObj = nextUnfinishedObjective(active)
+        if nextObj then
+            details[#details + 1] = "GO TO: " .. nextObj:gsub("^0/1%s*", "")
+        else
+            details[#details + 1] = "GO TO: Dungeon exit / turn-in"
+        end
+    elseif person and person.name then
         details[#details + 1] = "GO TO: " .. person.name
     elseif currentNextQuestPickup and currentNextQuestPickup.npc then
         details[#details + 1] = "GO TO: " .. currentNextQuestPickup.npc
@@ -1173,7 +1200,7 @@ exportSnapshot = function()
         "NavigationStep=" .. tostring(currentNavigationStepIndex and (tostring(currentNavigationStepIndex) .. "/" .. tostring(currentNavigationStepCount or "?")) or "none"),
         "ArrowState=" .. tostring(currentArrowState or "unknown"),
         "ArrowMode=" .. tostring(currentArrowState == "active-same-map" and "same-map-safe" or "hidden"),
-        "TravelHintState=" .. tostring(currentArrowState ~= "active-same-map" and currentTravelInstruction and "shown" or "hidden"),
+        "TravelHintState=" .. tostring(currentRouteStep and currentRouteStep.dungeon and zoneMatchesAliases({ "Wailing Caverns" }) and "hidden" or (currentArrowState ~= "active-same-map" and currentTravelInstruction and "shown" or "hidden")),
         "FastTravelMode=" .. tostring(currentFastTravelMode or "none"),
         "FastTravelSuggestion=" .. tostring(currentFastTravelSuggestion or "none"),
         "AutoFlightEnabled=" .. tostring(DB and DB.autoFlight ~= false or false),
