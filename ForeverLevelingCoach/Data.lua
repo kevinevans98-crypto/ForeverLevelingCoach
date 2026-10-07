@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.8.9",
+    version = "0.9.0",
     supported = {
         faction = "Horde",
         class = "SHAMAN",
@@ -75,6 +75,11 @@ ForeverLevelingCoach_Data = {
             name = "Thunder Bluff",
             zoneAliases = { "Thunder Bluff" },
             note = "Bundle Thunder Bluff hand-ins with trainer, bank, auction, or travel stops.",
+        },
+        WAILING_CAVERNS = {
+            name = "Wailing Caverns",
+            zoneAliases = { "The Barrens", "Barrens", "Wailing Caverns" },
+            note = "Dungeon cluster: prioritize when you have worthwhile Wailing Caverns quests stacked together.",
         },
     },
 
@@ -253,6 +258,25 @@ ForeverLevelingCoach_Data = {
                 {
                     instruction = "Obtain a Water Sapta from Islen Waterseer in The Barrens, then bring it to Tiev Mordune in Silverpine Forest around 37.3, 44.2.",
                 },
+            },
+        },
+
+        {
+            questID = 914,
+            cluster = "WAILING_CAVERNS",
+            clusterPriority = 0,
+            title = "Leaders of the Fang",
+            tag = "DO",
+            minLevel = 18,
+            maxLevel = 30,
+            note = "Wailing Caverns dungeon quest. Strong value because the objectives are all inside the dungeon and can be completed in one run.",
+            personTarget = {
+                role = "Dungeon objective",
+                name = "Wailing Caverns",
+                zone = "The Barrens",
+                locationType = "DUNGEON — inside Wailing Caverns",
+                locationNote = "The four Fang leaders and their gems are inside the Wailing Caverns dungeon.",
+                approach = "Enter Wailing Caverns and complete Cobrahn, Anacondra, Pythas, and Serpentis in the same run.",
             },
         },
 
