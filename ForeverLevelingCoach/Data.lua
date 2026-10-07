@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.6.2",
+    version = "0.6.3",
     supported = {
         faction = "Horde",
         class = "SHAMAN",
@@ -146,8 +146,7 @@ ForeverLevelingCoach_Data = {
                 },
                 {
                     zoneAliases = { "Alterac Mountains", "Misty Shore" },
-                    instruction = "You went past Silverpine into Alterac Mountains. Turn back west/northwest toward Silverpine Forest; the arrow will keep pointing toward the Brazier across the zone border.",
-                    waypoint = { mapID = 1421, x = 0.383, y = 0.446, label = "Brazier of Everfount" },
+                    instruction = "OFF ROUTE: you went past Silverpine into Alterac Mountains near the Misty Shore. Turn back toward Silverpine Forest. The arrow stays hidden until you are back on the verified Silverpine map so it cannot send you the wrong way.",
                 },
                 {
                     zoneAliases = { "Silverpine Forest", "Silverpine", "The Sepulcher" },
