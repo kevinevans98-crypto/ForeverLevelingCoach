@@ -1040,8 +1040,7 @@ end
 
 local function scanTaxiMapAndAutoFly()
     currentTaxiOptions = {}
-    currentAutoFlightTarget = currentRouteStep and currentRouteStep.flightTarget or nil
-    currentAutoFlightStatus = "no-target"
+    currentAutoFlightStatus = currentAutoFlightTarget and "waiting-for-flight-master" or "no-target"
 
     if not DB or not NumTaxiNodes or not TaxiNodeName or not TaxiNodeGetType then
         currentAutoFlightStatus = "taxi-api-unavailable"
@@ -1074,7 +1073,9 @@ local function scanTaxiMapAndAutoFly()
 
     if targetReachable then
         currentAutoFlightStatus = "target-reachable-click"
-        print("|cff33ff99FLC:|r Flight ready: click " .. tostring(currentAutoFlightTarget) .. ".")
+        if DB.autoFlight then
+            print("|cff33ff99FLC:|r Flight ready: click " .. tostring(currentAutoFlightTarget) .. ".")
+        end
     else
         currentAutoFlightStatus = "target-not-reachable-here"
     end
@@ -1207,6 +1208,27 @@ local function getLazyTravelTarget(step, flightTarget)
 
     -- Lazy Mode never points an arrow blindly across maps. Instead it converts
     -- cross-zone travel into the next local action the player can actually do.
+    if zoneMatchesAliases({ "Splintertree Post" }) then
+        return {
+            role = "Travel",
+            name = "Splintertree Flight Master",
+            zone = "Splintertree Post, Ashenvale",
+            coords = "around 74, 63",
+            locationType = "LOCAL TRAVEL STEP",
+            locationNote = "Use the Horde flight master at Splintertree Post.",
+            approach = "Follow the local arrow to the flight master, open the taxi map, then choose the route destination.",
+            instruction = "Click " .. tostring(flightTarget) .. " on the flight map",
+            action = "CLICK " .. string.upper(tostring(flightTarget)),
+            useArrow = true,
+            waypoint = {
+                mapID = 1440,
+                x = 0.74,
+                y = 0.63,
+                label = "Splintertree Flight Master",
+            },
+        }
+    end
+
     if zoneMatchesAliases({ "Zoram'gar Outpost" }) and flightTarget ~= "Splintertree Post" then
         return {
             role = "Travel",
