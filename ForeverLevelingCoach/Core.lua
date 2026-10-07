@@ -610,39 +610,51 @@ local function updateArrow()
         arrowFrame:Hide()
         return
     end
+
     local _, waypoint = getTravelInstruction(currentRouteStep)
     currentNavigationWaypoint = waypoint
     if not waypoint or not waypoint.mapID or not waypoint.x or not waypoint.y then
         arrowFrame:Hide()
         return
     end
-    local mapID = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player")
-    if mapID ~= waypoint.mapID then
+
+    local playerMapID = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player")
+    if not playerMapID or not C_Map.GetPlayerMapPosition or not C_Map.GetWorldPosFromMapPos or not CreateVector2D then
         arrowFrame:Hide()
         return
     end
-    local pos = C_Map.GetPlayerMapPosition and C_Map.GetPlayerMapPosition(mapID, "player")
-    if not pos then
+
+    local playerMapPos = C_Map.GetPlayerMapPosition(playerMapID, "player")
+    if not playerMapPos then
         arrowFrame:Hide()
         return
     end
+
+    local px, py = playerMapPos:GetXY()
+    local playerContinent, playerWorld = C_Map.GetWorldPosFromMapPos(playerMapID, CreateVector2D(px, py))
+    local targetContinent, targetWorld = C_Map.GetWorldPosFromMapPos(waypoint.mapID, CreateVector2D(waypoint.x, waypoint.y))
+
+    if not playerWorld or not targetWorld or playerContinent ~= targetContinent then
+        arrowFrame:Hide()
+        return
+    end
+
+    local pwx, pwy = playerWorld:GetXY()
+    local twx, twy = targetWorld:GetXY()
+    local dx, dy = twx - pwx, twy - pwy
+
     arrowFrame:Show()
-    local px, py = pos:GetXY()
-    local dx, dy = waypoint.x - px, waypoint.y - py
     local targetAngle = atan2Safe(dx, -dy)
     local facing = GetPlayerFacing and GetPlayerFacing() or 0
     arrowTexture:SetRotation(targetAngle - facing)
-    local meters = getWaypointDistanceMeters(mapID, px, py, waypoint.x, waypoint.y)
+
+    local yards = math.sqrt(dx * dx + dy * dy)
+    local meters = yards * 0.9144
     local label = waypoint.label or currentRouteStep.title or "Route target"
-    if meters then
-        if meters >= 1000 then
-            arrowLabel:SetText(string.format("%s  •  %.2f km", label, meters / 1000))
-        else
-            arrowLabel:SetText(string.format("%s  •  %d m", label, math.floor(meters + 0.5)))
-        end
+    if meters >= 1000 then
+        arrowLabel:SetText(string.format("%s  •  %.2f km", label, meters / 1000))
     else
-        local dist = math.sqrt(dx * dx + dy * dy) * 100
-        arrowLabel:SetText(string.format("%s  •  %.1f%%", label, dist))
+        arrowLabel:SetText(string.format("%s  •  %d m", label, math.floor(meters + 0.5)))
     end
 end
 
@@ -751,6 +763,7 @@ exportSnapshot = function()
         "CurrentSubZone=" .. tostring((GetSubZoneText and GetSubZoneText()) or "?"),
         "CurrentTravelStep=" .. tostring(currentTravelInstruction or "none"),
         "NavigationTarget=" .. tostring(currentNavigationWaypoint and currentNavigationWaypoint.label or "none"),
+        "ArrowMode=" .. tostring(currentNavigationWaypoint and "world-space" or "hidden"),
     }
 
     lines[#lines + 1] = "ScoredCandidates:"
