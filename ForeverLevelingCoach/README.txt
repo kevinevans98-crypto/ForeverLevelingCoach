@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.13.2
+Forever Leveling Coach v0.13.3
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.13.2 highlights
+v0.13.3 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -265,3 +265,7 @@ Roadmap
 - Completed route steps can now declare a dedicated turnInTarget and turnInFlightTarget
 - At Zoram'gar, cross-zone turn-ins can hand off locally to the Zoram'gar flight master rather than pointing blindly across maps
 - Warsong Reports completion prefers a flight toward Crossroads, then a local Barrens arrow to Kadrak
+
+- Level 22 training false-positive fixed from live Forever Beta verification
+- The Shaman What's Training panel shows 0 available at level 22 and the next ranks at level 24
+- For the current 22-30 route, class-training reminders now begin at level 24 and then check even levels
