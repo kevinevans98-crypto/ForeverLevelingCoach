@@ -455,33 +455,26 @@ resizeGrip:SetNormalTexture("Interface/ChatFrame/UI-ChatIM-SizeGrabber-Up")
 resizeGrip:SetHighlightTexture("Interface/ChatFrame/UI-ChatIM-SizeGrabber-Highlight")
 resizeGrip:SetPushedTexture("Interface/ChatFrame/UI-ChatIM-SizeGrabber-Down")
 
-local arrowFrame = CreateFrame("Frame", "ForeverLevelingCoachArrowFrame", UIParent, "BackdropTemplate")
-arrowFrame:SetSize(150, 120)
+local arrowFrame = CreateFrame("Frame", "ForeverLevelingCoachArrowFrame", UIParent)
+arrowFrame:SetSize(120, 92)
 arrowFrame:SetMovable(true)
 arrowFrame:EnableMouse(true)
 arrowFrame:SetClampedToScreen(true)
-arrowFrame:SetBackdrop({
-    bgFile = "Interface/DialogFrame/UI-DialogBox-Background-Dark",
-    edgeFile = "Interface/DialogFrame/UI-DialogBox-Border",
-    tile = true,
-    tileSize = 32,
-    edgeSize = 18,
-    insets = { left = 6, right = 6, top = 6, bottom = 6 },
-})
-arrowFrame:SetBackdropColor(0.05, 0.05, 0.05, 0.48)
-arrowFrame:SetBackdropBorderColor(0.72, 0.55, 0.20, 0.90)
+arrowFrame:SetFrameStrata("HIGH")
 
+-- Floating WoW-style navigation arrow: no window/background.
 local arrowTexture = arrowFrame:CreateTexture(nil, "ARTWORK")
-arrowTexture:SetSize(58, 58)
-arrowTexture:SetPoint("TOP", 0, -8)
-arrowTexture:SetTexture("Interface/Buttons/UI-ScrollBar-ScrollUpButton-Up")
-arrowTexture:SetAlpha(0.30)
+arrowTexture:SetSize(64, 64)
+arrowTexture:SetPoint("TOP", 0, 0)
+arrowTexture:SetTexture("Interface/Minimap/MinimapArrow")
+arrowTexture:SetAlpha(1)
 
-local arrowLabel = arrowFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-arrowLabel:SetPoint("TOPLEFT", 8, -70)
-arrowLabel:SetPoint("TOPRIGHT", -8, -70)
+local arrowLabel = arrowFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+arrowLabel:SetPoint("TOP", arrowTexture, "BOTTOM", 0, -2)
+arrowLabel:SetWidth(180)
 arrowLabel:SetJustifyH("CENTER")
-arrowLabel:SetText("No verified waypoint")
+arrowLabel:SetShadowOffset(1, -1)
+arrowLabel:SetText("")
 
 local function saveArrowPosition()
     local point, _, relativePoint, x, y = arrowFrame:GetPoint(1)
@@ -498,6 +491,18 @@ end)
 arrowFrame:SetScript("OnDragStop", function(self)
     self:StopMovingOrSizing()
     saveArrowPosition()
+end)
+
+arrowFrame:SetScript("OnEnter", function()
+    if DB and not DB.locked and GameTooltip then
+        GameTooltip:SetOwner(arrowFrame, "ANCHOR_BOTTOM")
+        GameTooltip:SetText("Forever Leveling Coach Arrow")
+        GameTooltip:AddLine("Drag to move. /flc lock to lock it.", 1, 1, 1)
+        GameTooltip:Show()
+    end
+end)
+arrowFrame:SetScript("OnLeave", function()
+    if GameTooltip then GameTooltip:Hide() end
 end)
 
 local function savePosition()
@@ -561,14 +566,14 @@ local function updateArrow()
     local mapID = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player")
     if not mapID or mapID ~= waypoint.mapID then
         arrowTexture:SetRotation(0)
-        arrowLabel:SetText(label .. "\nTravel to target zone")
+        arrowLabel:SetText(label .. " - travel to target zone")
         return
     end
 
     local pos = C_Map.GetPlayerMapPosition and C_Map.GetPlayerMapPosition(waypoint.mapID, "player")
     if not pos then
         arrowTexture:SetRotation(0)
-        arrowLabel:SetText(label .. "\nPosition unavailable")
+        arrowLabel:SetText(label)
         return
     end
 
@@ -579,7 +584,7 @@ local function updateArrow()
     arrowTexture:SetRotation(targetAngle - facing)
 
     local mapDistance = math.sqrt(dx * dx + dy * dy) * 100
-    arrowLabel:SetText(string.format("%s\n%.1f map%% away", label, mapDistance))
+    arrowLabel:SetText(string.format("%s  •  %.1f%%", label, mapDistance))
 end
 
 local function render()
@@ -641,6 +646,7 @@ local function applySettings()
     frame:SetAlpha(DB.alpha or defaults.alpha)
     if DB.visible == false then frame:Hide() else frame:Show() end
     resizeGrip:SetShown(not DB.locked)
+    arrowFrame:EnableMouse(not DB.locked)
 
     arrowFrame:ClearAllPoints()
     arrowFrame:SetPoint(DB.arrowPoint or "TOP", UIParent, DB.arrowRelativePoint or "TOP", DB.arrowX or 0, DB.arrowY or -90)
@@ -775,10 +781,12 @@ SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
     elseif msg == "lock" then
         DB.locked = true
         resizeGrip:Hide()
+        arrowFrame:EnableMouse(false)
         print("|cff33ff99FLC:|r window locked.")
     elseif msg == "unlock" then
         DB.locked = false
         resizeGrip:Show()
+        arrowFrame:EnableMouse(true)
         print("|cff33ff99FLC:|r window unlocked.")
     elseif msg == "beginner" then
         DB.beginner = not DB.beginner
