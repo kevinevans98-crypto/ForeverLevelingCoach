@@ -1190,6 +1190,13 @@ local function render()
     currentObjectiveTarget = getBestObjectiveTarget(step, active)
     currentTravelTarget = getLazyTravelTarget(step)
 
+    if currentObjectiveTarget and currentObjectiveTarget.waypoint
+        and C_Map and C_Map.GetBestMapForUnit
+        and C_Map.GetBestMapForUnit("player") == currentObjectiveTarget.waypoint.mapID then
+        currentAutoFlightTarget = nil
+        currentAutoFlightStatus = "local-objective"
+    end
+
     if currentTravelTarget then
         currentPersonTarget = {
             role = currentTravelTarget.role,
