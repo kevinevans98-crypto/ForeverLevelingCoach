@@ -127,6 +127,7 @@ local currentNavigationStepIndex = nil
 local currentNavigationStepCount = nil
 local currentFastTravelSuggestion = nil
 local currentFastTravelMode = nil
+local currentNextQuestPickup = nil
 local exportSnapshot
 local syncQuests
 
@@ -818,6 +819,9 @@ local function updateArrow()
     end
 
     local _, waypoint, navIndex, navCount = getTravelInstruction(currentRouteStep)
+    if currentNextQuestPickup and currentNextQuestPickup.useArrow and currentNextQuestPickup.waypoint then
+        waypoint = currentNextQuestPickup.waypoint
+    end
     currentNavigationWaypoint = waypoint
     currentNavigationStepIndex = navIndex
     currentNavigationStepCount = navCount
@@ -904,6 +908,16 @@ arrowFrame:SetScript("OnUpdate", function(_, elapsed)
     end
 end)
 
+local function formatNextQuestPickup(pickup)
+    if not pickup then return nil end
+    local parts = {}
+    if pickup.title then parts[#parts + 1] = pickup.title end
+    if pickup.npc then parts[#parts + 1] = "from " .. pickup.npc end
+    if pickup.zone then parts[#parts + 1] = "in " .. pickup.zone end
+    if pickup.coords then parts[#parts + 1] = "around " .. pickup.coords end
+    return table.concat(parts, " ")
+end
+
 local function render()
     if not playerSupported() then
         routeText:SetText("Current build: Horde Shaman levels 1–30")
@@ -915,6 +929,12 @@ local function render()
 
     local step, active = chooseRouteStep(currentByID)
     currentRouteStep = step
+    currentNextQuestPickup = nil
+    if step and step.nextPickup then
+        if step.nextPickup.showWhileActive or (active and active.isComplete) then
+            currentNextQuestPickup = step.nextPickup
+        end
+    end
     local travelInstruction, navigationWaypoint = getTravelInstruction(step)
     currentTravelInstruction = travelInstruction
     currentNavigationWaypoint = navigationWaypoint
@@ -931,6 +951,15 @@ local function render()
     end
     if currentTravelInstruction then
         details[#details + 1] = "Travel step: " .. currentTravelInstruction
+    end
+    if currentNextQuestPickup then
+        local pickupText = formatNextQuestPickup(currentNextQuestPickup)
+        if pickupText then
+            details[#details + 1] = "Next quest pickup: " .. pickupText
+        end
+        if currentNextQuestPickup.note then
+            details[#details + 1] = currentNextQuestPickup.note
+        end
     end
     if currentCluster and currentClusterCount > 1 then
         local cluster = Data.clusters and Data.clusters[currentCluster]
@@ -1011,6 +1040,10 @@ exportSnapshot = function()
         "TravelHintState=" .. tostring(currentArrowState ~= "active-same-map" and currentTravelInstruction and "shown" or "hidden"),
         "FastTravelMode=" .. tostring(currentFastTravelMode or "none"),
         "FastTravelSuggestion=" .. tostring(currentFastTravelSuggestion or "none"),
+        "NextQuestPickup=" .. tostring(currentNextQuestPickup and currentNextQuestPickup.title or "none"),
+        "NextQuestPickupNPC=" .. tostring(currentNextQuestPickup and currentNextQuestPickup.npc or "none"),
+        "NextQuestPickupZone=" .. tostring(currentNextQuestPickup and currentNextQuestPickup.zone or "none"),
+        "NextQuestPickupCoords=" .. tostring(currentNextQuestPickup and currentNextQuestPickup.coords or "none"),
         "ArrowPlayerMapID=" .. tostring(currentArrowDebug.playerMapID or "none"),
         "ArrowPlayerXY=" .. (currentArrowDebug.playerX and string.format("%.4f,%.4f", currentArrowDebug.playerX, currentArrowDebug.playerY) or "none"),
         "ArrowTargetMapID=" .. tostring(currentArrowDebug.targetMapID or "none"),
