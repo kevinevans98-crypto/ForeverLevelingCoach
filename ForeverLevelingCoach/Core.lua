@@ -705,16 +705,23 @@ exportSnapshot = function()
         end
     end
 
-    lines[#lines + 1] = "DiscoveredUnknownQuests:"
+    lines[#lines + 1] = "UnresolvedUnknownQuests:"
+    local unresolvedUnknownCount = 0
     for _, record in pairs(DB.discoveredQuests or {}) do
-        lines[#lines + 1] = string.format("- %d | %s | firstLevel=%s | lastLevel=%s",
-            record.questID or 0,
-            record.title or "?",
-            tostring(record.firstSeenLevel or "?"),
-            tostring(record.lastSeenLevel or "?"))
-        for _, objective in ipairs(record.objectives or {}) do
-            lines[#lines + 1] = "  objective: " .. objective
+        if record.questID and not isKnownQuest(record.questID) then
+            unresolvedUnknownCount = unresolvedUnknownCount + 1
+            lines[#lines + 1] = string.format("- %d | %s | firstLevel=%s | lastLevel=%s",
+                record.questID or 0,
+                record.title or "?",
+                tostring(record.firstSeenLevel or "?"),
+                tostring(record.lastSeenLevel or "?"))
+            for _, objective in ipairs(record.objectives or {}) do
+                lines[#lines + 1] = "  objective: " .. objective
+            end
         end
+    end
+    if unresolvedUnknownCount == 0 then
+        lines[#lines + 1] = "- none"
     end
 
     local text = table.concat(lines, "\n")
