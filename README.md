@@ -50,3 +50,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 
 - Step-by-step travel guidance with zone-aware instructions
 - Live floating arrow updates while moving and turning
+
+- Arrow distance display uses meters/kilometers when world-position conversion is available
