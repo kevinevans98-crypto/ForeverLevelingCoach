@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.8.0
+Forever Leveling Coach v0.8.1
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.8.0 highlights
+v0.8.1 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -121,3 +121,9 @@ Roadmap
 - Route-specific fast-travel suggestions can prefer Hearthstone or flight paths over long rides
 - Quest 96 now suggests a Ratchet flight from Orgrimmar when useful, with a Ratchet-bound ready Hearthstone taking priority
 - Export includes FastTravelMode and FastTravelSuggestion
+
+- Next Quest Pickup support added
+- Route data can now name the next quest, NPC, zone, coordinates, and optional pickup waypoint
+- Main guide shows the pickup separately from the current objective
+- Export includes NextQuestPickup fields
+- Call of Water recovery now shows Water Sapta from Islen Waterseer at 65.8, 43.8 without inventing an unknown quest ID
