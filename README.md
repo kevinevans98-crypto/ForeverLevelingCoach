@@ -88,3 +88,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Ashenvale routes now use Splintertree Post as the preferred flight destination and stale taxi targets are cleared on route changes
 
 - Added Leaders of the Fang [914] to the Wailing Caverns dungeon route so it competes against Ashenvale recommendations instead of being ignored
+
+- Dungeon route mode: entrance waypoints, proximity-aware scoring, short next-objective guidance, and Wailing Caverns cave-vs-instance instructions
