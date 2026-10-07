@@ -125,6 +125,8 @@ local currentTravelInstruction = nil
 local currentNavigationWaypoint = nil
 local currentNavigationStepIndex = nil
 local currentNavigationStepCount = nil
+local currentFastTravelSuggestion = nil
+local currentFastTravelMode = nil
 local exportSnapshot
 local syncQuests
 
@@ -253,6 +255,65 @@ local function getNavigationStep(step, travel)
            nav and nav.waypoint or travel.waypoint,
            index,
            #travel.steps
+end
+
+local function getHearthStatus()
+    local status = {
+        hasStone = false,
+        ready = false,
+        cooldown = 0,
+        bind = (GetBindLocation and GetBindLocation()) or "Unknown",
+    }
+
+    if GetItemCount then
+        status.hasStone = (GetItemCount(6948) or 0) > 0
+    end
+
+    if GetItemCooldown then
+        local startTime, duration, enabled = GetItemCooldown(6948)
+        if enabled == 1 and duration then
+            if duration == 0 then
+                status.ready = status.hasStone
+                status.cooldown = 0
+            else
+                local remaining = math.max(0, (startTime or 0) + duration - GetTime())
+                status.cooldown = remaining
+                status.ready = status.hasStone and remaining <= 0
+            end
+        end
+    end
+
+    return status
+end
+
+local function getFastTravelSuggestion(step, travelInstruction)
+    local zone = (GetZoneText and GetZoneText()) or ""
+    local hearth = getHearthStatus()
+
+    -- Route-specific verified fast-travel advice. We only recommend shortcuts
+    -- whose destination is known to be useful for the active route.
+    if step and step.questID == 96 then
+        if zoneMatchesAliases({ "Orgrimmar" }) then
+            if hearth.ready and hearth.bind and string.find(string.lower(hearth.bind), "ratchet", 1, true) then
+                return "FASTEST: Hearthstone to Ratchet, then ride south along the coast to Islen Waterseer around 65.8, 43.8.", "hearth"
+            end
+            return "FAST TRAVEL: If Ratchet is available on your flight master, fly to Ratchet instead of riding through all of Durotar/Barrens. From Ratchet, head south along the coast to Islen Waterseer around 65.8, 43.8.", "flight"
+        elseif zoneMatchesAliases({ "The Barrens", "Barrens", "Ratchet" }) then
+            return "LOCAL ROUTE: If you are in Ratchet, head south along the coast. Islen Waterseer is around 65.8, 43.8.", "local"
+        elseif hearth.ready then
+            return string.format("HEARTH READY: Bound to %s. Use it only if that destination puts you closer to Ratchet/The Barrens than your current route.", hearth.bind or "Unknown"), "hearth-check"
+        end
+    end
+
+    if hearth.hasStone then
+        if hearth.ready then
+            return string.format("Hearthstone ready (bound to %s). Use it if that bind is closer to the current objective.", hearth.bind or "Unknown"), "hearth-check"
+        elseif hearth.cooldown and hearth.cooldown > 0 then
+            return string.format("Hearthstone on cooldown: about %d min remaining.", math.ceil(hearth.cooldown / 60)), "hearth-cooldown"
+        end
+    end
+
+    return nil, nil
 end
 
 local function getTravelInstruction(step)
@@ -732,7 +793,15 @@ local currentArrowDebug = {}
 local function updateTravelHint(message, state)
     if not travelHintFrame then return end
     if message and message ~= "" and state ~= "active-same-map" then
-        travelHintText:SetText(message)
+        local hint = message
+        if currentFastTravelSuggestion and currentFastTravelSuggestion ~= "" then
+            if hint and hint ~= "" then
+                hint = currentFastTravelSuggestion .. "\n\n" .. hint
+            else
+                hint = currentFastTravelSuggestion
+            end
+        end
+        travelHintText:SetText(hint or "")
         travelHintFrame:Show()
     else
         travelHintFrame:Hide()
@@ -940,6 +1009,8 @@ exportSnapshot = function()
         "ArrowState=" .. tostring(currentArrowState or "unknown"),
         "ArrowMode=" .. tostring(currentArrowState == "active-same-map" and "same-map-safe" or "hidden"),
         "TravelHintState=" .. tostring(currentArrowState ~= "active-same-map" and currentTravelInstruction and "shown" or "hidden"),
+        "FastTravelMode=" .. tostring(currentFastTravelMode or "none"),
+        "FastTravelSuggestion=" .. tostring(currentFastTravelSuggestion or "none"),
         "ArrowPlayerMapID=" .. tostring(currentArrowDebug.playerMapID or "none"),
         "ArrowPlayerXY=" .. (currentArrowDebug.playerX and string.format("%.4f,%.4f", currentArrowDebug.playerX, currentArrowDebug.playerY) or "none"),
         "ArrowTargetMapID=" .. tostring(currentArrowDebug.targetMapID or "none"),
