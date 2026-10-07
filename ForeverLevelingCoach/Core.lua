@@ -31,6 +31,8 @@ local defaults = {
     autoFlight = true,
     gearAdvisor = true,
     lazyMode = true,
+    autoAccept = true,
+    autoTurnIn = true,
     lastUIVersion = "0.4.2",
     lastCluster = nil,
 }
@@ -1386,6 +1388,8 @@ exportSnapshot = function()
         "FastTravelMode=" .. tostring(currentFastTravelMode or "none"),
         "FastTravelSuggestion=" .. tostring(currentFastTravelSuggestion or "none"),
         "LazyModeEnabled=" .. tostring(DB and DB.lazyMode ~= false or false),
+        "AutoAcceptEnabled=" .. tostring(DB and DB.autoAccept ~= false or false),
+        "AutoTurnInEnabled=" .. tostring(DB and DB.autoTurnIn ~= false or false),
         "LazyTravelTarget=" .. tostring(currentTravelTarget and currentTravelTarget.name or "none"),
         "GearAdvisorEnabled=" .. tostring(DB and DB.gearAdvisor ~= false or false),
         "AutoFlightEnabled=" .. tostring(DB and DB.autoFlight ~= false or false),
@@ -1790,11 +1794,88 @@ else
 end
 -- End Gear Advisor -----------------------------------------------------------
 
+-- Lazy quest automation ------------------------------------------------------
+local function flcCurrentDialogQuestID()
+    if type(GetQuestID) == "function" then
+        local ok, questID = pcall(GetQuestID)
+        if ok and questID and questID > 0 then return questID end
+    end
+    return nil
+end
+
+local function flcShouldAutoAcceptQuest(questID)
+    if not DB or DB.autoAccept == false then return false end
+    if not questID then return false end
+    local step = getStepByQuestID(questID)
+    if not step then return false end
+    return (step.tag or "DO") ~= "SKIP"
+end
+
+local function flcShouldAutoTurnInQuest(questID)
+    if not DB or DB.autoTurnIn == false then return false end
+    if not questID then return false end
+    local step = getStepByQuestID(questID)
+    if not step then return false end
+    return (step.tag or "DO") ~= "SKIP"
+end
+
+local function flcHandleQuestDetail()
+    local questID = flcCurrentDialogQuestID()
+    if not flcShouldAutoAcceptQuest(questID) then return end
+    if type(AcceptQuest) == "function" then
+        local ok = pcall(AcceptQuest)
+        if ok then
+            local step = getStepByQuestID(questID)
+            print("|cff33ff99FLC:|r auto-accepted " .. tostring(step and step.title or ("quest " .. tostring(questID))) .. ".")
+        end
+    end
+end
+
+local function flcHandleQuestProgress()
+    local questID = flcCurrentDialogQuestID()
+    if not flcShouldAutoTurnInQuest(questID) then return end
+    if type(IsQuestCompletable) == "function" and not IsQuestCompletable() then return end
+    if type(CompleteQuest) == "function" then
+        pcall(CompleteQuest)
+    end
+end
+
+local function flcHandleQuestComplete()
+    local questID = flcCurrentDialogQuestID()
+    if not flcShouldAutoTurnInQuest(questID) then return end
+
+    local choices = 0
+    if type(GetNumQuestChoices) == "function" then
+        local ok, value = pcall(GetNumQuestChoices)
+        if ok and value then choices = value end
+    end
+
+    -- Never guess a reward. If there is a choice, stop so Gear Advisor/user can decide.
+    if choices and choices > 0 then
+        print("|cffffcc00FLC:|r reward choice detected — pick the best item, then finish the turn-in.")
+        return
+    end
+
+    if type(GetQuestReward) == "function" then
+        local ok = pcall(GetQuestReward, 0)
+        if ok then
+            print("|cff33ff99FLC:|r auto-turned in quest.")
+        end
+    end
+end
+-- End Lazy quest automation --------------------------------------------------
+
 SLASH_FOREVERLEVELINGCOACH1 = "/flc"
 SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
     msg = (msg or ""):lower()
 
-    if msg == "lazy" then
+    if msg == "autoaccept" then
+        DB.autoAccept = not DB.autoAccept
+        print("|cff33ff99FLC:|r auto accept " .. (DB.autoAccept and "enabled." or "disabled."))
+    elseif msg == "autoturnin" then
+        DB.autoTurnIn = not DB.autoTurnIn
+        print("|cff33ff99FLC:|r auto turn-in " .. (DB.autoTurnIn and "enabled." or "disabled."))
+    elseif msg == "lazy" then
         DB.lazyMode = not DB.lazyMode
         render()
         print("|cff33ff99FLC:|r Lazy Mode " .. (DB.lazyMode and "enabled." or "disabled."))
@@ -1839,13 +1920,16 @@ SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
         syncQuests()
     else
         print("|cff33ff99Forever Leveling Coach v" .. tostring(Data.version) .. "|r")
-        print("/flc show, hide, go, lazy, sync, export, gear, autoflight, arrow, lock, unlock, beginner")
+        print("/flc show, hide, go, lazy, autoaccept, autoturnin, sync, export, gear, autoflight, arrow, lock, unlock, beginner")
     end
 end
 
 FLC:RegisterEvent("ADDON_LOADED")
 FLC:RegisterEvent("PLAYER_LOGIN")
 FLC:RegisterEvent("QUEST_LOG_UPDATE")
+FLC:RegisterEvent("QUEST_DETAIL")
+FLC:RegisterEvent("QUEST_PROGRESS")
+FLC:RegisterEvent("QUEST_COMPLETE")
 FLC:RegisterEvent("QUEST_ACCEPTED")
 FLC:RegisterEvent("QUEST_REMOVED")
 FLC:RegisterEvent("QUEST_TURNED_IN")
@@ -1864,6 +1948,15 @@ FLC:SetScript("OnEvent", function(_, event, arg1)
         if C_Timer and C_Timer.NewTicker then
             FLC.ticker = C_Timer.NewTicker(15, syncQuests)
         end
+    elseif event == "QUEST_DETAIL" then
+        flcHandleQuestDetail()
+        syncQuests()
+    elseif event == "QUEST_PROGRESS" then
+        flcHandleQuestProgress()
+        syncQuests()
+    elseif event == "QUEST_COMPLETE" then
+        flcHandleQuestComplete()
+        syncQuests()
     elseif event == "TAXIMAP_OPENED" then
         taxiOpenSerial = taxiOpenSerial + 1
         syncQuests()
