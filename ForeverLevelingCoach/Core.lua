@@ -1124,10 +1124,12 @@ local function isClassTrainingDue()
     if not DB then return false end
     local _, classFile = UnitClass("player")
     local level = UnitLevel("player") or 1
-    if classFile ~= "SHAMAN" or level < 4 then return false end
+    if classFile ~= "SHAMAN" then return false end
 
-    -- Classic Shaman trainer ranks begin at level 4 and then every even level.
-    if (level % 2) ~= 0 then return false end
+    -- Live Forever Beta verification: at level 22 the spellbook's
+    -- What's Training panel shows 0 available and the next Shaman ranks at 24.
+    -- For the current 22-30 route, only begin reminders at 24.
+    if level < 24 or (level % 2) ~= 0 then return false end
     return (tonumber(DB.lastClassTrainerLevel) or 0) < level
 end
 
