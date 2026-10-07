@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.13.4
+Forever Leveling Coach v0.13.5
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.13.4 highlights
+v0.13.5 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -275,3 +275,7 @@ Roadmap
 - When the destination is reachable, FLC tells you exactly which flight to click
 - FLC no longer calls TakeTaxiNode automatically, preventing unwanted flights or client restrictions
 - Flight assist is disabled by default; /flc autoflight toggles the assist messages
+
+- Splintertree local flight handoff added: when a route needs another zone, Lazy Mode points to the Splintertree flight master and says which destination to click
+- Taxi scanning now preserves completed-quest turn-in flight targets instead of reverting to the quest's normal flight target
+- Flight-ready chat messages respect /flc autoflight; route detection and known-flight learning still work without auto-clicking anything
