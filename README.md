@@ -110,3 +110,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Clickable quest focus: click the current route title or Go button to super-track/open the recommended quest when supported
 
 - Objective-aware GPS routing for The Warsong Reports, including closest unfinished contact selection and verified Ashenvale waypoints
+
+- Lazy Mode: minimal NEXT / GO TO / DO UI for short play sessions, plus local travel handoffs instead of unsafe cross-zone arrows
