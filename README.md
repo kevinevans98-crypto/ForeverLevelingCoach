@@ -108,3 +108,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Added percentage-based Gear Advisor verdicts with bounded estimates instead of major/small upgrade labels
 
 - Clickable quest focus: click the current route title or Go button to super-track/open the recommended quest when supported
+
+- Objective-aware GPS routing for The Warsong Reports, including closest unfinished contact selection and verified Ashenvale waypoints
