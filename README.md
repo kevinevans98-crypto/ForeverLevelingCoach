@@ -80,3 +80,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Added terrain/context guidance for quest people: outside vs dungeon, landmark notes, and approach instructions
 
 - Added live-verified Quest 3369 (In Nightmares) with Hamuul Runetotem / Elder Rise turn-in guidance and flight-path-first travel instructions
+
+- GPS-style compact play UI: GO TO / WHERE / FASTEST / DO, while verbose diagnostics stay in exports
