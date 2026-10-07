@@ -97,3 +97,5 @@ Roadmap
 - Corrected WoW-facing math: GetPlayerFacing is counterclockwise from north, while map Y increases south
 - Switched the floating arrow to a native Blizzard up-arrow texture with a known zero-direction orientation
 - Export now includes arrow heading/rotation diagnostics for live verification
+
+- Call of Water [63] Silverpine instructions expanded with the actual terrain route: Sepulcher backside -> trees/rocks -> hidden pool -> Water Sapta -> elemental -> bracers -> Brazier
