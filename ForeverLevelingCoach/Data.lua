@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.13.1",
+    version = "0.13.2",
     supported = {
         faction = "Horde",
         class = "SHAMAN",
@@ -482,6 +482,20 @@ ForeverLevelingCoach_Data = {
             minLevel = 17,
             maxLevel = 25,
             note = "Efficient while moving through Ashenvale: it naturally sends you through multiple Horde positions. Complete it alongside nearby Ashenvale quests.",
+            turnInFlightTarget = "Crossroads",
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Kadrak",
+                zone = "Northern Barrens watch tower",
+                coords = "48.1, 5.4",
+                locationType = "QUEST TURN-IN",
+                locationNote = "Kadrak is at the watch tower on the northern edge of The Barrens.",
+                approach = "From Crossroads, ride north on the main road to Kadrak's watch tower near the Ashenvale border.",
+                instruction = "Return to Kadrak at 48.1, 5.4 in northern The Barrens.",
+                action = "TURN IN THE WARSONG REPORTS",
+                useArrow = true,
+                waypoint = { mapID = 1413, x = 0.481, y = 0.054, label = "Kadrak" },
+            },
             objectiveTargets = {
                 {
                     objectiveContains = "Warsong Scout Update",
