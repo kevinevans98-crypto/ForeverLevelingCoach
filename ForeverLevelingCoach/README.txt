@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.12.0
+Forever Leveling Coach v0.12.1
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.12.0 highlights
+v0.12.1 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -237,3 +237,8 @@ Roadmap
 - /flc autoaccept toggles automatic quest acceptance
 - /flc autoturnin toggles automatic quest completion/turn-in
 - Export reports AutoAcceptEnabled and AutoTurnInEnabled
+
+- Warsong Supplies [6571] is now recognized from the live Forever quest log
+- Classified OPTIONAL because the full quest includes a long multi-zone detour
+- Added local Lazy Mode targets for Warsong Oil, Logging Rope, and Pixel / Warsong Saw Blades
+- Fixed stale Splintertree AutoFlightTarget once the active objective is already on the player's current map
