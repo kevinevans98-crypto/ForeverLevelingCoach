@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.9.7
+Forever Leveling Coach v0.9.8
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.9.7 highlights
+v0.9.8 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -202,3 +202,7 @@ Roadmap
 - Gear Advisor stays focused on fast decisions instead of fake precision
 
 - Fixed stale AutoFlightTarget export while inside a dungeon; it now correctly reports none when taxi routing is disabled by dungeon mode
+
+- Gear Advisor now checks whether the character can actually use the item before scoring it
+- Weapon/armor proficiency and class restrictions can no longer be labeled as upgrades when the game reports the item unusable
+- Added FLC: CANNOT USE verdict with red-tooltip fallback for Forever Beta restrictions
