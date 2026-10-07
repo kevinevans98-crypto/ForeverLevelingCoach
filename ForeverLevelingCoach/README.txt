@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.9.3
+Forever Leveling Coach v0.9.4
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.9.3 highlights
+v0.9.4 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -187,3 +187,8 @@ Roadmap
 - Rings/trinkets compare against the weaker equipped slot
 - /flc gear toggles Gear Advisor on/off
 - This is intentionally labeled a leveling estimate rather than a perfect endgame simulator
+
+- Fixed Gear Advisor tooltip hook crash on the Forever Beta client
+- Uses TooltipDataProcessor for item tooltips when available instead of blindly hooking OnTooltipSetItem
+- Export now self-initializes saved settings if addon startup was interrupted, preventing DB nil errors
+- Hidden comparison tooltip is excluded from Gear Advisor processing
