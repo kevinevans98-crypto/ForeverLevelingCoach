@@ -76,3 +76,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Travel Optimizer refresh fix: active routes now surface flight-path shortcuts in the main guide
 
 - Fixed stale Sputtervalve guidance after The Glowing Shard completes; next-pickup routing now follows Falla Sagewind
+
+- Added terrain/context guidance for quest people: outside vs dungeon, landmark notes, and approach instructions
