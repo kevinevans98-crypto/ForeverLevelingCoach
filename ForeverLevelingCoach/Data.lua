@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.8.0",
+    version = "0.8.1",
     supported = {
         faction = "Horde",
         class = "SHAMAN",
@@ -223,6 +223,16 @@ ForeverLevelingCoach_Data = {
             minLevel = 20,
             maxLevel = 30,
             note = "Recovery step: bring a Water Sapta to Tiev Mordune in Silverpine Forest. The Sapta comes from Islen Waterseer in The Barrens.",
+            nextPickup = {
+                title = "Water Sapta",
+                npc = "Islen Waterseer",
+                zone = "The Barrens",
+                coords = "65.8, 43.8",
+                showWhileActive = true,
+                useArrow = true,
+                note = "Look for a separate quest named Water Sapta from Islen Waterseer. If she does not offer it, the recovery chain may need to be restarted from Tiev Mordune.",
+                waypoint = { mapID = 1413, x = 0.658, y = 0.438, label = "Next quest pickup: Water Sapta" },
+            },
             travelGuide = {
                 {
                     zoneAliases = { "The Barrens", "Barrens", "Ratchet" },
