@@ -106,3 +106,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Gear Advisor now rejects unusable items before scoring, preventing false MAJOR UPGRADE labels on gear the character cannot equip
 
 - Added percentage-based Gear Advisor verdicts with bounded estimates instead of major/small upgrade labels
+
+- Clickable quest focus: click the current route title or Go button to super-track/open the recommended quest when supported
