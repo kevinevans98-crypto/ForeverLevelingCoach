@@ -64,3 +64,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Multi-step waypoint routing foundation: staged instructions, proximity-based advancement, and safer terrain-aware arrow activation
 
 - Added a compact travel hint window for cross-zone travel when the arrow is intentionally hidden
+
+- Added a movable and resizable travel hint window with saved position and size
