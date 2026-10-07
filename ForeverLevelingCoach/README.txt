@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.13.1
+Forever Leveling Coach v0.13.2
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.13.1 highlights
+v0.13.2 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -260,3 +260,8 @@ Roadmap
 - Naga at the Zoram Strand, Between a Rock and a Thistlefur, and Troll Charm now have local GPS targets
 - Vorsha the Lasher is OPTIONAL because it is an elite escort/event and may cost time while solo
 - Blackfathom Deeps quests The Essence of Aku'Mai and Amongst the Ruins are recognized as OPTIONAL dungeon work for a future BFD run
+
+- Completed Warsong Reports now routes back to Kadrak at 48.1,5.4 in northern The Barrens instead of leaving the arrow blank
+- Completed route steps can now declare a dedicated turnInTarget and turnInFlightTarget
+- At Zoram'gar, cross-zone turn-ins can hand off locally to the Zoram'gar flight master rather than pointing blindly across maps
+- Warsong Reports completion prefers a flight toward Crossroads, then a local Barrens arrow to Kadrak
