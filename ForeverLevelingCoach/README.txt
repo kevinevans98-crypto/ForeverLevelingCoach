@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.8.5
+Forever Leveling Coach v0.8.6
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.8.5 highlights
+v0.8.6 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -144,3 +144,8 @@ Roadmap
 - Quest-person guidance now includes Location type, Location note, and How to get there
 - Falla Sagewind is explicitly marked OUTSIDE on top of the Wailing Caverns mountain, NOT inside the dungeon
 - Sputtervalve is explicitly marked beside the Ratchet flight master and may lack a normal quest marker
+
+- Live-discovered Quest 3369 (In Nightmares) is now known and routed as a completed Thunder Bluff turn-in
+- Hamuul Runetotem is labeled as the turn-in person on Elder Rise
+- Barrens -> Thunder Bluff guidance now explicitly recommends using the flight path when available, with a ground-route fallback
+- No unverified Hamuul coordinates were invented; the addon gives city/landmark instructions until we verify a precise waypoint
