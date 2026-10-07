@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.8.9
+Forever Leveling Coach v0.9.0
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.8.9 highlights
+v0.9.0 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -166,3 +166,7 @@ Roadmap
 - Ashenvale route quests now target Splintertree Post as the preferred flight destination
 - At a flight master, FLC can now detect Splintertree Post as reachable and attempt to select it automatically
 - Live-discovered quest IDs 914 (Leaders of the Fang) and 1490 (Nara Wildmane) are now recognized as known
+
+- Leaders of the Fang [914] is now a routed Wailing Caverns dungeon quest
+- Dungeon quests can now compete with zone quests instead of being ignored just because they are newly discovered
+- Leaders of the Fang is labeled DUNGEON — inside Wailing Caverns with a short one-run objective note
