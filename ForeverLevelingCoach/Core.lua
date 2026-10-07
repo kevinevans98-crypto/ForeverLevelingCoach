@@ -28,6 +28,7 @@ local defaults = {
     travelHintY = -190,
     travelHintWidth = 300,
     travelHintHeight = 90,
+    autoFlight = true,
     lastUIVersion = "0.4.2",
     lastCluster = nil,
 }
@@ -47,6 +48,7 @@ local function copyDefaults()
         end
     end
     ForeverLevelingCoachDB.discoveredQuests = ForeverLevelingCoachDB.discoveredQuests or {}
+    ForeverLevelingCoachDB.knownFlightPaths = ForeverLevelingCoachDB.knownFlightPaths or {}
 
     -- One-time v0.4.2 UI cleanup: compact, see-through current-step panel.
     if ForeverLevelingCoachDB.lastUIVersion ~= "0.4.2" then
@@ -129,6 +131,10 @@ local currentFastTravelSuggestion = nil
 local currentFastTravelMode = nil
 local currentNextQuestPickup = nil
 local currentPersonTarget = nil
+local currentTaxiOptions = {}
+local currentAutoFlightTarget = nil
+local currentAutoFlightStatus = "idle"
+local taxiOpenSerial = 0
 local exportSnapshot
 local syncQuests
 
@@ -937,6 +943,67 @@ local function formatNextQuestPickup(pickup)
     return table.concat(parts, " ")
 end
 
+local function normalizeTaxiName(name)
+    return string.lower((name or ""):gsub("^%s+", ""):gsub("%s+$", ""))
+end
+
+local function taxiNameMatches(name, target)
+    if not name or not target then return false end
+    local n = normalizeTaxiName(name)
+    local t = normalizeTaxiName(target)
+    return n == t or string.find(n, t, 1, true) ~= nil
+end
+
+local function scanTaxiMapAndAutoFly()
+    currentTaxiOptions = {}
+    currentAutoFlightTarget = currentRouteStep and currentRouteStep.flightTarget or nil
+    currentAutoFlightStatus = "no-target"
+
+    if not DB or not NumTaxiNodes or not TaxiNodeName or not TaxiNodeGetType then
+        currentAutoFlightStatus = "taxi-api-unavailable"
+        return
+    end
+
+    DB.knownFlightPaths = DB.knownFlightPaths or {}
+    local count = NumTaxiNodes() or 0
+    local targetSlot = nil
+
+    for i = 1, count do
+        local name = TaxiNodeName(i)
+        local nodeType = TaxiNodeGetType(i)
+        if name and name ~= "" then
+            local usable = nodeType == "REACHABLE" or nodeType == "CURRENT"
+            if usable then
+                currentTaxiOptions[#currentTaxiOptions + 1] = name
+                DB.knownFlightPaths[name] = true
+            end
+            if currentAutoFlightTarget and nodeType == "REACHABLE" and taxiNameMatches(name, currentAutoFlightTarget) then
+                targetSlot = i
+            end
+        end
+    end
+
+    if not currentAutoFlightTarget then
+        currentAutoFlightStatus = "no-target"
+        return
+    end
+
+    if targetSlot then
+        currentAutoFlightStatus = DB.autoFlight and "target-reachable-auto" or "target-reachable-manual"
+        if DB.autoFlight and TakeTaxiNode then
+            local ok = pcall(TakeTaxiNode, targetSlot)
+            if ok then
+                currentAutoFlightStatus = "auto-flight-requested"
+            else
+                currentAutoFlightStatus = "auto-flight-blocked"
+                print("|cffffcc00FLC:|r " .. currentAutoFlightTarget .. " is available. Click it on the flight map; the client blocked automatic selection.")
+            end
+        end
+    else
+        currentAutoFlightStatus = "target-not-reachable-here"
+    end
+end
+
 local function render()
     if not playerSupported() then
         routeText:SetText("Current build: Horde Shaman levels 1–30")
@@ -1089,6 +1156,10 @@ exportSnapshot = function()
         "TravelHintState=" .. tostring(currentArrowState ~= "active-same-map" and currentTravelInstruction and "shown" or "hidden"),
         "FastTravelMode=" .. tostring(currentFastTravelMode or "none"),
         "FastTravelSuggestion=" .. tostring(currentFastTravelSuggestion or "none"),
+        "AutoFlightEnabled=" .. tostring(DB and DB.autoFlight ~= false or false),
+        "AutoFlightTarget=" .. tostring(currentAutoFlightTarget or (currentRouteStep and currentRouteStep.flightTarget) or "none"),
+        "AutoFlightStatus=" .. tostring(currentAutoFlightStatus or "none"),
+        "CurrentFlightOptions=" .. (#currentTaxiOptions > 0 and table.concat(currentTaxiOptions, " | ") or "none"),
         "NextQuestPickup=" .. tostring(currentNextQuestPickup and currentNextQuestPickup.title or "none"),
         "NextQuestPickupNPC=" .. tostring(currentNextQuestPickup and currentNextQuestPickup.npc or "none"),
         "NextQuestPickupZone=" .. tostring(currentNextQuestPickup and currentNextQuestPickup.zone or "none"),
@@ -1108,6 +1179,22 @@ exportSnapshot = function()
         "ArrowTargetHeadingDeg=" .. (currentArrowDebug.targetAngle and string.format("%.1f", math.deg(currentArrowDebug.targetAngle)) or "none"),
         "ArrowRotationDeg=" .. (currentArrowDebug.relativeAngle and string.format("%.1f", math.deg(currentArrowDebug.relativeAngle)) or "none"),
     }
+
+    lines[#lines + 1] = "KnownFlightPaths:"
+    local knownFlights = {}
+    if DB and DB.knownFlightPaths then
+        for name, known in pairs(DB.knownFlightPaths) do
+            if known then knownFlights[#knownFlights + 1] = name end
+        end
+    end
+    table.sort(knownFlights)
+    if #knownFlights == 0 then
+        lines[#lines + 1] = "- none learned yet; open flight masters so FLC can learn them"
+    else
+        for _, name in ipairs(knownFlights) do
+            lines[#lines + 1] = "- " .. name
+        end
+    end
 
     lines[#lines + 1] = "ScoredCandidates:"
     local clusterCounts = getActiveClusterCounts(currentByID)
@@ -1215,6 +1302,9 @@ SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
     elseif msg == "export" then
         syncQuests()
         exportSnapshot()
+    elseif msg == "autoflight" then
+        DB.autoFlight = not DB.autoFlight
+        print("|cff33ff99FLC:|r automatic flight selection " .. (DB.autoFlight and "enabled." or "disabled."))
     elseif msg == "arrow" then
         DB.arrowVisible = not DB.arrowVisible
         updateArrow()
@@ -1242,7 +1332,7 @@ SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
         syncQuests()
     else
         print("|cff33ff99Forever Leveling Coach v" .. tostring(Data.version) .. "|r")
-        print("/flc show, hide, sync, export, arrow, lock, unlock, beginner")
+        print("/flc show, hide, sync, export, autoflight, arrow, lock, unlock, beginner")
     end
 end
 
@@ -1256,6 +1346,7 @@ FLC:RegisterEvent("PLAYER_LEVEL_UP")
 FLC:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 FLC:RegisterEvent("ZONE_CHANGED")
 FLC:RegisterEvent("ZONE_CHANGED_INDOORS")
+FLC:RegisterEvent("TAXIMAP_OPENED")
 
 FLC:SetScript("OnEvent", function(_, event, arg1)
     if event == "ADDON_LOADED" and arg1 == ADDON_NAME then
@@ -1266,6 +1357,10 @@ FLC:SetScript("OnEvent", function(_, event, arg1)
         if C_Timer and C_Timer.NewTicker then
             FLC.ticker = C_Timer.NewTicker(15, syncQuests)
         end
+    elseif event == "TAXIMAP_OPENED" then
+        taxiOpenSerial = taxiOpenSerial + 1
+        syncQuests()
+        scanTaxiMapAndAutoFly()
     else
         syncQuests()
     end
