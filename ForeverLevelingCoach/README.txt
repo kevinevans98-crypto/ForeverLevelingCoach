@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.7.1
+Forever Leveling Coach v0.7.2
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.7.1 highlights
+v0.7.2 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -111,3 +111,7 @@ Roadmap
 
 - Added a compact travel hint window that appears when the arrow is hidden because the next target is on another map or has no safe waypoint
 - The hint automatically disappears when the same-map arrow becomes active again
+
+- Travel hint window is now movable and resizable
+- Travel hint size and position persist between sessions
+- /flc lock also locks the travel hint window and hides its resize grip
