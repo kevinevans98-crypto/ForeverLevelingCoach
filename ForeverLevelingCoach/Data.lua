@@ -1,8 +1,11 @@
 ForeverLevelingCoach_Data = {
-    version = "0.14.2",
+    version = "0.15.0",
     supported = {
         faction = "Horde",
-        class = "SHAMAN",
+        classes = {
+            SHAMAN = true,
+            ROGUE = true,
+        },
         minLevel = 1,
         maxLevel = 30,
     },
@@ -40,7 +43,7 @@ ForeverLevelingCoach_Data = {
         [1490] = true, -- Nara Wildmane (live-discovered in Forever)
     },
 
-    weaponPreference = {
+    shamanWeaponPreference = {
         mode = "2H_ONLY",
         allowedSubTypes = {
             ["Two-Handed Axes"] = true,
