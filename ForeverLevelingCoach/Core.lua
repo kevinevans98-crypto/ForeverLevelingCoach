@@ -499,7 +499,7 @@ arrowFrame:SetFrameStrata("HIGH")
 local arrowTexture = arrowFrame:CreateTexture(nil, "ARTWORK")
 arrowTexture:SetSize(64, 64)
 arrowTexture:SetPoint("TOP", 0, 0)
-arrowTexture:SetTexture("Interface/Minimap/MinimapArrow")
+arrowTexture:SetTexture("Interface/Buttons/UI-ScrollBar-ScrollUpButton-Up")
 arrowTexture:SetAlpha(1)
 
 local arrowLabel = arrowFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
@@ -606,10 +606,12 @@ local function atan2Safe(y, x)
 end
 
 local currentArrowState = "hidden"
+local currentArrowDebug = {}
 
 local function updateArrow()
     if not DB or DB.arrowVisible == false or not currentRouteStep then
         currentArrowState = "hidden-disabled"
+        currentArrowDebug = {}
         arrowFrame:Hide()
         return
     end
@@ -618,6 +620,7 @@ local function updateArrow()
     currentNavigationWaypoint = waypoint
     if not waypoint or not waypoint.mapID or not waypoint.x or not waypoint.y then
         currentArrowState = "hidden-no-waypoint"
+        currentArrowDebug = {}
         arrowFrame:Hide()
         return
     end
@@ -625,6 +628,7 @@ local function updateArrow()
     local playerMapID = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player")
     if not playerMapID then
         currentArrowState = "hidden-no-player-map"
+        currentArrowDebug = {}
         arrowFrame:Hide()
         return
     end
@@ -634,6 +638,7 @@ local function updateArrow()
     -- the wrong direction. Only point when player and target share a verified map.
     if playerMapID ~= waypoint.mapID then
         currentArrowState = "hidden-different-map"
+        currentArrowDebug = {}
         arrowFrame:Hide()
         return
     end
@@ -641,18 +646,32 @@ local function updateArrow()
     local pos = C_Map.GetPlayerMapPosition and C_Map.GetPlayerMapPosition(playerMapID, "player")
     if not pos then
         currentArrowState = "hidden-no-position"
+        currentArrowDebug = {}
         arrowFrame:Hide()
         return
     end
 
     local px, py = pos:GetXY()
     local dx, dy = waypoint.x - px, waypoint.y - py
-    local targetAngle = atan2Safe(dx, -dy)
+    local targetAngle = atan2Safe(-dx, -dy)
     local facing = GetPlayerFacing and GetPlayerFacing() or 0
+    local relativeAngle = targetAngle - facing
 
     arrowFrame:Show()
     currentArrowState = "active-same-map"
-    arrowTexture:SetRotation(targetAngle - facing)
+    arrowTexture:SetRotation(relativeAngle)
+
+    currentArrowDebug = {
+        playerMapID = playerMapID,
+        playerX = px,
+        playerY = py,
+        targetMapID = waypoint.mapID,
+        targetX = waypoint.x,
+        targetY = waypoint.y,
+        facing = facing,
+        targetAngle = targetAngle,
+        relativeAngle = relativeAngle,
+    }
 
     local meters = getWaypointDistanceMeters(playerMapID, px, py, waypoint.x, waypoint.y)
     local label = waypoint.label or currentRouteStep.title or "Route target"
@@ -774,7 +793,14 @@ exportSnapshot = function()
         "CurrentTravelStep=" .. tostring(currentTravelInstruction or "none"),
         "NavigationTarget=" .. tostring(currentNavigationWaypoint and currentNavigationWaypoint.label or "none"),
         "ArrowState=" .. tostring(currentArrowState or "unknown"),
-        "ArrowMode=" .. tostring(currentNavigationWaypoint and "world-space" or "hidden"),
+        "ArrowMode=" .. tostring(currentArrowState == "active-same-map" and "same-map-safe" or "hidden"),
+        "ArrowPlayerMapID=" .. tostring(currentArrowDebug.playerMapID or "none"),
+        "ArrowPlayerXY=" .. (currentArrowDebug.playerX and string.format("%.4f,%.4f", currentArrowDebug.playerX, currentArrowDebug.playerY) or "none"),
+        "ArrowTargetMapID=" .. tostring(currentArrowDebug.targetMapID or "none"),
+        "ArrowTargetXY=" .. (currentArrowDebug.targetX and string.format("%.4f,%.4f", currentArrowDebug.targetX, currentArrowDebug.targetY) or "none"),
+        "ArrowFacingDeg=" .. (currentArrowDebug.facing and string.format("%.1f", math.deg(currentArrowDebug.facing)) or "none"),
+        "ArrowTargetHeadingDeg=" .. (currentArrowDebug.targetAngle and string.format("%.1f", math.deg(currentArrowDebug.targetAngle)) or "none"),
+        "ArrowRotationDeg=" .. (currentArrowDebug.relativeAngle and string.format("%.1f", math.deg(currentArrowDebug.relativeAngle)) or "none"),
     }
 
     lines[#lines + 1] = "ScoredCandidates:"
