@@ -16,6 +16,12 @@ local defaults = {
     locked = false,
     beginner = true,
     visible = true,
+    arrowVisible = true,
+    arrowPoint = "TOP",
+    arrowRelativePoint = "TOP",
+    arrowX = 0,
+    arrowY = -90,
+    arrowScale = 1,
 }
 
 local TAG_LABELS = {
@@ -32,6 +38,7 @@ local function copyDefaults()
             ForeverLevelingCoachDB[k] = v
         end
     end
+    ForeverLevelingCoachDB.discoveredQuests = ForeverLevelingCoachDB.discoveredQuests or {}
     DB = ForeverLevelingCoachDB
 end
 
@@ -88,6 +95,42 @@ local function isQuestCompleted(questID)
         return C_QuestLog.IsQuestFlaggedCompleted(questID) and true or false
     end
     return false
+end
+
+local function isKnownQuest(questID)
+    if Data.knownQuestIDs and Data.knownQuestIDs[questID] then return true end
+    for _, step in ipairs(Data.route or {}) do
+        if step.questID == questID then return true end
+    end
+    return false
+end
+
+local function scanUnknownQuests()
+    if not DB then return end
+    local level = UnitLevel("player") or 1
+    for _, q in ipairs(currentQuests or {}) do
+        if not isKnownQuest(q.questID) then
+            local key = tostring(q.questID)
+            local firstSeen = DB.discoveredQuests[key] == nil
+            DB.discoveredQuests[key] = DB.discoveredQuests[key] or {
+                questID = q.questID,
+                title = q.title,
+                firstSeenLevel = level,
+                seenCount = 0,
+            }
+            local r = DB.discoveredQuests[key]
+            r.title = q.title
+            r.lastSeenLevel = level
+            r.seenCount = (r.seenCount or 0) + 1
+            r.objectives = {}
+            for _, obj in ipairs(q.objectives or {}) do
+                r.objectives[#r.objectives + 1] = obj.text or ""
+            end
+            if firstSeen then
+                print(string.format("|cffffcc00FLC NEW / UNVERIFIED:|r %s (Quest ID %d)", q.title, q.questID))
+            end
+        end
+    end
 end
 
 local function playerSupported()
@@ -184,6 +227,49 @@ resizeGrip:SetNormalTexture("Interface/ChatFrame/UI-ChatIM-SizeGrabber-Up")
 resizeGrip:SetHighlightTexture("Interface/ChatFrame/UI-ChatIM-SizeGrabber-Highlight")
 resizeGrip:SetPushedTexture("Interface/ChatFrame/UI-ChatIM-SizeGrabber-Down")
 
+local arrowFrame = CreateFrame("Frame", "ForeverLevelingCoachArrowFrame", UIParent, "BackdropTemplate")
+arrowFrame:SetSize(150, 120)
+arrowFrame:SetMovable(true)
+arrowFrame:EnableMouse(true)
+arrowFrame:SetClampedToScreen(true)
+arrowFrame:SetBackdrop({
+    bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+    edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+    tile = true,
+    tileSize = 16,
+    edgeSize = 12,
+    insets = { left = 3, right = 3, top = 3, bottom = 3 },
+})
+
+local arrowTexture = arrowFrame:CreateTexture(nil, "ARTWORK")
+arrowTexture:SetSize(58, 58)
+arrowTexture:SetPoint("TOP", 0, -8)
+arrowTexture:SetTexture("Interface/Buttons/UI-ScrollBar-ScrollUpButton-Up")
+arrowTexture:SetAlpha(0.30)
+
+local arrowLabel = arrowFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+arrowLabel:SetPoint("TOPLEFT", 8, -70)
+arrowLabel:SetPoint("TOPRIGHT", -8, -70)
+arrowLabel:SetJustifyH("CENTER")
+arrowLabel:SetText("No verified waypoint")
+
+local function saveArrowPosition()
+    local point, _, relativePoint, x, y = arrowFrame:GetPoint(1)
+    DB.arrowPoint = point
+    DB.arrowRelativePoint = relativePoint
+    DB.arrowX = x
+    DB.arrowY = y
+end
+
+arrowFrame:RegisterForDrag("LeftButton")
+arrowFrame:SetScript("OnDragStart", function(self)
+    if not DB.locked then self:StartMoving() end
+end)
+arrowFrame:SetScript("OnDragStop", function(self)
+    self:StopMovingOrSizing()
+    saveArrowPosition()
+end)
+
 local function savePosition()
     local point, _, relativePoint, x, y = frame:GetPoint(1)
     DB.point = point
@@ -213,6 +299,7 @@ end)
 
 local currentQuests = {}
 local currentByID = {}
+local currentRouteStep = nil
 
 local function objectiveSummary(active)
     if not active then return nil end
@@ -227,6 +314,49 @@ local function objectiveSummary(active)
     return table.concat(lines, "\n")
 end
 
+local function updateArrow()
+    if not DB or DB.arrowVisible == false then
+        arrowFrame:Hide()
+        return
+    end
+
+    arrowFrame:Show()
+    local step = currentRouteStep
+    local waypoint = step and step.waypoint
+
+    if not waypoint or not waypoint.mapID or not waypoint.x or not waypoint.y then
+        arrowTexture:SetRotation(0)
+        arrowTexture:SetAlpha(0.30)
+        arrowLabel:SetText("No verified waypoint\nfor this step yet")
+        return
+    end
+
+    arrowTexture:SetAlpha(1)
+    local label = waypoint.label or step.title or "Route target"
+    local mapID = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player")
+    if not mapID or mapID ~= waypoint.mapID then
+        arrowTexture:SetRotation(0)
+        arrowLabel:SetText(label .. "\nTravel to target zone")
+        return
+    end
+
+    local pos = C_Map.GetPlayerMapPosition and C_Map.GetPlayerMapPosition(waypoint.mapID, "player")
+    if not pos then
+        arrowTexture:SetRotation(0)
+        arrowLabel:SetText(label .. "\nPosition unavailable")
+        return
+    end
+
+    local px, py = pos:GetXY()
+    local dx, dy = waypoint.x - px, waypoint.y - py
+    local targetAngle = math.atan2 and math.atan2(dx, -dy) or 0
+    local facing = GetPlayerFacing and GetPlayerFacing() or 0
+    arrowTexture:SetRotation(targetAngle - facing)
+
+    local mapDistance = math.sqrt(dx * dx + dy * dy) * 100
+    arrowLabel:SetText(string.format("%s\n%.1f map%% away", label, mapDistance))
+end
+
 local function render()
     if not playerSupported() then
         routeText:SetText("Current build: Horde Shaman levels 1–30")
@@ -236,6 +366,7 @@ local function render()
     end
 
     local step, active = chooseRouteStep(currentByID)
+    currentRouteStep = step
     local tag = TAG_LABELS[step.tag] or step.tag or "DO"
 
     routeText:SetText(tag .. ": " .. (step.title or "Next step"))
@@ -261,16 +392,19 @@ local function render()
             break
         end
         local status = q.isComplete and "complete" or "active"
-        lines[#lines + 1] = string.format("• %s (%d) — %s", q.title, q.questID, status)
+        local verify = isKnownQuest(q.questID) and "" or " [NEW / UNVERIFIED]"
+        lines[#lines + 1] = string.format("• %s (%d) — %s%s", q.title, q.questID, status, verify)
     end
     if #currentQuests == 0 then
         lines[#lines + 1] = "No active quests detected."
     end
     questText:SetText(table.concat(lines, "\n"))
+    updateArrow()
 end
 
 local function syncQuests()
     currentQuests, currentByID = getQuestLogSnapshot()
+    scanUnknownQuests()
     render()
 end
 
@@ -282,6 +416,11 @@ local function applySettings()
     frame:SetAlpha(DB.alpha or defaults.alpha)
     if DB.visible == false then frame:Hide() else frame:Show() end
     resizeGrip:SetShown(not DB.locked)
+
+    arrowFrame:ClearAllPoints()
+    arrowFrame:SetPoint(DB.arrowPoint or "TOP", UIParent, DB.arrowRelativePoint or "TOP", DB.arrowX or 0, DB.arrowY or -90)
+    arrowFrame:SetScale(DB.arrowScale or 1)
+    if DB.arrowVisible == false then arrowFrame:Hide() else arrowFrame:Show() end
 end
 
 local function exportSnapshot()
@@ -297,9 +436,22 @@ local function exportSnapshot()
     }
 
     for _, q in ipairs(currentQuests) do
-        lines[#lines + 1] = string.format("- %d | %s | %s", q.questID, q.title, q.isComplete and "complete" or "active")
+        local routeStatus = isKnownQuest(q.questID) and "KNOWN" or "NEW/UNVERIFIED"
+        lines[#lines + 1] = string.format("- %d | %s | %s | %s", q.questID, q.title, q.isComplete and "complete" or "active", routeStatus)
         for _, obj in ipairs(q.objectives or {}) do
             lines[#lines + 1] = string.format("  %s %s", obj.finished and "[done]" or "[ ]", obj.text or "")
+        end
+    end
+
+    lines[#lines + 1] = "DiscoveredUnknownQuests:"
+    for _, record in pairs(DB.discoveredQuests or {}) do
+        lines[#lines + 1] = string.format("- %d | %s | firstLevel=%s | lastLevel=%s",
+            record.questID or 0,
+            record.title or "?",
+            tostring(record.firstSeenLevel or "?"),
+            tostring(record.lastSeenLevel or "?"))
+        for _, objective in ipairs(record.objectives or {}) do
+            lines[#lines + 1] = "  objective: " .. objective
         end
     end
 
@@ -360,6 +512,10 @@ SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
     elseif msg == "export" then
         syncQuests()
         exportSnapshot()
+    elseif msg == "arrow" then
+        DB.arrowVisible = not DB.arrowVisible
+        updateArrow()
+        print("|cff33ff99FLC:|r arrow " .. (DB.arrowVisible and "enabled." or "disabled."))
     elseif msg == "lock" then
         DB.locked = true
         resizeGrip:Hide()
@@ -381,7 +537,7 @@ SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
         syncQuests()
     else
         print("|cff33ff99Forever Leveling Coach v" .. tostring(Data.version) .. "|r")
-        print("/flc show, hide, sync, export, lock, unlock, beginner")
+        print("/flc show, hide, sync, export, arrow, lock, unlock, beginner")
     end
 end
 
