@@ -1483,11 +1483,11 @@ local function flcGearEvaluateItem(link, sourceTooltip)
     end
 
     if pct >= 20 then
-        return "MAJOR", string.format("Estimated +%d%%", math.floor(pct + 0.5))
+        return "MAJOR", "Equip this"
     elseif pct >= 5 then
-        return "UPGRADE", string.format("Estimated +%d%%", math.floor(pct + 0.5))
+        return "UPGRADE", "Better for leveling"
     elseif pct >= 1 then
-        return "SMALL", string.format("Estimated +%d%%", math.floor(pct + 0.5))
+        return "SMALL", "Small improvement"
     end
     return "KEEP", "Keep current item"
 end
@@ -1528,7 +1528,6 @@ local function flcAddGearAdvice(tooltip, tooltipData)
             tooltip:AddLine("FLC: KEEP CURRENT ITEM", 1.0, 0.35, 0.35)
         end
         if reason then tooltip:AddLine(reason, 0.75, 0.75, 0.75) end
-        tooltip:AddLine("Leveling estimate", 0.45, 0.45, 0.45)
         tooltip:Show()
         tooltip.__flcGearLink = link
     end
