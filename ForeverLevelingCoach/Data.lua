@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.4.6",
+    version = "0.5.0",
     supported = {
         faction = "Horde",
         class = "SHAMAN",
@@ -19,6 +19,25 @@ ForeverLevelingCoach_Data = {
         [6543] = true, -- The Warsong Reports
         [1489] = true, -- Hamuul Runetotem
         [6981] = true, -- The Glowing Shard
+    },
+
+    -- Adaptive smart-route scoring. Higher score = better next step.
+    -- These are intentionally simple and explainable so exports can show why
+    -- the addon made a recommendation.
+    scoring = {
+        tag = {
+            IMPORTANT = 1000,
+            DO = 300,
+            OPTIONAL = 120,
+            SKIP = -500,
+        },
+        completedTurnIn = 180,
+        currentZoneCluster = 170,
+        rememberedCluster = 60,
+        clusterQuest = 22,
+        partialProgressMax = 80,
+        waypointNearMax = 90,
+        clusterPriorityMax = 30,
     },
 
     -- Quest clusters let the router keep you in one area and stack nearby
