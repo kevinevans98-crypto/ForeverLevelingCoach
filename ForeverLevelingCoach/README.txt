@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.13.3
+Forever Leveling Coach v0.13.4
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.13.3 highlights
+v0.13.4 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -269,3 +269,9 @@ Roadmap
 - Level 22 training false-positive fixed from live Forever Beta verification
 - The Shaman What's Training panel shows 0 available at level 22 and the next ranks at level 24
 - For the current 22-30 route, class-training reminders now begin at level 24 and then check even levels
+
+- Smart Flight Assist replaces automatic taxi clicking
+- FLC still learns known flight paths and detects the correct route destination
+- When the destination is reachable, FLC tells you exactly which flight to click
+- FLC no longer calls TakeTaxiNode automatically, preventing unwanted flights or client restrictions
+- Flight assist is disabled by default; /flc autoflight toggles the assist messages
