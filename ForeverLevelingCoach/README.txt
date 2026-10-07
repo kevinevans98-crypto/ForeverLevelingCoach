@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.14.1
+Forever Leveling Coach v0.14.2
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.14.1 highlights
+v0.14.2 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -291,3 +291,9 @@ Roadmap
 
 - Fixed Relic Advisor startup/render crash caused by flcRelicStatus being declared after render()
 - Relic status helper is now forward-declared before the UI can call it
+
+- Shadowfang Keep dungeon awareness added
+- Live SFK quests 1098 Deathstalkers in Shadowfang, 1013 The Book of Ur, and 1014 Arugal Must Die are now known
+- While physically inside a supported dungeon, FLC prioritizes unfinished quests for that dungeon over outside-world turn-ins
+- Completed dungeon quests no longer pull you out of the instance while unfinished same-dungeon objectives remain
+- Dungeon-mode detection is now cluster-based instead of hard-coded only for Wailing Caverns
