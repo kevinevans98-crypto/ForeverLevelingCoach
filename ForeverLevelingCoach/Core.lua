@@ -560,10 +560,54 @@ local versionText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSma
 versionText:SetPoint("TOPRIGHT", -14, -15)
 versionText:SetText("v" .. tostring(Data.version or "?"))
 
+local function focusCurrentQuest()
+    local questID = currentRouteStep and currentRouteStep.questID
+    if not questID then
+        print("|cffffcc00FLC:|r no active routed quest to open.")
+        return
+    end
+
+    local tracked = false
+    if C_SuperTrack and type(C_SuperTrack.SetSuperTrackedQuestID) == "function" then
+        local ok = pcall(C_SuperTrack.SetSuperTrackedQuestID, questID)
+        tracked = ok
+    end
+
+    local opened = false
+    if type(QuestMapFrame_OpenToQuestDetails) == "function" then
+        opened = pcall(QuestMapFrame_OpenToQuestDetails, questID)
+    elseif C_QuestLog and type(C_QuestLog.SetSelectedQuest) == "function" then
+        pcall(C_QuestLog.SetSelectedQuest, questID)
+        if type(ToggleQuestLog) == "function" then
+            opened = pcall(ToggleQuestLog)
+        elseif type(OpenQuestLog) == "function" then
+            opened = pcall(OpenQuestLog)
+        end
+    elseif type(ToggleQuestLog) == "function" then
+        opened = pcall(ToggleQuestLog)
+    end
+
+    if tracked and opened then
+        print("|cff33ff99FLC:|r tracking and opened " .. tostring(currentRouteStep.title or questID) .. ".")
+    elseif tracked then
+        print("|cff33ff99FLC:|r tracking " .. tostring(currentRouteStep.title or questID) .. ".")
+    elseif opened then
+        print("|cff33ff99FLC:|r opened quest details.")
+    else
+        print("|cffffcc00FLC:|r this Forever client did not expose a supported quest-focus API.")
+    end
+end
+
 local exportButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
 exportButton:SetSize(72, 22)
 exportButton:SetPoint("TOPRIGHT", -12, -38)
 exportButton:SetText("Export")
+
+local goButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+goButton:SetSize(42, 22)
+goButton:SetPoint("RIGHT", exportButton, "LEFT", -4, 0)
+goButton:SetText("Go")
+goButton:SetScript("OnClick", focusCurrentQuest)
 exportButton:SetScript("OnClick", function()
     syncQuests()
     exportSnapshot()
@@ -571,9 +615,25 @@ end)
 
 local routeText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 routeText:SetPoint("TOPLEFT", 14, -45)
-routeText:SetPoint("TOPRIGHT", -94, -45)
+routeText:SetPoint("TOPRIGHT", -142, -45)
 routeText:SetJustifyH("LEFT")
 routeText:SetText("Loading route...")
+
+local routeClickButton = CreateFrame("Button", nil, frame)
+routeClickButton:SetPoint("TOPLEFT", routeText, "TOPLEFT", -2, 4)
+routeClickButton:SetPoint("BOTTOMRIGHT", routeText, "BOTTOMRIGHT", 2, -4)
+routeClickButton:RegisterForClicks("LeftButtonUp")
+routeClickButton:SetScript("OnClick", focusCurrentQuest)
+routeClickButton:SetScript("OnEnter", function()
+    if GameTooltip then
+        GameTooltip:SetOwner(routeClickButton, "ANCHOR_BOTTOM")
+        GameTooltip:SetText("Click to track/open this quest")
+        GameTooltip:Show()
+    end
+end)
+routeClickButton:SetScript("OnLeave", function()
+    if GameTooltip then GameTooltip:Hide() end
+end)
 
 local mainScroll = CreateFrame("ScrollFrame", "ForeverLevelingCoachMainScroll", frame, "UIPanelScrollFrameTemplate")
 mainScroll:SetPoint("TOPLEFT", routeText, "BOTTOMLEFT", 0, -10)
@@ -1612,7 +1672,9 @@ SLASH_FOREVERLEVELINGCOACH1 = "/flc"
 SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
     msg = (msg or ""):lower()
 
-    if msg == "sync" then
+    if msg == "go" then
+        focusCurrentQuest()
+    elseif msg == "sync" then
         syncQuests()
         print("|cff33ff99FLC:|r quest log synced.")
     elseif msg == "export" then
@@ -1651,7 +1713,7 @@ SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
         syncQuests()
     else
         print("|cff33ff99Forever Leveling Coach v" .. tostring(Data.version) .. "|r")
-        print("/flc show, hide, sync, export, gear, autoflight, arrow, lock, unlock, beginner")
+        print("/flc show, hide, go, sync, export, gear, autoflight, arrow, lock, unlock, beginner")
     end
 end
 
