@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.9.2
+Forever Leveling Coach v0.9.3
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.9.2 highlights
+v0.9.3 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -180,3 +180,10 @@ Roadmap
 
 - Inside-dungeon cleanup: once inside Wailing Caverns, FLC clears the outside cave waypoint, Ratchet taxi target, and entrance instructions
 - Dungeon GPS now uses GO TO for the next unfinished objective and keeps the travel hint hidden while already inside
+
+- Gear Advisor added: hover equippable loot, bag items, or quest rewards for a quick FLC upgrade verdict
+- Labels: MAJOR UPGRADE, UPGRADE, SMALL UPGRADE, KEEP CURRENT ITEM, or NOT USABLE YET
+- Uses a leveling-focused Shaman stat heuristic and heavily weights weapon DPS when the client exposes damage/speed on the tooltip
+- Rings/trinkets compare against the weaker equipped slot
+- /flc gear toggles Gear Advisor on/off
+- This is intentionally labeled a leveling estimate rather than a perfect endgame simulator
