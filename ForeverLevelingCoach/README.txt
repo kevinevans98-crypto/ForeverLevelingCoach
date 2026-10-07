@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.13.5
+Forever Leveling Coach v0.14.0
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.13.5 highlights
+v0.14.0 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -279,3 +279,12 @@ Roadmap
 - Splintertree local flight handoff added: when a route needs another zone, Lazy Mode points to the Splintertree flight master and says which destination to click
 - Taxi scanning now preserves completed-quest turn-in flight targets instead of reverting to the quest's normal flight target
 - Flight-ready chat messages respect /flc autoflight; route detection and known-flight learning still work without auto-clicking anything
+
+- Relic Advisor added for Forever-specific Shaman Totem/Relic items
+- Totem of Charged Flames [263412] is recognized and scored as a real relic instead of being ignored by the stat-only Gear Advisor
+- Relic slot (INVTYPE_RELIC / slot 18) is supported by Gear Advisor
+- Lazy Mode reminds you to equip a known relic if it is sitting in your bags
+- /flc export reports WeaponPreference, EquippedRelic, KnownRelicTarget, and RelicStatus
+- /flc relic toggles the relic reminder
+- Shamm's weapon-upgrade preference is now hard-filtered to 2H Axe / 2H Mace; swords, staves, 1H weapons, and other weapon types are labeled NOT YOUR 2H TARGET
+- Call of Fire [1527] is recognized as the Horde Shaman source quest for the Forever Totem of Charged Flames reward
