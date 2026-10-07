@@ -1448,6 +1448,40 @@ local function flcEquippedScore(slot)
     return flcItemScore(link, flcGearScanTooltip), link
 end
 
+local function flcItemUsabilityReason(link, sourceTooltip)
+    if not link then return nil end
+
+    -- Prefer the game's own usability check so weapon/armor proficiency,
+    -- class restrictions, and other character-specific restrictions win over scoring.
+    if type(IsUsableItem) == "function" then
+        local ok, usable = pcall(IsUsableItem, link)
+        if ok and usable == false then
+            return "Your character cannot use this item"
+        end
+    end
+
+    -- Forever beta fallback: inspect red requirement text on the primary tooltip.
+    if sourceTooltip and sourceTooltip.GetName and sourceTooltip.NumLines then
+        local name = sourceTooltip:GetName()
+        local count = sourceTooltip:NumLines() or 0
+        for i = 2, count do
+            local left = _G[name .. "TextLeft" .. i]
+            local text = left and left:GetText()
+            local r, g, b = left and left:GetTextColor()
+            if text and r and g and b and r > 0.8 and g < 0.35 and b < 0.35 then
+                local lower = string.lower(text)
+                if string.find(lower, "cannot use", 1, true)
+                    or string.find(lower, "requires", 1, true)
+                    or string.find(lower, "classes:", 1, true) then
+                    return text
+                end
+            end
+        end
+    end
+
+    return nil
+end
+
 local function flcGearEvaluateItem(link, sourceTooltip)
     if not link or not GetItemInfo then return nil end
     local _, _, _, _, requiredLevel, _, _, _, equipLoc = GetItemInfo(link)
@@ -1458,6 +1492,11 @@ local function flcGearEvaluateItem(link, sourceTooltip)
 
     if requiredLevel and requiredLevel > (UnitLevel("player") or 1) then
         return "LOCKED", "Requires level " .. tostring(requiredLevel)
+    end
+
+    local unusableReason = flcItemUsabilityReason(link, sourceTooltip)
+    if unusableReason then
+        return "UNUSABLE", unusableReason
     end
 
     local candidateScore = flcItemScore(link, sourceTooltip)
@@ -1524,6 +1563,8 @@ local function flcAddGearAdvice(tooltip, tooltipData)
             tooltip:AddLine("FLC: SMALL UPGRADE", 1.0, 0.82, 0.2)
         elseif grade == "LOCKED" then
             tooltip:AddLine("FLC: NOT USABLE YET", 1.0, 0.55, 0.2)
+        elseif grade == "UNUSABLE" then
+            tooltip:AddLine("FLC: CANNOT USE", 1.0, 0.25, 0.25)
         else
             tooltip:AddLine("FLC: KEEP CURRENT ITEM", 1.0, 0.35, 0.35)
         end
