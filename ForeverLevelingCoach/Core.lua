@@ -29,6 +29,7 @@ local defaults = {
     travelHintWidth = 300,
     travelHintHeight = 90,
     autoFlight = true,
+    gearAdvisor = true,
     lastUIVersion = "0.4.2",
     lastCluster = nil,
 }
@@ -1203,6 +1204,7 @@ exportSnapshot = function()
         "TravelHintState=" .. tostring(currentRouteStep and currentRouteStep.dungeon and zoneMatchesAliases({ "Wailing Caverns" }) and "hidden" or (currentArrowState ~= "active-same-map" and currentTravelInstruction and "shown" or "hidden")),
         "FastTravelMode=" .. tostring(currentFastTravelMode or "none"),
         "FastTravelSuggestion=" .. tostring(currentFastTravelSuggestion or "none"),
+        "GearAdvisorEnabled=" .. tostring(DB and DB.gearAdvisor ~= false or false),
         "AutoFlightEnabled=" .. tostring(DB and DB.autoFlight ~= false or false),
         "AutoFlightTarget=" .. tostring(currentAutoFlightTarget or (currentRouteStep and currentRouteStep.flightTarget) or "none"),
         "AutoFlightStatus=" .. tostring(currentAutoFlightStatus or "none"),
@@ -1339,6 +1341,203 @@ exportSnapshot = function()
     FLCExportFrame.edit:SetFocus()
 end
 
+
+-- Gear Advisor ---------------------------------------------------------------
+-- Lightweight leveling heuristic for Horde Shaman. The goal is a quick
+-- "equip / keep" answer on hover, not a full endgame simulator.
+local FLC_GEAR_WEIGHTS = {
+    ITEM_MOD_STRENGTH_SHORT = 2.0,
+    ITEM_MOD_AGILITY_SHORT = 1.4,
+    ITEM_MOD_STAMINA_SHORT = 0.7,
+    ITEM_MOD_INTELLECT_SHORT = 0.5,
+    ITEM_MOD_SPIRIT_SHORT = 0.2,
+    ITEM_MOD_ATTACK_POWER_SHORT = 0.5,
+    ITEM_MOD_CRIT_RATING_SHORT = 0.6,
+    ITEM_MOD_HIT_RATING_SHORT = 0.8,
+    ITEM_MOD_HASTE_RATING_SHORT = 0.4,
+    ITEM_MOD_ARMOR_PENETRATION_RATING_SHORT = 0.4,
+    ITEM_MOD_SPELL_POWER_SHORT = 0.15,
+    ITEM_MOD_DAMAGE_PER_SECOND_SHORT = 10.0,
+}
+
+local FLC_EQUIP_SLOTS = {
+    INVTYPE_HEAD = {1},
+    INVTYPE_NECK = {2},
+    INVTYPE_SHOULDER = {3},
+    INVTYPE_BODY = {4},
+    INVTYPE_CHEST = {5},
+    INVTYPE_ROBE = {5},
+    INVTYPE_WAIST = {6},
+    INVTYPE_LEGS = {7},
+    INVTYPE_FEET = {8},
+    INVTYPE_WRIST = {9},
+    INVTYPE_HAND = {10},
+    INVTYPE_FINGER = {11, 12},
+    INVTYPE_TRINKET = {13, 14},
+    INVTYPE_CLOAK = {15},
+    INVTYPE_WEAPON = {16},
+    INVTYPE_2HWEAPON = {16},
+    INVTYPE_WEAPONMAINHAND = {16},
+    INVTYPE_WEAPONOFFHAND = {17},
+    INVTYPE_SHIELD = {17},
+    INVTYPE_HOLDABLE = {17},
+    INVTYPE_RANGED = {18},
+    INVTYPE_RANGEDRIGHT = {18},
+}
+
+local flcGearScanTooltip = CreateFrame("GameTooltip", "ForeverLevelingCoachGearScanTooltip", UIParent, "GameTooltipTemplate")
+flcGearScanTooltip:SetOwner(UIParent, "ANCHOR_NONE")
+
+local function flcTooltipWeaponDPS(tooltip)
+    if not tooltip then return 0 end
+    local minDamage, maxDamage, speed, explicitDPS
+    local name = tooltip:GetName()
+    local count = tooltip:NumLines() or 0
+    for i = 2, count do
+        local left = _G[name .. "TextLeft" .. i]
+        local right = _G[name .. "TextRight" .. i]
+        local text = ((left and left:GetText()) or "") .. " " .. ((right and right:GetText()) or "")
+        local lo, hi = string.match(text, "(%d+)%s*%-%s*(%d+)%s+[Dd]amage")
+        if lo and hi then
+            minDamage, maxDamage = tonumber(lo), tonumber(hi)
+        end
+        local spd = string.match(text, "[Ss]peed%s+([%d%.]+)")
+        if spd then speed = tonumber(spd) end
+        local dps = string.match(text, "([%d%.]+)%s+[Dd]amage%s+[Pp]er%s+[Ss]econd")
+        if dps then explicitDPS = tonumber(dps) end
+    end
+    if explicitDPS then return explicitDPS end
+    if minDamage and maxDamage and speed and speed > 0 then
+        return ((minDamage + maxDamage) / 2) / speed
+    end
+    return 0
+end
+
+local function flcItemScore(link, tooltip)
+    if not link then return 0 end
+    local score = 0
+    local stats = GetItemStats and GetItemStats(link)
+    if stats then
+        for stat, value in pairs(stats) do
+            local weight = FLC_GEAR_WEIGHTS[stat]
+            if weight and value then
+                score = score + (value * weight)
+            end
+        end
+    end
+
+    local _, _, _, itemLevel, _, _, _, _, equipLoc = GetItemInfo(link)
+    if itemLevel then score = score + (itemLevel * 0.08) end
+
+    if equipLoc == "INVTYPE_WEAPON" or equipLoc == "INVTYPE_2HWEAPON"
+        or equipLoc == "INVTYPE_WEAPONMAINHAND" or equipLoc == "INVTYPE_WEAPONOFFHAND"
+        or equipLoc == "INVTYPE_RANGED" or equipLoc == "INVTYPE_RANGEDRIGHT" then
+        local dps = flcTooltipWeaponDPS(tooltip)
+        score = score + (dps * 10)
+    end
+
+    return score
+end
+
+local function flcEquippedScore(slot)
+    local link = GetInventoryItemLink and GetInventoryItemLink("player", slot)
+    if not link then return 0, nil end
+    flcGearScanTooltip:ClearLines()
+    flcGearScanTooltip:SetInventoryItem("player", slot)
+    return flcItemScore(link, flcGearScanTooltip), link
+end
+
+local function flcGearEvaluateItem(link, sourceTooltip)
+    if not link or not GetItemInfo then return nil end
+    local _, _, _, _, requiredLevel, _, _, _, equipLoc = GetItemInfo(link)
+    if not equipLoc or equipLoc == "" then return nil end
+
+    local slots = FLC_EQUIP_SLOTS[equipLoc]
+    if not slots then return nil end
+
+    if requiredLevel and requiredLevel > (UnitLevel("player") or 1) then
+        return "LOCKED", "Requires level " .. tostring(requiredLevel)
+    end
+
+    local candidateScore = flcItemScore(link, sourceTooltip)
+    local equippedScore, equippedLink
+    for _, slot in ipairs(slots) do
+        local score, eqLink = flcEquippedScore(slot)
+        if equippedScore == nil or score < equippedScore then
+            equippedScore, equippedLink = score, eqLink
+        end
+    end
+    equippedScore = equippedScore or 0
+
+    if not equippedLink then
+        return "MAJOR", "Empty slot — equip it"
+    end
+
+    local delta = candidateScore - equippedScore
+    local pct
+    if equippedScore > 0 then
+        pct = (delta / equippedScore) * 100
+    else
+        pct = delta > 0 and 100 or 0
+    end
+
+    if pct >= 20 then
+        return "MAJOR", string.format("Estimated +%d%%", math.floor(pct + 0.5))
+    elseif pct >= 5 then
+        return "UPGRADE", string.format("Estimated +%d%%", math.floor(pct + 0.5))
+    elseif pct >= 1 then
+        return "SMALL", string.format("Estimated +%d%%", math.floor(pct + 0.5))
+    end
+    return "KEEP", "Keep current item"
+end
+
+local function flcAddGearAdvice(tooltip)
+    if not DB or DB.gearAdvisor == false or not tooltip or tooltip.__flcGearBusy then return end
+    local _, link = tooltip:GetItem()
+    if not link then return end
+    if tooltip.__flcGearLink == link then return end
+
+    tooltip.__flcGearBusy = true
+    local grade, reason = flcGearEvaluateItem(link, tooltip)
+    if grade then
+        tooltip:AddLine(" ")
+        if grade == "MAJOR" then
+            tooltip:AddLine("FLC: ★ MAJOR UPGRADE", 0.2, 1.0, 0.2)
+        elseif grade == "UPGRADE" then
+            tooltip:AddLine("FLC: UPGRADE", 0.2, 1.0, 0.2)
+        elseif grade == "SMALL" then
+            tooltip:AddLine("FLC: SMALL UPGRADE", 1.0, 0.82, 0.2)
+        elseif grade == "LOCKED" then
+            tooltip:AddLine("FLC: NOT USABLE YET", 1.0, 0.55, 0.2)
+        else
+            tooltip:AddLine("FLC: KEEP CURRENT ITEM", 1.0, 0.35, 0.35)
+        end
+        if reason then tooltip:AddLine(reason, 0.75, 0.75, 0.75) end
+        tooltip:AddLine("Leveling estimate", 0.45, 0.45, 0.45)
+        tooltip:Show()
+        tooltip.__flcGearLink = link
+    end
+    tooltip.__flcGearBusy = false
+end
+
+local function flcHookGearTooltip(tooltip)
+    if not tooltip or tooltip.__flcGearHooked then return end
+    tooltip.__flcGearHooked = true
+    if tooltip.HookScript then
+        tooltip:HookScript("OnTooltipSetItem", function(self)
+            self.__flcGearLink = nil
+            flcAddGearAdvice(self)
+        end)
+        tooltip:HookScript("OnTooltipCleared", function(self)
+            self.__flcGearLink = nil
+        end)
+    end
+end
+
+flcHookGearTooltip(GameTooltip)
+if ItemRefTooltip then flcHookGearTooltip(ItemRefTooltip) end
+-- End Gear Advisor -----------------------------------------------------------
+
 SLASH_FOREVERLEVELINGCOACH1 = "/flc"
 SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
     msg = (msg or ""):lower()
@@ -1349,6 +1548,9 @@ SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
     elseif msg == "export" then
         syncQuests()
         exportSnapshot()
+    elseif msg == "gear" then
+        DB.gearAdvisor = not DB.gearAdvisor
+        print("|cff33ff99FLC:|r gear advisor " .. (DB.gearAdvisor and "enabled." or "disabled."))
     elseif msg == "autoflight" then
         DB.autoFlight = not DB.autoFlight
         print("|cff33ff99FLC:|r automatic flight selection " .. (DB.autoFlight and "enabled." or "disabled."))
@@ -1379,7 +1581,7 @@ SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
         syncQuests()
     else
         print("|cff33ff99Forever Leveling Coach v" .. tostring(Data.version) .. "|r")
-        print("/flc show, hide, sync, export, autoflight, arrow, lock, unlock, beginner")
+        print("/flc show, hide, sync, export, gear, autoflight, arrow, lock, unlock, beginner")
     end
 end
 
