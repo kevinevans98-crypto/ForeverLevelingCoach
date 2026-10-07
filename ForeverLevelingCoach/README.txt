@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.9.4
+Forever Leveling Coach v0.9.5
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.9.4 highlights
+v0.9.5 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -192,3 +192,7 @@ Roadmap
 - Uses TooltipDataProcessor for item tooltips when available instead of blindly hooking OnTooltipSetItem
 - Export now self-initializes saved settings if addon startup was interrupted, preventing DB nil errors
 - Hidden comparison tooltip is excluded from Gear Advisor processing
+
+- Fixed ShoppingTooltip crash in Gear Advisor on Forever Beta
+- Gear Advisor now ignores comparison shopping tooltips that do not expose GetItem(), while still annotating the primary hovered-item tooltip
+- Tooltip post-callback now accepts tooltip data as a safe fallback for item links
