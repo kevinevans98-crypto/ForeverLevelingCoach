@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.9.0",
+    version = "0.9.1",
     supported = {
         faction = "Horde",
         class = "SHAMAN",
@@ -78,8 +78,8 @@ ForeverLevelingCoach_Data = {
         },
         WAILING_CAVERNS = {
             name = "Wailing Caverns",
-            zoneAliases = { "The Barrens", "Barrens", "Wailing Caverns" },
-            note = "Dungeon cluster: prioritize when you have worthwhile Wailing Caverns quests stacked together.",
+            zoneAliases = { "Wailing Caverns" },
+            note = "Dungeon cluster: full area bonus only while inside Wailing Caverns; outside, entrance proximity is used instead.",
         },
     },
 
@@ -263,20 +263,40 @@ ForeverLevelingCoach_Data = {
 
         {
             questID = 914,
+            dungeon = true,
+            flightTarget = "Ratchet",
             cluster = "WAILING_CAVERNS",
             clusterPriority = 0,
             title = "Leaders of the Fang",
             tag = "DO",
             minLevel = 18,
             maxLevel = 30,
-            note = "Wailing Caverns dungeon quest. Strong value because the objectives are all inside the dungeon and can be completed in one run.",
+            note = "Wailing Caverns dungeon quest. Complete all four Fang leaders in one run.",
+            waypoint = { mapID = 1413, x = 0.460, y = 0.360, label = "Wailing Caverns cave entrance" },
             personTarget = {
-                role = "Dungeon objective",
+                role = "Dungeon",
                 name = "Wailing Caverns",
                 zone = "The Barrens",
-                locationType = "DUNGEON — inside Wailing Caverns",
-                locationNote = "The four Fang leaders and their gems are inside the Wailing Caverns dungeon.",
-                approach = "Enter Wailing Caverns and complete Cobrahn, Anacondra, Pythas, and Serpentis in the same run.",
+                coords = "46.0, 36.0",
+                locationType = "DUNGEON — enter the cave first",
+                locationNote = "The dungeon is inside the Wailing Caverns cave near Lushwater Oasis.",
+                approach = "Go to the cave around 46.0, 36.0, enter it, then follow the cave inward to the dungeon portal. Do not climb onto the mountain for this quest.",
+                useArrow = true,
+                waypoint = { mapID = 1413, x = 0.460, y = 0.360, label = "Wailing Caverns cave entrance" },
+            },
+            travelGuide = {
+                {
+                    zoneAliases = { "The Barrens", "Barrens" },
+                    instruction = "Go to the Wailing Caverns cave entrance around 46.0, 36.0 near Lushwater Oasis. Enter the cave and follow it inward to the dungeon portal.",
+                    waypoint = { mapID = 1413, x = 0.460, y = 0.360, label = "Wailing Caverns cave entrance" },
+                },
+                {
+                    zoneAliases = { "Wailing Caverns" },
+                    instruction = "You are inside Wailing Caverns. Stay in the dungeon and complete the remaining Fang leader objectives.",
+                },
+                {
+                    instruction = "If a flight master offers Ratchet, fly there. Then travel west/northwest to the Wailing Caverns cave entrance around 46.0, 36.0.",
+                },
             },
         },
 
