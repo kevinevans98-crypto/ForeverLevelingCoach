@@ -959,6 +959,9 @@ local function render()
                     name = step.nextPickup.npc,
                     zone = step.nextPickup.zone,
                     coords = step.nextPickup.coords,
+                    locationType = step.nextPickup.locationType,
+                    locationNote = step.nextPickup.locationNote,
+                    approach = step.nextPickup.approach,
                     waypoint = step.nextPickup.waypoint,
                 }
             end
@@ -1000,6 +1003,15 @@ local function render()
         if currentPersonTarget.zone then personLine = personLine .. " — " .. currentPersonTarget.zone end
         if currentPersonTarget.coords then personLine = personLine .. " (" .. currentPersonTarget.coords .. ")" end
         details[#details + 1] = "Marked person: " .. personLine
+        if currentPersonTarget.locationType then
+            details[#details + 1] = "Location type: " .. currentPersonTarget.locationType
+        end
+        if currentPersonTarget.locationNote then
+            details[#details + 1] = "Location: " .. currentPersonTarget.locationNote
+        end
+        if currentPersonTarget.approach then
+            details[#details + 1] = "How to get there: " .. currentPersonTarget.approach
+        end
     end
     if currentCluster and currentClusterCount > 1 then
         local cluster = Data.clusters and Data.clusters[currentCluster]
@@ -1088,6 +1100,9 @@ exportSnapshot = function()
         "MarkedPersonName=" .. tostring(currentPersonTarget and currentPersonTarget.name or "none"),
         "MarkedPersonZone=" .. tostring(currentPersonTarget and currentPersonTarget.zone or "none"),
         "MarkedPersonCoords=" .. tostring(currentPersonTarget and currentPersonTarget.coords or "none"),
+        "MarkedPersonLocationType=" .. tostring(currentPersonTarget and currentPersonTarget.locationType or "none"),
+        "MarkedPersonLocationNote=" .. tostring(currentPersonTarget and currentPersonTarget.locationNote or "none"),
+        "MarkedPersonApproach=" .. tostring(currentPersonTarget and currentPersonTarget.approach or "none"),
         "ArrowPlayerMapID=" .. tostring(currentArrowDebug.playerMapID or "none"),
         "ArrowPlayerXY=" .. (currentArrowDebug.playerX and string.format("%.4f,%.4f", currentArrowDebug.playerX, currentArrowDebug.playerY) or "none"),
         "ArrowTargetMapID=" .. tostring(currentArrowDebug.targetMapID or "none"),
