@@ -114,3 +114,6 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Lazy Mode: minimal NEXT / GO TO / DO UI for short play sessions, plus local travel handoffs instead of unsafe cross-zone arrows
 
 - Auto Accept / Auto Turn-In for routed quests, with reward-choice safety so the addon never guesses a reward
+
+- Added Warsong Supplies [6571] as an OPTIONAL live-verified quest with local Ashenvale objective guidance
+- Clears stale flight targets after reaching the active objective map
