@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.4.2
+Forever Leveling Coach v0.4.3
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.4.2 highlights
+v0.4.3 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -28,6 +28,8 @@ v0.4.2 highlights
 - Compact current-quest-only main window
 - Semi-transparent Blizzard-style frame and border
 - Full quest list stays hidden from the main UI and remains available through /flc export
+- Live level-21 quest classifications added for Ashenvale, Stonetalon, Wailing Caverns follow-ups, and Warsong Reports
+- These newly classified entries use verified quest IDs from the player's Forever quest log; no invented coordinates were added
 
 Important routing rule
 ----------------------
