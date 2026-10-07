@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.4.4
+Forever Leveling Coach v0.4.5
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.4.4 highlights
+v0.4.5 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -35,6 +35,7 @@ v0.4.4 highlights
 - If the current zone is unknown, the cluster with the most useful active work is preferred
 - IMPORTANT class/unlock quests still override normal area clusters
 - Main window stays clean: it shows only the current quest plus a short "Area stack" count
+- Export button added directly to the main guide window for one-click /flc export access
 
 Important routing rule
 ----------------------
