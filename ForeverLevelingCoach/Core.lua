@@ -2155,7 +2155,7 @@ local function render()
 
     local specName, talentPick = flcTalentRecommendation()
     if specName and talentPick then
-        detailLines[#detailLines + 1] = |cff6bb8d9Talent:|r " .. tostring(specName) .. " — " .. tostring(talentPick)
+        detailLines[#detailLines + 1] = "|cff6bb8d9Talent:|r " .. tostring(specName) .. " — " .. tostring(talentPick)
     end
 
     if DB and DB.lazyMode ~= false and step and step.cluster then
