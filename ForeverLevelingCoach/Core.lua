@@ -281,6 +281,34 @@ local function getStepByQuestID(questID)
     return nil
 end
 
+local function routeStepEligible(step, level, playerClass)
+    if not step then return false end
+
+    -- SKIP is a hard routing exclusion, not merely a low score. Keep SKIP
+    -- entries in data for classification/export purposes, but never surface
+    -- them as the recommended next step or count them toward cluster density.
+    if (step.tag or "DO") == "SKIP" then
+        return false
+    end
+
+    level = level or (UnitLevel("player") or 1)
+    if level < (step.minLevel or 1) or level > (step.maxLevel or 999) then
+        return false
+    end
+
+    if not playerClass then
+        local _, classFile = UnitClass("player")
+        playerClass = classFile
+    end
+
+    if step.class and step.class ~= playerClass then
+        return false
+    end
+
+    return true
+end
+
+
 local function zoneMatchesCluster(clusterID)
     local cluster = Data.clusters and Data.clusters[clusterID]
     if not cluster then return false end
@@ -462,11 +490,12 @@ end
 local function getActiveClusterCounts(byID)
     local counts = {}
     local level = UnitLevel("player") or 1
+    local _, playerClass = UnitClass("player")
 
     for _, step in ipairs(Data.route or {}) do
         local active = byID[step.questID]
-        local inRange = level >= (step.minLevel or 1) and level <= (step.maxLevel or 999)
-        if active and inRange and step.cluster and not isQuestCompleted(step.questID) then
+        if active and routeStepEligible(step, level, playerClass)
+            and step.cluster and not isQuestCompleted(step.questID) then
             counts[step.cluster] = (counts[step.cluster] or 0) + 1
         end
     end
@@ -613,9 +642,9 @@ local function getNearbyClusterQuestNames(step, byID)
     local _, playerClass = UnitClass("player")
     for _, routeStep in ipairs(Data.route or {}) do
         if routeStep.cluster == step.cluster and routeStep.questID ~= step.questID then
-            local classMatch = (not routeStep.class) or routeStep.class == playerClass
             local active = byID[routeStep.questID]
-            if classMatch and active and not isQuestCompleted(routeStep.questID) then
+            if active and routeStepEligible(routeStep, UnitLevel("player") or 1, playerClass)
+                and not isQuestCompleted(routeStep.questID) then
                 names[#names + 1] = {
                     title = routeStep.title or active.title or ("Quest " .. tostring(routeStep.questID)),
                     priority = routeStep.clusterPriority or 999,
@@ -659,10 +688,9 @@ local function chooseRouteStep(byID)
     if insideDungeonCluster then
         for _, step in ipairs(Data.route or {}) do
             local active = byID[step.questID]
-            local inRange = level >= (step.minLevel or 1) and level <= (step.maxLevel or 999)
             local _, playerClass = UnitClass("player")
-            local classMatch = (not step.class) or step.class == playerClass
-            if step.dungeon and step.cluster == insideDungeonCluster and active and inRange and classMatch
+            if step.dungeon and step.cluster == insideDungeonCluster and active
+                and routeStepEligible(step, level, playerClass)
                 and not active.isComplete and not isQuestCompleted(step.questID) then
                 local score, reasons = scoreRouteStep(step, active, clusterCounts)
                 score = score + 1000
@@ -677,11 +705,9 @@ local function chooseRouteStep(byID)
     if not bestStep then
     for _, step in ipairs(Data.route or {}) do
         local active = byID[step.questID]
-        local inRange = level >= (step.minLevel or 1) and level <= (step.maxLevel or 999)
-
         local _, playerClass = UnitClass("player")
-        local classMatch = (not step.class) or step.class == playerClass
-        if active and inRange and classMatch and not isQuestCompleted(step.questID) then
+        if active and routeStepEligible(step, level, playerClass)
+            and not isQuestCompleted(step.questID) then
             local score, reasons = scoreRouteStep(step, active, clusterCounts)
             if score > bestScore then
                 bestStep = step
