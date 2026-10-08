@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.17.4
+Forever Leveling Coach v0.17.5
 
 Current scope
 -------------
@@ -374,3 +374,8 @@ Roadmap
 - The Adventurer points to Eleanor Shackleton at 57.2,55.4 southwest of Brill
 - The Great Outdoors gives explicit /sit then wait-for-Boosted-Rest steps at the same campfire
 - Added Sticks and Bones [86784] as OPTIONAL only; do it opportunistically at Eleanor's hill because branch spawns can make it inefficient
+
+- Added Fields of Grief [365] with pumpkin farm objective around 35.9,50.5 and Brill turn-in to Apothecary Johaan
+- Added its short Brill follow-up Fields of Grief [407] to the Captured Scarlet Zealot in the Gallow's End Tavern cellar
+- Added A Rogue's Deal [8] turn-in to Innkeeper Renee at 61.7,52.0
+- Added transition-turn-in deferral: completed Brill deliveries can wait when an efficient nearby objective such as Fields of Grief is still unfinished, preventing backtracking
