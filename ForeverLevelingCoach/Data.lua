@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.16.5",
+    version = "0.17.0",
     supported = {
         faction = "Horde",
         classes = {
@@ -68,6 +68,46 @@ ForeverLevelingCoach_Data = {
             ["Two-Handed Maces"] = true,
         },
         label = "2H Axe / 2H Mace",
+    },
+
+    rogueLevelingBuild = {
+        name = "Combat",
+        purpose = "Fast 1-30 questing + dungeon quest runs",
+        sourceNote = "Current WoW Forever beta leveling build: Combat through Blade Flurry.",
+        talentsByLevel = {
+            [10] = { talent = "Improved Sinister Strike", rank = 1, maxRank = 2 },
+            [11] = { talent = "Improved Sinister Strike", rank = 2, maxRank = 2 },
+            [12] = { talent = "Improved Eviscerate", rank = 1, maxRank = 3 },
+            [13] = { talent = "Improved Eviscerate", rank = 2, maxRank = 3 },
+            [14] = { talent = "Improved Eviscerate", rank = 3, maxRank = 3 },
+            [15] = { talent = "Deflection", rank = 1, maxRank = 3 },
+            [16] = { talent = "Deflection", rank = 2, maxRank = 3 },
+            [17] = { talent = "Deflection", rank = 3, maxRank = 3 },
+            [18] = { talent = "Precision", rank = 1, maxRank = 3 },
+            [19] = { talent = "Precision", rank = 2, maxRank = 3 },
+            [20] = { talent = "Precision", rank = 3, maxRank = 3 },
+            [21] = { talent = "Riposte", rank = 1, maxRank = 1 },
+            [22] = { talent = "Endurance", rank = 1, maxRank = 2 },
+            [23] = { talent = "Endurance", rank = 2, maxRank = 2 },
+            [24] = { talent = "Improved Sprint", rank = 1, maxRank = 2 },
+            [25] = { talent = "Dual Wield Specialization", rank = 1, maxRank = 5 },
+            [26] = { talent = "Dual Wield Specialization", rank = 2, maxRank = 5 },
+            [27] = { talent = "Dual Wield Specialization", rank = 3, maxRank = 5 },
+            [28] = { talent = "Dual Wield Specialization", rank = 4, maxRank = 5 },
+            [29] = { talent = "Dual Wield Specialization", rank = 5, maxRank = 5 },
+            [30] = { talent = "Blade Flurry", rank = 1, maxRank = 1 },
+        },
+        final30 = {
+            "Improved Sinister Strike 2/2",
+            "Improved Eviscerate 3/3",
+            "Deflection 3/3",
+            "Precision 3/3",
+            "Riposte 1/1",
+            "Endurance 2/2",
+            "Improved Sprint 1/2",
+            "Dual Wield Specialization 5/5",
+            "Blade Flurry 1/1",
+        },
     },
 
     rogueGearProfile = {
