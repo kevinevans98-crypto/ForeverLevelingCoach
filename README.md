@@ -263,3 +263,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - The live window now shows at most two actionable gear upgrades with current item, recommended item, estimated gain, and source; optional empty slots stay hidden during gameplay.
 
 - Full equipped-slot diagnostics remain in `/flc export`, while `/flc gearscan` prints only a compact upgrade summary.
+
+- v0.24.2: Hotfix gear scanner compatibility on Forever clients where the legacy global item-info API is unavailable; item info/stat reads now use safe legacy/new-API fallbacks.
