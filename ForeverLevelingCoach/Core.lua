@@ -541,6 +541,8 @@ local function getNearbyClusterQuestNames(step, byID)
                     title = routeStep.title or active.title or ("Quest " .. tostring(routeStep.questID)),
                     priority = routeStep.clusterPriority or 999,
                     complete = active.isComplete and true or false,
+                    step = routeStep,
+                    active = active,
                 }
             end
         end
@@ -1591,18 +1593,21 @@ local function render()
     local detailLines = { "DO: " .. tostring(action) }
 
     if DB and DB.lazyMode ~= false and step and step.cluster then
-        local nearby = getNearbyClusterQuestNames(step, currentByID)
-        if #nearby > 0 then
-            local labels = {}
-            local maxShown = 3
-            for i = 1, math.min(#nearby, maxShown) do
-                local q = nearby[i]
-                labels[#labels + 1] = (q.complete and "✓ " or "") .. tostring(q.title)
+        local clusterQuests = getNearbyClusterQuestNames(step, currentByID)
+        for _, q in ipairs(clusterQuests) do
+            local qAction = nil
+            if q.active and q.active.isComplete then
+                qAction = (q.step and q.step.turnInTarget and q.step.turnInTarget.action)
+                    or ("TURN IN " .. string.upper(q.title or "QUEST"))
+            elseif q.active then
+                qAction = objectiveSummary(q.active)
             end
-            if #nearby > maxShown then
-                labels[#labels + 1] = "+" .. tostring(#nearby - maxShown) .. " more"
+
+            detailLines[#detailLines + 1] = ""
+            detailLines[#detailLines + 1] = tostring(q.title or "Quest")
+            if qAction and qAction ~= "" then
+                detailLines[#detailLines + 1] = "DO: " .. tostring(qAction)
             end
-            detailLines[#detailLines + 1] = "NEARBY: " .. table.concat(labels, " • ")
         end
     end
 
