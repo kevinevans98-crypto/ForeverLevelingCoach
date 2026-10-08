@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.17.2",
+    version = "0.17.3",
     supported = {
         faction = "Horde",
         classes = {
@@ -25,6 +25,8 @@ ForeverLevelingCoach_Data = {
         [8] = true, -- A Rogue's Deal delivery (verified in Forever DB)
         [590] = true, -- A Rogue's Deal (verified in Forever DB)
         [381] = true, -- The Scarlet Crusade (verified in Forever DB)
+        [382] = true, -- The Red Messenger (live-verified on Ms; Forever DB cross-check)
+        [383] = true, -- Vital Intelligence (Forever DB chain follow-up)
         [3902] = true, -- Scavenging Deathknell (verified in Forever DB)
         [3096] = true, -- Encrypted Scroll (live-verified on Ms)
         [3901] = true, -- Rattling the Rattlecages (live-verified on Ms)
@@ -364,6 +366,83 @@ ForeverLevelingCoach_Data = {
                 action = "TURN IN A LIGHT IN THE DARKNESS",
                 useArrow = true,
                 waypoint = { mapID = 1420, x = 0.311, y = 0.664, label = "Aramis Hammerhand" },
+            },
+        },
+        {
+            questID = 382,
+            class = "ROGUE",
+            cluster = "TIRISFAL_DEATHKNELL",
+            clusterPriority = 1,
+            title = "The Red Messenger",
+            tag = "DO",
+            minLevel = 5,
+            maxLevel = 8,
+            note = "Immediate Deathknell follow-up to The Scarlet Crusade. Kill Meven Korgal at the same Scarlet camp before leaving the area.",
+            waypoint = { mapID = 1420, x = 0.366, y = 0.685, label = "Meven Korgal" },
+            objectiveTargets = {
+                {
+                    objectiveContains = "Scarlet Crusade Documents",
+                    role = "Kill / loot",
+                    name = "Meven Korgal",
+                    zone = "Tirisfal Glades",
+                    coords = "36.6, 68.5",
+                    locationType = "NAMED MOB — Scarlet camp",
+                    instruction = "Kill Meven Korgal at the Scarlet camp around 36.6, 68.5 and loot the documents.",
+                    action = "KILL MEVEN KORGAL + LOOT DOCUMENTS",
+                    useArrow = true,
+                    waypoint = { mapID = 1420, x = 0.366, y = 0.685, label = "Meven Korgal" },
+                },
+            },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Executor Arren",
+                zone = "Deathknell, Tirisfal Glades",
+                coords = "32.2, 66.0",
+                locationType = "QUEST TURN-IN",
+                instruction = "Return the Scarlet Crusade Documents to Executor Arren at 32.2, 66.0.",
+                action = "TURN IN THE RED MESSENGER",
+                useArrow = true,
+                waypoint = { mapID = 1420, x = 0.322, y = 0.660, label = "Executor Arren" },
+            },
+            nextPickup = {
+                title = "Vital Intelligence",
+                npc = "Executor Arren",
+                role = "Quest giver",
+                zone = "Deathknell, Tirisfal Glades",
+                coords = "32.2, 66.0",
+                showWhileActive = false,
+                waypoint = { mapID = 1420, x = 0.322, y = 0.660, label = "Executor Arren" },
+            },
+        },
+        {
+            questID = 383,
+            class = "ROGUE",
+            cluster = "TIRISFAL_BRILL",
+            clusterPriority = 1,
+            title = "Vital Intelligence",
+            tag = "DO",
+            minLevel = 5,
+            maxLevel = 9,
+            note = "Natural transition quest from Deathknell to Brill. Deliver the documents to Executor Zygand and start the Brill hub.",
+            personTarget = {
+                role = "Quest turn-in",
+                name = "Executor Zygand",
+                zone = "Brill, Tirisfal Glades",
+                coords = "60.6, 51.8",
+                locationType = "QUEST TURN-IN / HUB TRANSITION",
+                instruction = "Travel to Brill and deliver the documents to Executor Zygand at 60.6, 51.8.",
+                action = "GO TO BRILL + TURN IN VITAL INTELLIGENCE",
+                useArrow = true,
+                waypoint = { mapID = 1420, x = 0.606, y = 0.518, label = "Executor Zygand" },
+            },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Executor Zygand",
+                zone = "Brill, Tirisfal Glades",
+                coords = "60.6, 51.8",
+                action = "TURN IN VITAL INTELLIGENCE",
+                useArrow = true,
+                waypoint = { mapID = 1420, x = 0.606, y = 0.518, label = "Executor Zygand" },
             },
         },
         {
