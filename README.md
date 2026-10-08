@@ -461,3 +461,11 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Vorsha the Lasher now also has an explicit verified pickup/escort start at Muglash 12.1, 34.6.
 
 - These quests can now transition from objective routing to verified turn-in arrows instead of becoming navigation dead ends when completed.
+
+- v0.41.0: Added full routing for The Essence of Aku'Mai (6563): Je'neu Sancrea pickup/turn-in, verified BFD approach around Darkshore 32,94, and sapphire collection guidance.
+
+- Added Amongst the Ruins (6921) BFD routing with verified Je'neu Sancrea pickup/turn-in and safe textual guidance to the underwater Fathom Stone before Twilight Lord Kelris; no invented instance coordinate.
+
+- Added Warsong Axe Shipment routing for Warsong Supplies at Booty Bay 26.4,73.3 beside Wharfmaster Lozgil.
+
+- Added objective-aware Leaders of the Fang guidance for Lady Anacondra and Lord Serpentis. These use dungeon text instead of fake fixed arrows because Anacondra has variable spawn points and reliable in-instance coordinates are not stored.
