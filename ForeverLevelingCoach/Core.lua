@@ -1765,7 +1765,30 @@ local function updateArrow()
     arrowFrame:Show()
     currentArrowState = "active-same-map"
     updateTravelHint(nil, currentArrowState)
+    -- Rotate the chevron as one rigid shape. The wing textures need both their
+    -- angle AND their center points rotated around the same pivot; otherwise the
+    -- two halves separate/cross as the player turns.
     local wing = 0.55
+    local cosA = math.cos(relativeAngle)
+    local sinA = math.sin(relativeAngle)
+
+    local function rotateChevronPoint(x, y)
+        return (x * cosA) - (y * sinA), (x * sinA) + (y * cosA)
+    end
+
+    local leftX, leftY = rotateChevronPoint(-7, -18)
+    local rightX, rightY = rotateChevronPoint(7, -18)
+
+    arrowLeft:ClearAllPoints()
+    arrowRight:ClearAllPoints()
+    arrowShadowLeft:ClearAllPoints()
+    arrowShadowRight:ClearAllPoints()
+
+    arrowLeft:SetPoint("CENTER", arrowFrame, "TOP", leftX, leftY)
+    arrowRight:SetPoint("CENTER", arrowFrame, "TOP", rightX, rightY)
+    arrowShadowLeft:SetPoint("CENTER", arrowFrame, "TOP", leftX + 1, leftY - 1)
+    arrowShadowRight:SetPoint("CENTER", arrowFrame, "TOP", rightX + 1, rightY - 1)
+
     arrowLeft:SetRotation(relativeAngle - wing)
     arrowRight:SetRotation(relativeAngle + wing)
     arrowShadowLeft:SetRotation(relativeAngle - wing)
@@ -1801,7 +1824,7 @@ end
 local arrowElapsed = 0
 arrowFrame:SetScript("OnUpdate", function(_, elapsed)
     arrowElapsed = arrowElapsed + elapsed
-    if arrowElapsed >= 0.05 then
+    if arrowElapsed >= 0.03 then
         arrowElapsed = 0
         updateArrow()
     end
