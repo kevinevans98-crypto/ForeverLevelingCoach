@@ -281,6 +281,23 @@ local function getStepByQuestID(questID)
     return nil
 end
 
+local function getPlayerRaceKeys()
+    local raceName, raceFile = UnitRace("player")
+    local keys = {}
+    if raceName and raceName ~= "" then keys[string.upper(raceName)] = true end
+    if raceFile and raceFile ~= "" then keys[string.upper(raceFile)] = true end
+
+    -- Forever's custom race token may differ between client builds. Matching
+    -- both the localized race name and raceFile keeps Skyborne routing safe.
+    if raceName and string.find(string.lower(raceName), "skyborne", 1, true) then
+        keys.SKYBORNE = true
+    end
+    if raceFile and string.find(string.lower(raceFile), "skyborne", 1, true) then
+        keys.SKYBORNE = true
+    end
+    return keys
+end
+
 local function routeStepEligible(step, level, playerClass)
     if not step then return false end
 
@@ -303,6 +320,20 @@ local function routeStepEligible(step, level, playerClass)
 
     if step.class and step.class ~= playerClass then
         return false
+    end
+
+    if step.races then
+        local raceKeys = getPlayerRaceKeys()
+        local matched = false
+        for raceKey, enabled in pairs(step.races) do
+            if enabled and raceKeys[string.upper(raceKey)] then
+                matched = true
+                break
+            end
+        end
+        if not matched then
+            return false
+        end
     end
 
     return true
@@ -730,7 +761,22 @@ local function chooseRouteStep(byID)
         return bestStep, bestActive
     end
 
-    local fallback = Data.fallback and Data.fallback[level]
+    local fallback
+    local _, playerClass = UnitClass("player")
+    if playerClass == "SHAMAN" and Data.shamanRaceFallback then
+        local raceKeys = getPlayerRaceKeys()
+        local raceFallback
+        if raceKeys.ORC or raceKeys.TROLL then
+            raceFallback = Data.shamanRaceFallback.DUROTAR
+        elseif raceKeys.TAUREN then
+            raceFallback = Data.shamanRaceFallback.MULGORE
+        elseif raceKeys.SKYBORNE then
+            raceFallback = Data.shamanRaceFallback.ZEPHRAS
+        end
+        fallback = raceFallback and raceFallback[level]
+    end
+    fallback = fallback or (Data.fallback and Data.fallback[level])
+
     if fallback then
         currentRouteScore = 0
         currentRouteReasons = { "fallback guidance: no scored verified active quest" }
