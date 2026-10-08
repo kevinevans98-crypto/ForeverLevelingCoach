@@ -919,6 +919,39 @@ local function getCompletedTurnInBatch(byID, anchorStep)
     return batch
 end
 
+local function getWorthwhileCurrentMapObjective(excludeQuestID)
+    if not currentByID or not C_Map or not C_Map.GetBestMapForUnit then return nil end
+
+    local playerMapID = C_Map.GetBestMapForUnit("player")
+    if not playerMapID then return nil end
+
+    local level = UnitLevel("player") or 1
+    local _, playerClass = UnitClass("player")
+
+    for _, otherStep in ipairs(Data.route or {}) do
+        local otherActive = currentByID[otherStep.questID]
+        local tag = otherStep.tag or "DO"
+
+        if otherStep.questID ~= excludeQuestID
+            and otherActive
+            and not otherActive.isComplete
+            and not otherStep.backgroundQuest
+            and (tag == "IMPORTANT" or tag == "DO")
+            and routeStepEligible(otherStep, level, playerClass)
+            and not isQuestCompleted(otherStep.questID) then
+
+            local target = getBestObjectiveTarget and getBestObjectiveTarget(otherStep, otherActive) or nil
+            local waypoint = target and target.waypoint or otherStep.waypoint
+
+            if waypoint and waypoint.mapID == playerMapID then
+                return otherStep, waypoint
+            end
+        end
+    end
+
+    return nil
+end
+
 local function getCompletedTurnInDecision(step, active, quickPickup)
     if not step or not active or not active.isComplete then return nil, nil end
 
@@ -927,6 +960,20 @@ local function getCompletedTurnInDecision(step, active, quickPickup)
         and quickPickup.distance
         and quickPickup.distance <= 0.05 then
         return "QUICK PICKUP FIRST", "verified worthwhile pickup is right beside you"
+    end
+
+    -- Do not leave the current map just to cash in a normal completed quest
+    -- while worthwhile DO/IMPORTANT field work is still available here.
+    -- IMPORTANT completed quests are exempt so class/progression steps can win.
+    local turnWaypoint = step.turnInTarget and step.turnInTarget.waypoint or nil
+    local playerMapID = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player") or nil
+    if (step.tag or "DO") ~= "IMPORTANT"
+        and turnWaypoint and turnWaypoint.mapID
+        and playerMapID and turnWaypoint.mapID ~= playerMapID then
+        local localStep = getWorthwhileCurrentMapObjective(step.questID)
+        if localStep then
+            return "DEFER TURN-IN", "finish current-zone " .. tostring(localStep.title or "route work") .. " before cross-zone turn-in"
+        end
     end
 
     if step.deferTurnInForQuestIDs then
@@ -1010,6 +1057,9 @@ local function scoreRouteStep(step, active, clusterCounts)
         local decision, decisionReason = getCompletedTurnInDecision(step, active, nil)
         if decision == "DEFER TURN-IN" then
             local penalty = weights.smartTurnInDeferPenalty or weights.finishClusterBeforeTurnInPenalty or 400
+            if decisionReason and string.find(decisionReason, "cross-zone", 1, true) then
+                penalty = weights.crossZoneTurnInDeferPenalty or penalty
+            end
             score = score - penalty
             reasons[#reasons + 1] = string.format("defer turn-in: %s (-%d)", tostring(decisionReason or "finish nearby work first"), penalty)
         end
