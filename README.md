@@ -395,3 +395,9 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - v0.29.7: Added live Quick Pickup arrival handling. Within 8 meters of the verified quest giver, FLC hides the arrow and changes the top HUD prompt to INTERACT NOW.
 
 - If the player backs away before accepting the quest, FLC automatically restores normal Quick Pickup arrow navigation; accepting the quest still returns control to the saved route.
+
+- v0.30.0: Added Smart Turn-In Flow with TURN IN NOW, DEFER TURN-IN, and QUICK PICKUP FIRST decisions for completed quests.
+
+- Completed quests can now receive a real routing penalty when nearby unfinished route work should be finished first, allowing another active quest to become STEP 1 instead of merely displaying a defer message.
+
+- Export now includes TurnInDecision and TurnInDecisionReason for live route auditing.
