@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.51.0",
+    version = "0.52.0",
     supported = {
         faction = "Horde",
         classes = {
@@ -7,6 +7,7 @@ ForeverLevelingCoach_Data = {
             HUNTER = true,
             ROGUE = true,
             PRIEST = true,
+            PALADIN = true,
             SHAMAN = true,
             MAGE = true,
             WARLOCK = true,
@@ -24,7 +25,8 @@ ForeverLevelingCoach_Data = {
         WARRIOR = { name = "Warrior", optimized = true, gearProfile = "warriorGearProfile", talentData = "warriorTalentBuilds", talentSetting = "warriorTalentSpec", trainerData = "warriorTrainers", trainingStart = 2, trainingInterval = 2 },
         HUNTER = { name = "Hunter", optimized = true, gearProfile = "hunterGearProfile", talentData = "hunterTalentBuilds", talentSetting = "hunterTalentSpec", trainerData = "hunterTrainers", trainingStart = 2, trainingInterval = 2 },
         ROGUE = { name = "Rogue", optimized = true, gearProfile = "rogueGearProfile", talentData = "rogueTalentBuilds", talentSetting = "rogueTalentSpec" },
-        PRIEST = { name = "Priest", optimized = false },
+        PRIEST = { name = "Priest", optimized = true, gearProfile = "priestGearProfile", talentData = "priestTalentBuilds", talentSetting = "priestTalentSpec", trainerData = "priestTrainers", trainingStart = 2, trainingInterval = 2 },
+        PALADIN = { name = "Paladin", optimized = false },
         SHAMAN = { name = "Shaman", optimized = true, usesRelics = true, weaponPreference = "shamanWeaponPreference", trainerData = "shamanTrainers", trainingStart = 24, trainingInterval = 2 },
         MAGE = { name = "Mage", optimized = true, gearProfile = "mageGearProfile", talentData = "mageTalentBuilds", talentSetting = "mageTalentSpec", trainerData = "mageTrainers", trainingStart = 2, trainingInterval = 2 },
         WARLOCK = { name = "Warlock", optimized = true, gearProfile = "warlockGearProfile", talentData = "warlockTalentBuilds", talentSetting = "warlockTalentSpec", trainerData = "warlockTrainers", trainingStart = 2, trainingInterval = 2 },
@@ -139,6 +141,99 @@ ForeverLevelingCoach_Data = {
             ["Two-Handed Maces"] = true,
         },
         label = "2H Axe / 2H Mace",
+    },
+
+    priestTalentBuilds = {
+        defaultSpec = "Shadow",
+        Shadow = {
+            name = "Shadow",
+            purpose = "Efficient solo leveling with wand damage, sustain, and early Shadow power",
+            source = "Mobalytics WoW Forever Priest Leveling Guide, updated Sep 23 2026",
+            final30 = "2/0/19",
+            talentsByLevel = {
+                [10] = { talent = "Wand Specialization", rank = 1, maxRank = 2 },
+                [11] = { talent = "Wand Specialization", rank = 2, maxRank = 2 },
+                [12] = { talent = "Spirit Tap", rank = 1, maxRank = 5 },
+                [13] = { talent = "Spirit Tap", rank = 2, maxRank = 5 },
+                [14] = { talent = "Spirit Tap", rank = 3, maxRank = 5 },
+                [15] = { talent = "Spirit Tap", rank = 4, maxRank = 5 },
+                [16] = { talent = "Spirit Tap", rank = 5, maxRank = 5 },
+                [17] = { talent = "Improved Shadow Word: Pain", rank = 1, maxRank = 2 },
+                [18] = { talent = "Improved Shadow Word: Pain", rank = 2, maxRank = 2 },
+                [19] = { talent = "Shadow Focus", rank = 1, maxRank = 5 },
+                [20] = { talent = "Shadow Focus", rank = 2, maxRank = 5 },
+                [21] = { talent = "Shadow Focus", rank = 3, maxRank = 5 },
+                [22] = { talent = "Shadow Reach", rank = 1, maxRank = 2 },
+                [23] = { talent = "Shadow Reach", rank = 2, maxRank = 2 },
+                [24] = { talent = "Mind Flay", rank = 1, maxRank = 1 },
+                [25] = { talent = "Improved Mind Flay", rank = 1, maxRank = 2 },
+                [26] = { talent = "Improved Mind Flay", rank = 2, maxRank = 2 },
+                [27] = { talent = "Vampiric Embrace", rank = 1, maxRank = 1 },
+                [28] = { talent = "Shadow Weaving", rank = 1, maxRank = 3 },
+                [29] = { talent = "Shadow Weaving", rank = 2, maxRank = 3 },
+                [30] = { talent = "Shadow Weaving", rank = 3, maxRank = 3 },
+            },
+        },
+    },
+
+    priestGearProfile = {
+        armorPreferred = "Cloth",
+        armorAllowed = {
+            ["Cloth"] = true,
+        },
+        meleeWeapons = {
+            ["Daggers"] = true,
+            ["One-Handed Maces"] = true,
+            ["Staves"] = true,
+        },
+        rangedWeapons = {
+            ["Wands"] = true,
+        },
+    },
+
+    priestTrainers = {
+        names = {
+            ["Ur'kyo"] = true,
+            ["X'yera"] = true,
+            ["Aelthalyste"] = true,
+            ["Father Lankester"] = true,
+            ["Father Lazarus"] = true,
+            ["Father Cobb"] = true,
+            ["Malakai Cross"] = true,
+            ["Miles Welsh"] = true,
+        },
+        locations = {
+            {
+                city = "Undercity",
+                name = "Aelthalyste / Father Lankester / Father Lazarus",
+                zone = "War Quarter, Undercity",
+                coords = "48.7, 16.9",
+                mapID = 1458,
+                x = 0.487,
+                y = 0.169,
+                aliases = { "Undercity", "Tirisfal Glades", "Silverpine Forest", "Silverpine" },
+            },
+            {
+                city = "Orgrimmar",
+                name = "Ur'kyo / X'yera",
+                zone = "Spirit Lodge, Valley of Spirits, Orgrimmar",
+                coords = "35.8, 87.7",
+                mapID = 1454,
+                x = 0.358,
+                y = 0.877,
+                aliases = { "Orgrimmar", "Durotar", "The Barrens", "Barrens", "Ashenvale" },
+            },
+            {
+                city = "Thunder Bluff",
+                name = "Father Cobb / Malakai Cross / Miles Welsh",
+                zone = "Pools of Vision, below Spirit Rise, Thunder Bluff",
+                coords = "25.0, 19.0",
+                mapID = 1456,
+                x = 0.250,
+                y = 0.190,
+                aliases = { "Thunder Bluff", "Mulgore", "Stonetalon Mountains", "Stonetalon" },
+            },
+        },
     },
 
     warlockTalentBuilds = {
