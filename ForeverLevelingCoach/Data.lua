@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.50.0",
+    version = "0.51.0",
     supported = {
         faction = "Horde",
         classes = {
@@ -27,7 +27,7 @@ ForeverLevelingCoach_Data = {
         PRIEST = { name = "Priest", optimized = false },
         SHAMAN = { name = "Shaman", optimized = true, usesRelics = true, weaponPreference = "shamanWeaponPreference", trainerData = "shamanTrainers", trainingStart = 24, trainingInterval = 2 },
         MAGE = { name = "Mage", optimized = true, gearProfile = "mageGearProfile", talentData = "mageTalentBuilds", talentSetting = "mageTalentSpec", trainerData = "mageTrainers", trainingStart = 2, trainingInterval = 2 },
-        WARLOCK = { name = "Warlock", optimized = false },
+        WARLOCK = { name = "Warlock", optimized = true, gearProfile = "warlockGearProfile", talentData = "warlockTalentBuilds", talentSetting = "warlockTalentSpec", trainerData = "warlockTrainers", trainingStart = 2, trainingInterval = 2 },
         DRUID = { name = "Druid", optimized = false },
     },
 
@@ -139,6 +139,87 @@ ForeverLevelingCoach_Data = {
             ["Two-Handed Maces"] = true,
         },
         label = "2H Axe / 2H Mace",
+    },
+
+    warlockTalentBuilds = {
+        defaultSpec = "Affliction",
+        Affliction = {
+            name = "Affliction",
+            purpose = "Fast low-downtime leveling with strong DoTs, sustain, and demon support",
+            source = "Mobalytics WoW Forever Warlock Leveling Guide, updated Oct 8 2026",
+            final30 = "21/0/0",
+            talentsByLevel = {
+                [10] = { talent = "Improved Corruption", rank = 1, maxRank = 5 },
+                [11] = { talent = "Improved Corruption", rank = 2, maxRank = 5 },
+                [12] = { talent = "Improved Corruption", rank = 3, maxRank = 5 },
+                [13] = { talent = "Improved Corruption", rank = 4, maxRank = 5 },
+                [14] = { talent = "Improved Corruption", rank = 5, maxRank = 5 },
+                [15] = { talent = "Suppression", rank = 1, maxRank = 5 },
+                [16] = { talent = "Suppression", rank = 2, maxRank = 5 },
+                [17] = { talent = "Suppression", rank = 3, maxRank = 5 },
+                [18] = { talent = "Malediction", rank = 1, maxRank = 5 },
+                [19] = { talent = "Malediction", rank = 2, maxRank = 5 },
+                [20] = { talent = "Malediction", rank = 3, maxRank = 5 },
+                [21] = { talent = "Malediction", rank = 4, maxRank = 5 },
+                [22] = { talent = "Malediction", rank = 5, maxRank = 5 },
+                [23] = { talent = "Pandemic", rank = 1, maxRank = 3 },
+                [24] = { talent = "Pandemic", rank = 2, maxRank = 3 },
+                [25] = { talent = "Pandemic", rank = 3, maxRank = 3 },
+                [26] = { talent = "Nightfall", rank = 1, maxRank = 2 },
+                [27] = { talent = "Nightfall", rank = 2, maxRank = 2 },
+                [28] = { talent = "Amplify Curse", rank = 1, maxRank = 1 },
+                [29] = { talent = "Improved Bane of Agony", rank = 1, maxRank = 2 },
+                [30] = { talent = "Improved Bane of Agony", rank = 2, maxRank = 2 },
+            },
+        },
+    },
+
+    warlockGearProfile = {
+        armorPreferred = "Cloth",
+        armorAllowed = {
+            ["Cloth"] = true,
+        },
+        meleeWeapons = {
+            ["Daggers"] = true,
+            ["One-Handed Swords"] = true,
+            ["Staves"] = true,
+        },
+        rangedWeapons = {
+            ["Wands"] = true,
+        },
+    },
+
+    warlockTrainers = {
+        names = {
+            ["Grol'dar"] = true,
+            ["Mirket"] = true,
+            ["Zevrost"] = true,
+            ["Kaal Soulreaper"] = true,
+            ["Luther Pickman"] = true,
+            ["Richard Kerwin"] = true,
+        },
+        locations = {
+            {
+                city = "Undercity",
+                name = "Kaal Soulreaper / Luther Pickman / Richard Kerwin",
+                zone = "Magic Quarter, Undercity",
+                coords = "86.5, 15.7",
+                mapID = 1458,
+                x = 0.865,
+                y = 0.157,
+                aliases = { "Undercity", "Tirisfal Glades", "Silverpine Forest", "Silverpine" },
+            },
+            {
+                city = "Orgrimmar",
+                name = "Grol'dar / Mirket / Zevrost",
+                zone = "Darkfire Enclave, Cleft of Shadow, Orgrimmar",
+                coords = "48.4, 46.1",
+                mapID = 1454,
+                x = 0.484,
+                y = 0.461,
+                aliases = { "Orgrimmar", "Durotar", "The Barrens", "Barrens", "Ashenvale" },
+            },
+        },
     },
 
     mageTalentBuilds = {
