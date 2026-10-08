@@ -147,3 +147,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Added A Light in the Darkness [98389], Marla's Last Wish item-aware routing, and Night Web's Hollow clustering
 
 - Cluster quests now render as normal quest blocks in the scrollable Lazy window; no NEARBY label or 3-quest cap
+
+- Step-by-step Lazy guide with STEP 1 owning the arrow and later clustered quests queued below it
