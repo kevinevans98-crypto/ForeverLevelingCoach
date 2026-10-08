@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.48.0",
+    version = "0.49.0",
     supported = {
         faction = "Horde",
         classes = {
@@ -22,7 +22,7 @@ ForeverLevelingCoach_Data = {
     -- weapon rules; it is not required for core routing support.
     classProfiles = {
         WARRIOR = { name = "Warrior", optimized = true, gearProfile = "warriorGearProfile", talentData = "warriorTalentBuilds", talentSetting = "warriorTalentSpec", trainerData = "warriorTrainers", trainingStart = 2, trainingInterval = 2 },
-        HUNTER = { name = "Hunter", optimized = false },
+        HUNTER = { name = "Hunter", optimized = true, gearProfile = "hunterGearProfile", talentData = "hunterTalentBuilds", talentSetting = "hunterTalentSpec", trainerData = "hunterTrainers", trainingStart = 2, trainingInterval = 2 },
         ROGUE = { name = "Rogue", optimized = true, gearProfile = "rogueGearProfile", talentData = "rogueTalentBuilds", talentSetting = "rogueTalentSpec" },
         PRIEST = { name = "Priest", optimized = false },
         SHAMAN = { name = "Shaman", optimized = true, usesRelics = true, weaponPreference = "shamanWeaponPreference", trainerData = "shamanTrainers", trainingStart = 24, trainingInterval = 2 },
@@ -139,6 +139,91 @@ ForeverLevelingCoach_Data = {
             ["Two-Handed Maces"] = true,
         },
         label = "2H Axe / 2H Mace",
+    },
+
+    hunterTalentBuilds = {
+        defaultSpec = "Beast Mastery",
+        ["Beast Mastery"] = {
+            name = "Beast Mastery",
+            purpose = "Fast solo leveling with strong pet damage and mobility",
+            source = "Mobalytics WoW Forever Beast Mastery Hunter Leveling Guide, updated Oct 6 2026",
+            final30 = "21/0/0",
+            talentsByLevel = {
+                [10] = { talent = "Deadly Aspects", rank = 1, maxRank = 5 },
+                [11] = { talent = "Deadly Aspects", rank = 2, maxRank = 5 },
+                [12] = { talent = "Deadly Aspects", rank = 3, maxRank = 5 },
+                [13] = { talent = "Deadly Aspects", rank = 4, maxRank = 5 },
+                [14] = { talent = "Deadly Aspects", rank = 5, maxRank = 5 },
+                [15] = { talent = "Focused Fire", rank = 1, maxRank = 2 },
+                [16] = { talent = "Focused Fire", rank = 2, maxRank = 2 },
+                [17] = { talent = "Pathfinding", rank = 1, maxRank = 2 },
+                [18] = { talent = "Pathfinding", rank = 2, maxRank = 2 },
+                [19] = { talent = "Improved Revive Pet", rank = 1, maxRank = 2 },
+                [20] = { talent = "Bestial Swiftness", rank = 1, maxRank = 1 },
+                [21] = { talent = "Unleashed Fury", rank = 1, maxRank = 5 },
+                [22] = { talent = "Unleashed Fury", rank = 2, maxRank = 5 },
+                [23] = { talent = "Unleashed Fury", rank = 3, maxRank = 5 },
+                [24] = { talent = "Unleashed Fury", rank = 4, maxRank = 5 },
+                [25] = { talent = "Summon Hawk", rank = 1, maxRank = 1 },
+                [26] = { talent = "Unleashed Fury", rank = 5, maxRank = 5 },
+                [27] = { talent = "Ferocity", rank = 1, maxRank = 5 },
+                [28] = { talent = "Ferocity", rank = 2, maxRank = 5 },
+                [29] = { talent = "Ferocity", rank = 3, maxRank = 5 },
+                [30] = { talent = "Intimidation", rank = 1, maxRank = 1 },
+            },
+        },
+    },
+
+    hunterGearProfile = {
+        armorPreferred = "Leather",
+        armorAllowed = {
+            ["Cloth"] = true,
+            ["Leather"] = true,
+        },
+        meleeWeapons = {
+            ["Daggers"] = true,
+            ["Fist Weapons"] = true,
+            ["One-Handed Axes"] = true,
+            ["One-Handed Swords"] = true,
+            ["Two-Handed Axes"] = true,
+            ["Two-Handed Swords"] = true,
+            ["Polearms"] = true,
+            ["Staves"] = true,
+        },
+        rangedWeapons = {
+            ["Bows"] = true,
+            ["Crossbows"] = true,
+            ["Guns"] = true,
+        },
+    },
+
+    hunterTrainers = {
+        names = {
+            ["Ormak Grimshot"] = true,
+            ["Sian'dur"] = true,
+            ["Xor'juul"] = true,
+            ["Holt Thunderhorn"] = true,
+            ["Kary Thunderhorn"] = true,
+            ["Urek Thunderhorn"] = true,
+        },
+        orgrimmar = {
+            city = "Orgrimmar",
+            name = "Ormak / Sian'dur / Xor'juul",
+            zone = "Hunter's Hall, Valley of Honor, Orgrimmar",
+            coords = "67.0, 18.8",
+            mapID = 1454,
+            x = 0.670,
+            y = 0.188,
+        },
+        thunderBluff = {
+            city = "Thunder Bluff",
+            name = "Holt / Kary / Urek Thunderhorn",
+            zone = "Hunter's Hall, Hunter Rise, Thunder Bluff",
+            coords = "58.3, 88.3",
+            mapID = 1456,
+            x = 0.583,
+            y = 0.883,
+        },
     },
 
     warriorTalentBuilds = {
