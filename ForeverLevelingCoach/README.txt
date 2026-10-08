@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.17.5
+Forever Leveling Coach v0.17.6
 
 Current scope
 -------------
@@ -379,3 +379,7 @@ Roadmap
 - Added its short Brill follow-up Fields of Grief [407] to the Captured Scarlet Zealot in the Gallow's End Tavern cellar
 - Added A Rogue's Deal [8] turn-in to Innkeeper Renee at 61.7,52.0
 - Added transition-turn-in deferral: completed Brill deliveries can wait when an efficient nearby objective such as Fields of Grief is still unfinished, preventing backtracking
+
+- Added Gordo's Task [5481], live-verified on Ms
+- Gloom Weed objective routes along the Deathknell-to-Brill road around 46.3,53.5; turn-in is Junior Apothecary Holland in the Brill graveyard around 57.4,48.8
+- Brill-bound hand-ins now defer while Gordo's Task or Fields of Grief still has nearby collection work, reducing backtracking
