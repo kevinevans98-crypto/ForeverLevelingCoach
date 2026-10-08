@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.31.0",
+    version = "0.32.0",
     supported = {
         faction = "Horde",
         classes = {
@@ -491,6 +491,7 @@ ForeverLevelingCoach_Data = {
                 waypoint = { mapID = 1420, x = 0.322, y = 0.660, label = "Executor Arren" },
             },
             nextPickup = {
+                questID = 383,
                 title = "Vital Intelligence",
                 npc = "Executor Arren",
                 role = "Quest giver",
@@ -597,6 +598,7 @@ ForeverLevelingCoach_Data = {
                 waypoint = { mapID = 1420, x = 0.594, y = 0.524, label = "Apothecary Johaan" },
             },
             nextPickup = {
+                questID = 407,
                 title = "Fields of Grief",
                 npc = "Apothecary Johaan",
                 role = "Quest giver",
@@ -670,6 +672,7 @@ ForeverLevelingCoach_Data = {
                 waypoint = { mapID = 1420, x = 0.572, y = 0.554, label = "Eleanor Shackleton" },
             },
             nextPickup = {
+                questID = 96607,
                 title = "The Great Outdoors",
                 npc = "Eleanor Shackleton",
                 role = "Quest giver",
@@ -1348,6 +1351,7 @@ ForeverLevelingCoach_Data = {
                 },
             },
             nextPickup = {
+                questID = 3901,
                 title = "Rattling the Rattlecages",
                 npc = "Shadow Priest Sarvis",
                 role = "Quest giver",
@@ -2896,6 +2900,7 @@ ForeverLevelingCoach_Data = {
                 waypoint = { mapID = 1413, x = 0.6298, y = 0.3720, label = "Quest contact: Sputtervalve" },
             },
             nextPickup = {
+                questID = 3369,
                 title = "In Nightmares",
                 role = "Quest giver",
                 npc = "Falla Sagewind",
