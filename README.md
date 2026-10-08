@@ -305,3 +305,11 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Navigation arrow now uses WorldMapArrow with a safe scrollbar-arrow fallback for Forever clients where the previous minimap texture does not render.
 
 - Tightened the arrow target/distance panel so it takes less screen space.
+
+- v0.27.0: Reworked FLC into its own modern visual style instead of mimicking the stock WoW interface.
+
+- Main window, travel hint, and Settings now use flat charcoal panels with a teal accent and minimal borders.
+
+- Main and Settings buttons are visually flattened, current-objective styling uses a simple accent strip, and queued steps use muted slate colors.
+
+- Navigation is now a minimal teal pointer with plain target/distance text and no bordered fantasy-style label box.
