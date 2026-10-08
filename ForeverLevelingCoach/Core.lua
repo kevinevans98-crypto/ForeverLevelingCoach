@@ -233,6 +233,7 @@ local currentTurnInDecisionReason = nil
 local currentTurnInBatch = nil
 local currentBatchTurnInTarget = nil
 local currentHubChainPickup = nil
+local currentRouteDataGaps = {}
 local currentPersonTarget = nil
 local currentObjectiveTarget = nil
 local currentTravelTarget = nil
@@ -303,6 +304,44 @@ local function getStepByQuestID(questID)
         if step.questID == questID then return step end
     end
     return nil
+end
+
+
+local function scanCompletedRouteDataGaps()
+    local gaps = {}
+    for _, q in ipairs(currentQuests or {}) do
+        if q.isComplete and isKnownQuest(q.questID) and not isQuestCompleted(q.questID) then
+            local step = getStepByQuestID(q.questID)
+            local reason = nil
+
+            if not step then
+                reason = "KNOWN QUEST HAS NO ROUTE ENTRY"
+            elseif not step.turnInTarget then
+                reason = "ROUTE ENTRY MISSING TURN-IN TARGET"
+            elseif not step.turnInTarget.waypoint
+                or not step.turnInTarget.waypoint.mapID
+                or not step.turnInTarget.waypoint.x
+                or not step.turnInTarget.waypoint.y then
+                reason = "TURN-IN TARGET MISSING VERIFIED WAYPOINT"
+            end
+
+            if reason then
+                gaps[#gaps + 1] = {
+                    questID = q.questID,
+                    title = q.title,
+                    reason = reason,
+                    hasRouteEntry = step and true or false,
+                }
+            end
+        end
+    end
+
+    table.sort(gaps, function(a, b)
+        return (tonumber(a.questID) or 0) < (tonumber(b.questID) or 0)
+    end)
+
+    currentRouteDataGaps = gaps
+    return gaps
 end
 
 local function getPlayerRaceKeys()
@@ -1466,6 +1505,12 @@ local function renderQuestCards(cards)
                 card.status:SetTextColor(pickupNow and 0.46 or 0.62, pickupNow and 0.90 or 0.72, pickupNow and 0.69 or 0.72)
                 card.title:SetTextColor(0.86, 0.91, 0.92)
                 card.action:SetTextColor(0.66, 0.74, 0.76)
+            elseif info.dataGap then
+                card.accent:SetVertexColor(0.92, 0.58, 0.20, 0.95)
+                card.step:SetTextColor(0.92, 0.64, 0.28)
+                card.status:SetTextColor(1.00, 0.72, 0.30)
+                card.title:SetTextColor(0.92, 0.91, 0.86)
+                card.action:SetTextColor(0.72, 0.70, 0.64)
             elseif info.background then
                 card.accent:SetVertexColor(0.32, 0.38, 0.41, 0.55)
                 card.step:SetTextColor(0.42, 0.48, 0.51)
@@ -2923,6 +2968,22 @@ local function render()
         end
     end
 
+    if currentRouteDataGaps and #currentRouteDataGaps > 0 then
+        for _, gap in ipairs(currentRouteDataGaps) do
+            if #cardData >= #questCards then break end
+            cardData[#cardData + 1] = {
+                label = "DATA",
+                step = stepNumber,
+                status = "ROUTE DATA GAP",
+                title = tostring(gap.title or ("Quest " .. tostring(gap.questID or "?"))),
+                action = tostring(gap.reason or "TURN-IN DATA NEEDS VERIFICATION"),
+                dataGap = true,
+                background = false,
+            }
+            stepNumber = stepNumber + 1
+        end
+    end
+
     if DB and DB.gearAdvisor ~= false and DB.displayMode == "DETAILED" and flcGearScanSnapshot then
         local scan = flcGearScanSnapshot()
         local shown = 0
@@ -2986,6 +3047,7 @@ end
 syncQuests = function()
     currentQuests, currentByID = getQuestLogSnapshot()
     scanUnknownQuests()
+    scanCompletedRouteDataGaps()
     render()
 end
 
@@ -3251,6 +3313,8 @@ exportSnapshot = function()
         "HubChainPickup=" .. tostring(currentHubChainPickup and currentHubChainPickup.title or "none"),
         "HubChainQuestID=" .. tostring(currentHubChainPickup and currentHubChainPickup.questID or "none"),
         "HubChainSourceQuestID=" .. tostring(DB and DB.pendingHubChain and DB.pendingHubChain.sourceQuestID or "none"),
+        "RouteDataGapCount=" .. tostring(#(currentRouteDataGaps or {})),
+        "RouteDataGapTop=" .. tostring(currentRouteDataGaps and currentRouteDataGaps[1] and currentRouteDataGaps[1].title or "none"),
         "MarkedPersonRole=" .. tostring(currentPersonTarget and currentPersonTarget.role or "none"),
         "MarkedPersonName=" .. tostring(currentPersonTarget and currentPersonTarget.name or "none"),
         "MarkedPersonZone=" .. tostring(currentPersonTarget and currentPersonTarget.zone or "none"),
@@ -3414,6 +3478,19 @@ exportSnapshot = function()
         lines[#lines + 1] = string.format("- %d | %s | %s | %s", q.questID, q.title, q.isComplete and "complete" or "active", routeStatus)
         for _, obj in ipairs(q.objectives or {}) do
             lines[#lines + 1] = string.format("  %s %s", obj.finished and "[done]" or "[ ]", obj.text or "")
+        end
+    end
+
+    lines[#lines + 1] = "RouteDataGaps:"
+    if not currentRouteDataGaps or #currentRouteDataGaps == 0 then
+        lines[#lines + 1] = "- none"
+    else
+        for _, gap in ipairs(currentRouteDataGaps) do
+            lines[#lines + 1] = string.format("- %d | %s | %s | routeEntry=%s",
+                tonumber(gap.questID) or 0,
+                tostring(gap.title or "?"),
+                tostring(gap.reason or "UNKNOWN DATA GAP"),
+                gap.hasRouteEntry and "yes" or "no")
         end
     end
 
