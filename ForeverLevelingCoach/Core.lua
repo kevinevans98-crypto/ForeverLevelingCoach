@@ -50,26 +50,25 @@ local TAG_LABELS = {
 }
 
 local function getClassProfile()
-    local _, classFile = UnitClass("player")
-    if classFile == "SHAMAN" then
-        return {
-            classFile = classFile,
-            weaponPreference = Data.shamanWeaponPreference,
-            usesRelics = true,
-        }
-    elseif classFile == "ROGUE" then
-        return {
-            classFile = classFile,
-            weaponPreference = nil,
-            usesRelics = false,
-            rogueGearProfile = Data.rogueGearProfile,
-        }
-    end
-    return {
+    local className, classFile = UnitClass("player")
+    local configured = Data.classProfiles and Data.classProfiles[classFile] or nil
+    local profile = {
         classFile = classFile,
+        className = (configured and configured.name) or className or classFile or "Unknown",
+        optimized = configured and configured.optimized == true or false,
         weaponPreference = nil,
-        usesRelics = false,
+        usesRelics = configured and configured.usesRelics == true or false,
+        rogueGearProfile = nil,
     }
+
+    if configured and configured.weaponPreference == "shaman" then
+        profile.weaponPreference = Data.shamanWeaponPreference
+    end
+    if configured and configured.gearProfile == "rogue" then
+        profile.rogueGearProfile = Data.rogueGearProfile
+    end
+
+    return profile
 end
 
 local function flcTalentRecommendation()
@@ -2992,9 +2991,9 @@ end
 
 local function render()
     if not playerSupported() then
-        routeText:SetText("Current build: Horde Shaman + Rogue levels 1–30")
+        routeText:SetText("Current build: Horde classes levels 1–30")
         renderQuestCards({})
-        detailText:SetText("This character is outside the currently supported route.")
+        detailText:SetText("This character is outside the currently supported faction/level range.")
         detailText:Show()
         questText:SetText("")
         questText:Hide()
