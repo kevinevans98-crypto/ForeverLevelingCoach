@@ -229,6 +229,8 @@ local currentQuickPickupSuggestion = nil
 local currentArrivalState = nil
 local currentTurnInDecision = nil
 local currentTurnInDecisionReason = nil
+local currentTurnInBatch = nil
+local currentBatchTurnInTarget = nil
 local currentPersonTarget = nil
 local currentObjectiveTarget = nil
 local currentTravelTarget = nil
@@ -768,6 +770,74 @@ local function getNearestUnfinishedClusterObjective(step)
     end
 
     return bestStep, bestDistance
+end
+
+local function normalizeTurnInHub(zone)
+    zone = tostring(zone or "")
+    local hub = string.match(zone, "^%s*([^,]+)") or zone
+    hub = string.gsub(hub, "^%s+", "")
+    hub = string.gsub(hub, "%s+$", "")
+    return hub
+end
+
+local function getCompletedTurnInBatch(byID, anchorStep)
+    local batch = {
+        hub = nil,
+        mapID = nil,
+        entries = {},
+    }
+    if not byID or not anchorStep or not anchorStep.turnInTarget
+        or not anchorStep.turnInTarget.waypoint then
+        return nil
+    end
+
+    local anchorHub = normalizeTurnInHub(anchorStep.turnInTarget.zone)
+    local anchorMapID = anchorStep.turnInTarget.waypoint.mapID
+    if anchorHub == "" or not anchorMapID then return nil end
+
+    local level = UnitLevel("player") or 1
+    local _, playerClass = UnitClass("player")
+
+    for _, routeStep in ipairs(Data.route or {}) do
+        local active = byID[routeStep.questID]
+        local target = routeStep.turnInTarget
+        if active and active.isComplete
+            and not isQuestCompleted(routeStep.questID)
+            and routeStepEligible(routeStep, level, playerClass)
+            and target and target.waypoint
+            and target.waypoint.mapID == anchorMapID
+            and normalizeTurnInHub(target.zone) == anchorHub then
+
+            batch.entries[#batch.entries + 1] = {
+                step = routeStep,
+                active = active,
+                target = target,
+                distance = waypointDistanceNormalized(target.waypoint),
+            }
+        end
+    end
+
+    if #batch.entries < 2 then return nil end
+
+    table.sort(batch.entries, function(a, b)
+        if a.distance and b.distance and a.distance ~= b.distance then
+            return a.distance < b.distance
+        elseif a.distance and not b.distance then
+            return true
+        elseif b.distance and not a.distance then
+            return false
+        end
+        local ap = (a.step and a.step.clusterPriority) or 999
+        local bp = (b.step and b.step.clusterPriority) or 999
+        if ap ~= bp then return ap < bp end
+        return tostring(a.step and a.step.title or "") < tostring(b.step and b.step.title or "")
+    end)
+
+    batch.hub = anchorHub
+    batch.mapID = anchorMapID
+    batch.count = #batch.entries
+    batch.first = batch.entries[1]
+    return batch
 end
 
 local function getCompletedTurnInDecision(step, active, quickPickup)
@@ -2396,9 +2466,24 @@ local function render()
     end
     currentTurnInDecision = nil
     currentTurnInDecisionReason = nil
+    currentTurnInBatch = nil
+    currentBatchTurnInTarget = nil
     if active and active.isComplete then
         currentTurnInDecision, currentTurnInDecisionReason =
             getCompletedTurnInDecision(step, active, currentQuickPickupSuggestion)
+
+        if not currentQuickPickupSuggestion then
+            currentTurnInBatch = getCompletedTurnInBatch(currentByID, step)
+            if currentTurnInBatch and currentTurnInBatch.first then
+                currentBatchTurnInTarget = currentTurnInBatch.first.target
+                currentTurnInDecision = "TURN IN NOW"
+                currentTurnInDecisionReason = string.format(
+                    "batch %d completed quests at %s",
+                    currentTurnInBatch.count or #currentTurnInBatch.entries,
+                    tostring(currentTurnInBatch.hub or "same hub")
+                )
+            end
+        end
     end
 
     local routeFlightTarget = step and step.flightTarget or nil
@@ -2410,6 +2495,9 @@ local function render()
     currentPersonTarget = step and step.personTarget or nil
     if active and active.isComplete and step and step.turnInTarget then
         currentPersonTarget = step.turnInTarget
+    end
+    if currentBatchTurnInTarget then
+        currentPersonTarget = currentBatchTurnInTarget
     end
     currentObjectiveTarget = nil
     currentTravelTarget = nil
@@ -2453,13 +2541,17 @@ local function render()
         if currentObjectiveTarget.instruction then
             currentTravelInstruction = currentObjectiveTarget.instruction
         end
-    elseif active and active.isComplete and step and step.turnInTarget and step.turnInTarget.waypoint
-        and C_Map and C_Map.GetBestMapForUnit
-        and C_Map.GetBestMapForUnit("player") == step.turnInTarget.waypoint.mapID then
-        currentAutoFlightTarget = nil
-        currentAutoFlightStatus = "local-turn-in"
-        currentNavigationWaypoint = step.turnInTarget.waypoint
-        currentTravelInstruction = step.turnInTarget.instruction
+    elseif active and active.isComplete
+        and ((currentBatchTurnInTarget and currentBatchTurnInTarget.waypoint)
+            or (step and step.turnInTarget and step.turnInTarget.waypoint)) then
+        local target = currentBatchTurnInTarget or step.turnInTarget
+        if C_Map and C_Map.GetBestMapForUnit
+            and C_Map.GetBestMapForUnit("player") == target.waypoint.mapID then
+            currentAutoFlightTarget = nil
+            currentAutoFlightStatus = currentTurnInBatch and "local-batch-turn-in" or "local-turn-in"
+            currentNavigationWaypoint = target.waypoint
+            currentTravelInstruction = target.instruction
+        end
     end
 
     if currentTravelTarget then
@@ -2479,12 +2571,13 @@ local function render()
         currentFastTravelSuggestion = nil
         currentFastTravelMode = "lazy-local-travel"
     elseif active and active.isComplete and step and step.turnInTarget then
-        currentPersonTarget = step.turnInTarget
-        if step.turnInTarget.instruction then
-            currentTravelInstruction = step.turnInTarget.instruction
+        local target = currentBatchTurnInTarget or step.turnInTarget
+        currentPersonTarget = target
+        if target.instruction then
+            currentTravelInstruction = target.instruction
         end
-        if step.turnInTarget.waypoint then
-            currentNavigationWaypoint = step.turnInTarget.waypoint
+        if target.waypoint then
+            currentNavigationWaypoint = target.waypoint
         end
     elseif currentObjectiveTarget then
         currentPersonTarget = {
@@ -2559,6 +2652,8 @@ local function render()
     -- Location is communicated by the safe same-zone arrow/local travel handoff.
     if currentQuickPickupSuggestion then
         routeText:SetText("Quick pickup")
+    elseif currentTurnInBatch then
+        routeText:SetText("Return to " .. tostring(currentTurnInBatch.hub or "turn-in hub"))
     elseif currentTurnInDecision == "DEFER TURN-IN" then
         routeText:SetText("Finish nearby first")
     elseif currentTravelTarget and DB and DB.lazyMode ~= false then
@@ -2626,6 +2721,20 @@ local function render()
             background = false,
         }
         stepNumber = 3
+    elseif currentTurnInBatch and currentTurnInBatch.first then
+        local first = currentTurnInBatch.first
+        local firstTarget = first.target or {}
+        cardData[#cardData + 1] = {
+            label = "RETURN",
+            step = 1,
+            status = tostring(currentTurnInBatch.count or #currentTurnInBatch.entries) .. " TURN-INS",
+            title = tostring(currentTurnInBatch.hub or "Turn-in hub"),
+            action = firstTarget.name
+                and ("FIRST: TALK TO " .. string.upper(tostring(firstTarget.name)))
+                or tostring(firstTarget.action or "TURN IN QUESTS"),
+            background = false,
+        }
+        stepNumber = 2
     else
         cardData[#cardData + 1] = {
             step = 1,
@@ -2648,6 +2757,16 @@ local function render()
         for _, q in ipairs(clusterQuests) do
             if #cardData >= #questCards then break end
 
+            local inTurnInBatch = false
+            if currentTurnInBatch and q.step and q.active and q.active.isComplete then
+                for _, batchEntry in ipairs(currentTurnInBatch.entries or {}) do
+                    if batchEntry.step and batchEntry.step.questID == q.step.questID then
+                        inTurnInBatch = true
+                        break
+                    end
+                end
+            end
+
             local qAction = nil
             if q.active and q.active.isComplete then
                 qAction = (q.step and q.step.turnInTarget and q.step.turnInTarget.action)
@@ -2669,14 +2788,16 @@ local function render()
             local showAction = qAction and qAction ~= ""
                 and ((DB and DB.displayMode == "DETAILED") or not q.background)
 
-            cardData[#cardData + 1] = {
-                step = stepNumber,
-                status = statusLabel,
-                title = tostring(q.title or "Quest"),
-                action = showAction and tostring(qAction) or "",
-                background = q.background and true or false,
-            }
-            stepNumber = stepNumber + 1
+            if not inTurnInBatch then
+                cardData[#cardData + 1] = {
+                    step = stepNumber,
+                    status = statusLabel,
+                    title = tostring(q.title or "Quest"),
+                    action = showAction and tostring(qAction) or "",
+                    background = q.background and true or false,
+                }
+                stepNumber = stepNumber + 1
+            end
         end
     end
 
@@ -3027,6 +3148,9 @@ exportSnapshot = function()
         "ArrivalState=" .. tostring(currentArrivalState or "none"),
         "TurnInDecision=" .. tostring(currentTurnInDecision or "none"),
         "TurnInDecisionReason=" .. tostring(currentTurnInDecisionReason or "none"),
+        "TurnInBatchHub=" .. tostring(currentTurnInBatch and currentTurnInBatch.hub or "none"),
+        "TurnInBatchCount=" .. tostring(currentTurnInBatch and currentTurnInBatch.count or 0),
+        "TurnInBatchNext=" .. tostring(currentTurnInBatch and currentTurnInBatch.first and currentTurnInBatch.first.step and currentTurnInBatch.first.step.title or "none"),
         "MarkedPersonRole=" .. tostring(currentPersonTarget and currentPersonTarget.role or "none"),
         "MarkedPersonName=" .. tostring(currentPersonTarget and currentPersonTarget.name or "none"),
         "MarkedPersonZone=" .. tostring(currentPersonTarget and currentPersonTarget.zone or "none"),
@@ -3121,6 +3245,22 @@ exportSnapshot = function()
     else
         for _, name in ipairs(knownFlights) do
             lines[#lines + 1] = "- " .. name
+        end
+    end
+
+    lines[#lines + 1] = "TurnInBatch:"
+    if not currentTurnInBatch then
+        lines[#lines + 1] = "- none"
+    else
+        for index, entry in ipairs(currentTurnInBatch.entries or {}) do
+            lines[#lines + 1] = string.format("- %d | %d | %s | npc=%s | hub=%s | coords=%s%s",
+                index,
+                tonumber(entry.step and entry.step.questID) or 0,
+                tostring(entry.step and entry.step.title or "?"),
+                tostring(entry.target and entry.target.name or "unknown"),
+                tostring(currentTurnInBatch.hub or "unknown"),
+                tostring(entry.target and entry.target.coords or "unknown"),
+                entry.distance and string.format(" | mapDistance=%.3f", entry.distance) or "")
         end
     end
 
