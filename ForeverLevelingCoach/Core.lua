@@ -915,30 +915,36 @@ frame:EnableMouse(true)
 frame:SetClampedToScreen(true)
 frame:SetResizeBounds(340, 120, 700, 300)
 frame:SetBackdrop({
-    bgFile = "Interface/DialogFrame/UI-DialogBox-Background-Dark",
-    edgeFile = "Interface/DialogFrame/UI-DialogBox-Border",
-    tile = true,
-    tileSize = 32,
-    edgeSize = 24,
-    insets = { left = 7, right = 7, top = 7, bottom = 7 },
+    bgFile = "Interface/Buttons/WHITE8x8",
+    edgeFile = "Interface/Buttons/WHITE8x8",
+    tile = false,
+    edgeSize = 1,
+    insets = { left = 1, right = 1, top = 1, bottom = 1 },
 })
-frame:SetBackdropColor(0.025, 0.025, 0.025, 0.90)
-frame:SetBackdropBorderColor(0.72, 0.55, 0.20, 0.98)
+frame:SetBackdropColor(0.035, 0.045, 0.055, 0.96)
+frame:SetBackdropBorderColor(0.16, 0.20, 0.23, 1.0)
 
 local headerBar = frame:CreateTexture(nil, "BACKGROUND")
-headerBar:SetPoint("TOPLEFT", 8, -8)
-headerBar:SetPoint("TOPRIGHT", -8, -8)
-headerBar:SetHeight(30)
+headerBar:SetPoint("TOPLEFT", 1, -1)
+headerBar:SetPoint("TOPRIGHT", -1, -1)
+headerBar:SetHeight(34)
 headerBar:SetTexture("Interface/Buttons/WHITE8x8")
-headerBar:SetVertexColor(0.10, 0.08, 0.04, 0.72)
+headerBar:SetVertexColor(0.055, 0.070, 0.082, 1.0)
+
+local headerAccent = frame:CreateTexture(nil, "ARTWORK")
+headerAccent:SetPoint("BOTTOMLEFT", headerBar, "BOTTOMLEFT", 0, 0)
+headerAccent:SetPoint("BOTTOMRIGHT", headerBar, "BOTTOMRIGHT", 0, 0)
+headerAccent:SetHeight(2)
+headerAccent:SetTexture("Interface/Buttons/WHITE8x8")
+headerAccent:SetVertexColor(0.20, 0.82, 0.74, 0.95)
 
 local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 title:SetPoint("TOPLEFT", 16, -15)
-title:SetText("Forever Leveling Coach")
+title:SetText("|cff64d8c8Forever Leveling Coach|r")
 
 local subtitle = frame:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
 subtitle:SetPoint("LEFT", title, "RIGHT", 8, 0)
-subtitle:SetText("Horde • 1-30")
+subtitle:SetText("|cff73808aHorde • 1-30|r")
 
 local versionText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 versionText:SetPoint("TOPRIGHT", -14, -16)
@@ -982,21 +988,54 @@ local function focusCurrentQuest()
     end
 end
 
+local function flcStyleFlatButton(button, accent)
+    if not button then return end
+    local normal = button:GetNormalTexture()
+    local highlight = button:GetHighlightTexture()
+    local pushed = button:GetPushedTexture()
+
+    if button.Left then button.Left:Hide() end
+    if button.Middle then button.Middle:Hide() end
+    if button.Right then button.Right:Hide() end
+    if button.LeftDisabled then button.LeftDisabled:Hide() end
+    if button.MiddleDisabled then button.MiddleDisabled:Hide() end
+    if button.RightDisabled then button.RightDisabled:Hide() end
+
+    button:SetNormalTexture("Interface/Buttons/WHITE8x8")
+    button:SetHighlightTexture("Interface/Buttons/WHITE8x8", "ADD")
+    button:SetPushedTexture("Interface/Buttons/WHITE8x8")
+    normal = button:GetNormalTexture()
+    highlight = button:GetHighlightTexture()
+    pushed = button:GetPushedTexture()
+
+    if normal then normal:SetVertexColor(0.075, 0.095, 0.11, 1.0) end
+    if highlight then highlight:SetVertexColor(accent and 0.20 or 0.11, accent and 0.82 or 0.16, accent and 0.74 or 0.20, 0.22) end
+    if pushed then pushed:SetVertexColor(0.10, 0.16, 0.17, 1.0) end
+
+    local text = button:GetFontString()
+    if text then
+        text:SetTextColor(accent and 0.42 or 0.82, accent and 0.92 or 0.86, accent and 0.86 or 0.89)
+    end
+end
+
 local exportButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
 exportButton:SetSize(62, 22)
 exportButton:SetPoint("TOPRIGHT", -12, -42)
 exportButton:SetText("Export")
+flcStyleFlatButton(exportButton, false)
 
 local goButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
 goButton:SetSize(42, 22)
 goButton:SetPoint("RIGHT", exportButton, "LEFT", -4, 0)
 goButton:SetText("Go")
+flcStyleFlatButton(goButton, true)
 goButton:SetScript("OnClick", focusCurrentQuest)
 
 local settingsButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
 settingsButton:SetSize(64, 22)
 settingsButton:SetPoint("RIGHT", goButton, "LEFT", -4, 0)
 settingsButton:SetText("Settings")
+flcStyleFlatButton(settingsButton, false)
 
 exportButton:SetScript("OnClick", function()
     syncQuests()
@@ -1005,14 +1044,21 @@ end)
 
 local routeLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
 routeLabel:SetPoint("TOPLEFT", 16, -44)
-routeLabel:SetText("CURRENT OBJECTIVE")
+routeLabel:SetText("|cff6f7f88CURRENT OBJECTIVE|r")
 
 local objectiveHighlight = frame:CreateTexture(nil, "BACKGROUND")
 objectiveHighlight:SetPoint("TOPLEFT", 11, -58)
 objectiveHighlight:SetPoint("TOPRIGHT", -11, -58)
 objectiveHighlight:SetHeight(38)
 objectiveHighlight:SetTexture("Interface/Buttons/WHITE8x8")
-objectiveHighlight:SetVertexColor(0.23, 0.16, 0.035, 0.25)
+objectiveHighlight:SetVertexColor(0.060, 0.078, 0.090, 0.95)
+
+local objectiveAccent = frame:CreateTexture(nil, "ARTWORK")
+objectiveAccent:SetPoint("TOPLEFT", objectiveHighlight, "TOPLEFT", 0, 0)
+objectiveAccent:SetPoint("BOTTOMLEFT", objectiveHighlight, "BOTTOMLEFT", 0, 0)
+objectiveAccent:SetWidth(3)
+objectiveAccent:SetTexture("Interface/Buttons/WHITE8x8")
+objectiveAccent:SetVertexColor(0.20, 0.82, 0.74, 1.0)
 
 local routeText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 routeText:SetPoint("TOPLEFT", 16, -66)
@@ -1093,54 +1139,43 @@ resizeGrip:SetHighlightTexture("Interface/ChatFrame/UI-ChatIM-SizeGrabber-Highli
 resizeGrip:SetPushedTexture("Interface/ChatFrame/UI-ChatIM-SizeGrabber-Down")
 
 local arrowFrame = CreateFrame("Frame", "ForeverLevelingCoachArrowFrame", UIParent)
-arrowFrame:SetSize(220, 112)
+arrowFrame:SetSize(180, 88)
 arrowFrame:SetMovable(true)
 arrowFrame:EnableMouse(true)
 arrowFrame:SetClampedToScreen(true)
 arrowFrame:SetFrameStrata("HIGH")
 
--- Clean GPS-style navigation indicator. The map/facing math below is unchanged;
--- only the presentation is different from the old scrollbar-button texture.
+-- Minimal FLC navigation marker: no fantasy frame, no bordered label box.
 local arrowShadow = arrowFrame:CreateTexture(nil, "BACKGROUND")
-arrowShadow:SetSize(72, 72)
-arrowShadow:SetPoint("TOP", 2, -2)
+arrowShadow:SetSize(48, 48)
+arrowShadow:SetPoint("TOP", 1, -1)
 arrowShadow:SetTexture("Interface\\WorldMap\\WorldMapArrow")
-arrowShadow:SetVertexColor(0, 0, 0, 0.60)
+arrowShadow:SetVertexColor(0, 0, 0, 0.45)
 
 local arrowTexture = arrowFrame:CreateTexture(nil, "ARTWORK")
-arrowTexture:SetSize(66, 66)
+arrowTexture:SetSize(44, 44)
 arrowTexture:SetPoint("TOP", 0, 0)
 local arrowTextureOK = arrowTexture:SetTexture("Interface\\WorldMap\\WorldMapArrow")
 if arrowTextureOK == false then
     arrowTexture:SetTexture("Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Up")
     arrowShadow:SetTexture("Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Up")
 end
-arrowTexture:SetVertexColor(1.0, 0.78, 0.12, 1.0)
+arrowTexture:SetVertexColor(0.34, 0.90, 0.82, 1.0)
 
-local arrowInfo = CreateFrame("Frame", nil, arrowFrame, "BackdropTemplate")
-arrowInfo:SetSize(190, 38)
-arrowInfo:SetPoint("TOP", arrowTexture, "BOTTOM", 0, -3)
-arrowInfo:SetBackdrop({
-    bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-    edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
-    tile = true,
-    tileSize = 12,
-    edgeSize = 8,
-    insets = { left = 4, right = 4, top = 3, bottom = 3 },
-})
-arrowInfo:SetBackdropColor(0.015, 0.015, 0.015, 0.82)
-arrowInfo:SetBackdropBorderColor(0.55, 0.42, 0.14, 0.72)
-
-local arrowLabel = arrowInfo:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-arrowLabel:SetPoint("TOPLEFT", 7, -5)
-arrowLabel:SetPoint("TOPRIGHT", -7, -5)
+local arrowLabel = arrowFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+arrowLabel:SetPoint("TOP", arrowTexture, "BOTTOM", 0, -4)
+arrowLabel:SetWidth(178)
 arrowLabel:SetJustifyH("CENTER")
+arrowLabel:SetTextColor(0.88, 0.94, 0.95)
+arrowLabel:SetShadowOffset(1, -1)
 arrowLabel:SetText("")
 
-local arrowDistance = arrowInfo:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-arrowDistance:SetPoint("TOP", arrowLabel, "BOTTOM", 0, -2)
-arrowDistance:SetWidth(176)
+local arrowDistance = arrowFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+arrowDistance:SetPoint("TOP", arrowLabel, "BOTTOM", 0, -1)
+arrowDistance:SetWidth(178)
 arrowDistance:SetJustifyH("CENTER")
+arrowDistance:SetTextColor(0.38, 0.82, 0.76)
+arrowDistance:SetShadowOffset(1, -1)
 arrowDistance:SetText("")
 
 local travelHintFrame = CreateFrame("Frame", "ForeverLevelingCoachTravelHintFrame", UIParent, "BackdropTemplate")
@@ -1153,15 +1188,14 @@ travelHintFrame:EnableMouse(true)
 travelHintFrame:SetClampedToScreen(true)
 travelHintFrame:SetResizeBounds(220, 70, 560, 260)
 travelHintFrame:SetBackdrop({
-    bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-    edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
-    tile = true,
-    tileSize = 16,
-    edgeSize = 12,
-    insets = { left = 5, right = 5, top = 5, bottom = 5 },
+    bgFile = "Interface/Buttons/WHITE8x8",
+    edgeFile = "Interface/Buttons/WHITE8x8",
+    tile = false,
+    edgeSize = 1,
+    insets = { left = 1, right = 1, top = 1, bottom = 1 },
 })
-travelHintFrame:SetBackdropColor(0.03, 0.03, 0.03, 0.82)
-travelHintFrame:SetBackdropBorderColor(0.72, 0.55, 0.20, 0.95)
+travelHintFrame:SetBackdropColor(0.035, 0.045, 0.055, 0.94)
+travelHintFrame:SetBackdropBorderColor(0.16, 0.20, 0.23, 1.0)
 
 local travelHintTitle = travelHintFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 travelHintTitle:SetPoint("TOPLEFT", 10, -8)
@@ -1221,15 +1255,14 @@ settingsFrame:SetFrameStrata("DIALOG")
 settingsFrame:SetClampedToScreen(true)
 settingsFrame:EnableMouse(true)
 settingsFrame:SetBackdrop({
-    bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-    edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
-    tile = true,
-    tileSize = 16,
-    edgeSize = 14,
-    insets = { left = 5, right = 5, top = 5, bottom = 5 },
+    bgFile = "Interface/Buttons/WHITE8x8",
+    edgeFile = "Interface/Buttons/WHITE8x8",
+    tile = false,
+    edgeSize = 1,
+    insets = { left = 1, right = 1, top = 1, bottom = 1 },
 })
-settingsFrame:SetBackdropColor(0.025, 0.025, 0.025, 0.97)
-settingsFrame:SetBackdropBorderColor(0.72, 0.55, 0.20, 0.98)
+settingsFrame:SetBackdropColor(0.035, 0.045, 0.055, 0.98)
+settingsFrame:SetBackdropBorderColor(0.16, 0.20, 0.23, 1.0)
 settingsFrame:Hide()
 
 local settingsTitle = settingsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
@@ -1251,7 +1284,7 @@ local function addSettingsSection(text, y)
     line:SetPoint("RIGHT", settingsFrame, "RIGHT", -16, 0)
     line:SetHeight(1)
     line:SetTexture("Interface/Buttons/WHITE8x8")
-    line:SetVertexColor(0.45, 0.35, 0.16, 0.65)
+    line:SetVertexColor(0.20, 0.82, 0.74, 0.28)
     return fs
 end
 
@@ -1270,6 +1303,7 @@ local function makeSettingsToggle(label, key, x, y, width, onChanged)
         if syncQuests then syncQuests() end
         if refreshSettingsPanel then refreshSettingsPanel() end
     end)
+    flcStyleFlatButton(button, false)
     settingsButtons[key] = { button = button, label = label }
     return button
 end
@@ -1292,6 +1326,7 @@ addSettingsSection("INTERFACE", -260)
 
 local displayModeButton = CreateFrame("Button", nil, settingsFrame, "UIPanelButtonTemplate")
 displayModeButton:SetSize(128, 24)
+flcStyleFlatButton(displayModeButton, false)
 displayModeButton:SetPoint("TOPLEFT", 16, -284)
 displayModeButton:SetScript("OnClick", function()
     if not DB then return end
@@ -1302,6 +1337,7 @@ end)
 
 local lockButton = CreateFrame("Button", nil, settingsFrame, "UIPanelButtonTemplate")
 lockButton:SetSize(128, 24)
+flcStyleFlatButton(lockButton, false)
 lockButton:SetPoint("TOPLEFT", 154, -284)
 lockButton:SetScript("OnClick", function()
     if not DB then return end
@@ -1314,6 +1350,7 @@ end)
 
 local resetUIButton = CreateFrame("Button", nil, settingsFrame, "UIPanelButtonTemplate")
 resetUIButton:SetSize(128, 24)
+flcStyleFlatButton(resetUIButton, false)
 resetUIButton:SetPoint("TOPLEFT", 16, -314)
 resetUIButton:SetText("Reset UI")
 resetUIButton:SetScript("OnClick", function()
@@ -1348,6 +1385,7 @@ end)
 
 local gearSummaryButton = CreateFrame("Button", nil, settingsFrame, "UIPanelButtonTemplate")
 gearSummaryButton:SetSize(128, 24)
+flcStyleFlatButton(gearSummaryButton, false)
 gearSummaryButton:SetPoint("TOPLEFT", 154, -314)
 gearSummaryButton:SetText("Gear Summary")
 gearSummaryButton:SetScript("OnClick", function()
@@ -1373,6 +1411,7 @@ addSettingsSection("ACTIONS", -352)
 
 local trainedButton = CreateFrame("Button", nil, settingsFrame, "UIPanelButtonTemplate")
 trainedButton:SetSize(266, 24)
+flcStyleFlatButton(trainedButton, true)
 trainedButton:SetPoint("TOPLEFT", 16, -376)
 trainedButton:SetText("Mark Class Training Done")
 trainedButton:SetScript("OnClick", function()
@@ -2110,13 +2149,13 @@ local function render()
 
     local primaryState = active and active.isComplete and "TURN IN" or "DO NOW"
     local detailLines = {
-        "|cffffcc00STEP 1|r  |cff33ff99" .. tostring(primaryState) .. "|r",
+        "|cff64d8c8STEP 1|r  |cff75e0b0" .. tostring(primaryState) .. "|r",
         "|cffffffff" .. tostring(action) .. "|r",
     }
 
     local specName, talentPick = flcTalentRecommendation()
     if specName and talentPick then
-        detailLines[#detailLines + 1] = "|cff66ccffTalent:|r " .. tostring(specName) .. " — " .. tostring(talentPick)
+        detailLines[#detailLines + 1] = |cff6bb8d9Talent:|r " .. tostring(specName) .. " — " .. tostring(talentPick)
     end
 
     if DB and DB.lazyMode ~= false and step and step.cluster then
@@ -2134,10 +2173,10 @@ local function render()
 
             detailLines[#detailLines + 1] = ""
             local queueLabel = q.background and "  |cff707070WHILE QUESTING|r" or ""
-            local statusLabel = q.active and q.active.isComplete and "|cff6edb8fTURN IN|r" or "|cffbda66bNEXT|r"
-            local titleColor = q.background and "|cff8a8a8a" or "|cffc9c0aa"
+            local statusLabel = q.active and q.active.isComplete and "|cff75e0b0TURN IN|r" or "|cff7f929cNEXT|r"
+            local titleColor = q.background and "|cff68747b" or "|cffb9c4c9"
             detailLines[#detailLines + 1] = string.format(
-                "|cff8f7a50STEP %d|r  %s%s|r%s",
+                "|cff6f7f88STEP %d|r  %s%s|r%s",
                 stepNumber,
                 titleColor,
                 tostring(q.title or "Quest"),
@@ -2160,7 +2199,7 @@ local function render()
             if item.status ~= "OPTIONAL EMPTY" and item.status ~= "NOT EXPECTED YET" then
                 if shown == 0 then
                     detailLines[#detailLines + 1] = ""
-                    detailLines[#detailLines + 1] = "|cffffcc00GEAR UPGRADES|r"
+                    detailLines[#detailLines + 1] = "|cff64d8c8GEAR UPGRADES|r"
                 end
 
                 detailLines[#detailLines + 1] = string.format(
