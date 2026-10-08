@@ -512,11 +512,28 @@ local function getObjectiveProgress(active)
         return 0
     end
 
-    local finished = 0
+    local totalProgress = 0
+    local objectiveCount = 0
+
     for _, obj in ipairs(active.objectives) do
-        if obj.finished then finished = finished + 1 end
+        objectiveCount = objectiveCount + 1
+
+        if obj.finished then
+            totalProgress = totalProgress + 1
+        else
+            local text = obj.text or ""
+            local current, required = string.match(text, "(%d+)%s*/%s*(%d+)")
+            current = tonumber(current)
+            required = tonumber(required)
+
+            if current and required and required > 0 then
+                totalProgress = totalProgress + math.max(0, math.min(current / required, 1))
+            end
+        end
     end
-    return finished / #active.objectives
+
+    if objectiveCount == 0 then return 0 end
+    return totalProgress / objectiveCount
 end
 
 local function getActiveClusterCounts(byID)
@@ -642,7 +659,7 @@ local function scoreRouteStep(step, active, clusterCounts)
         if progress > 0 then
             local bonus = math.floor((weights.partialProgressMax or 0) * progress)
             score = score + bonus
-            reasons[#reasons + 1] = string.format("partly complete (+%d)", bonus)
+            reasons[#reasons + 1] = string.format("quest progress %d%% (+%d)", math.floor((progress * 100) + 0.5), bonus)
         end
     end
 
