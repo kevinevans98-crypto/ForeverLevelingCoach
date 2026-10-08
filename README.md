@@ -419,3 +419,9 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Route data gaps appear as non-disruptive warning cards beneath the live route and never steal STEP 1 or arrow ownership.
 
 - Export now includes RouteDataGapCount, RouteDataGapTop, and a RouteDataGaps section distinguishing missing route entries from missing turn-in targets/waypoints.
+
+- v0.34.0: Added a verified route entry for quest 1483 Ziz Fizziks, including Ratchet pickup, Windshear Crag turn-in at Ziz Fizziks around 59.0, 62.6, and verified waypoint navigation.
+
+- Added verified follow-up quest 1093 Super Reaper 6000 with Ziz pickup/turn-in and Venture Co. Operator objective routing around 69, 54 in Stonetalon Mountains.
+
+- Ziz Fizziks should no longer appear as a completed known-quest route-data gap; after turn-in, hub chaining can surface Super Reaper 6000.
