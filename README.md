@@ -329,3 +329,9 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - The top objective header now shows route context (Current route / Travel / Turn in quest / Class training) while the STEP 1 card owns the quest title, removing duplicate quest names.
 
 - Tightened spacing above the quest cards so the compact guide uses screen space more efficiently.
+
+- v0.28.2: Replaced the remaining WoW map-arrow artwork with an FLC-built flat chevron made from simple UI textures.
+
+- The custom chevron rotates with the existing navigation math and keeps the modern teal identity without relying on stock fantasy assets.
+
+- Route context headers such as Travel now use the teal UI palette, and quest-card borders were softened slightly.
