@@ -349,3 +349,9 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - The active STEP 1 card now has a little more height and contrast, while the top toolbar buttons are tighter and more evenly spaced.
 
 - Main guide scroll controls now hide automatically when the visible content fits without scrolling.
+
+- v0.28.7: Fixed Lazy Mode sending the player to a flight master when the route's flightTarget already matches the current zone/subzone.
+
+- Local same-map objective navigation now explicitly overrides any stale lazy travel target, so Ashenvale Outrunners at Splintertree points to the Outrunners instead of the Splintertree flight master.
+
+- Navigation rotation is normalized to -180..180 degrees for cleaner arrow behavior and export diagnostics.
