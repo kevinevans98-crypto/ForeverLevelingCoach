@@ -39,6 +39,7 @@ local defaults = {
     lastClassTrainerLevel = 0,
     lastUIVersion = "0.16.1",
     lastCluster = nil,
+    pendingHubChain = nil,
 }
 
 local TAG_LABELS = {
@@ -231,6 +232,7 @@ local currentTurnInDecision = nil
 local currentTurnInDecisionReason = nil
 local currentTurnInBatch = nil
 local currentBatchTurnInTarget = nil
+local currentHubChainPickup = nil
 local currentPersonTarget = nil
 local currentObjectiveTarget = nil
 local currentTravelTarget = nil
@@ -2087,10 +2089,10 @@ local function updateArrow()
     if currentArrivalState == "quick-pickup-interact" then
         currentArrivalState = nil
         if currentQuickPickupSuggestion then
-            routeText:SetText("Quick pickup")
+            routeText:SetText(currentHubChainPickup and "Pick up follow-up" or "Quick pickup")
             local topCard = questCards and questCards[1]
             if topCard and topCard:IsShown() then
-                topCard.status:SetText("PICK UP NOW")
+                topCard.status:SetText(currentHubChainPickup and "PICK UP NEXT" or "PICK UP NOW")
                 local npc = currentQuickPickupSuggestion.pickup and currentQuickPickupSuggestion.pickup.npc
                 topCard.action:SetText(npc and ("TALK TO " .. string.upper(tostring(npc))) or "PICK UP QUEST")
                 topCard.action:Show()
@@ -2422,6 +2424,93 @@ local function getLazyTravelTarget(step, flightTarget)
     return nil
 end
 
+local function clearPendingHubChain()
+    if DB then DB.pendingHubChain = nil end
+    currentHubChainPickup = nil
+end
+
+local function capturePendingHubChain(turnedInQuestID)
+    if not DB or not turnedInQuestID then return end
+    local sourceStep = getStepByQuestID(tonumber(turnedInQuestID))
+    local pickup = sourceStep and sourceStep.nextPickup or nil
+    if not pickup or not pickup.questID or not pickup.waypoint then
+        return
+    end
+
+    local nextStep = getStepByQuestID(pickup.questID)
+    if nextStep and not routeStepEligible(nextStep) then
+        return
+    end
+
+    DB.pendingHubChain = {
+        sourceQuestID = tonumber(turnedInQuestID),
+        questID = tonumber(pickup.questID),
+        title = pickup.title,
+        npc = pickup.npc,
+        role = pickup.role,
+        zone = pickup.zone,
+        coords = pickup.coords,
+        locationType = pickup.locationType or "FOLLOW-UP QUEST",
+        locationNote = pickup.locationNote,
+        approach = pickup.approach,
+        waypoint = pickup.waypoint,
+        createdAt = GetTime and GetTime() or 0,
+    }
+end
+
+local function getPendingHubChainSuggestion(byID)
+    if not DB or not DB.pendingHubChain then return nil end
+    local pending = DB.pendingHubChain
+    local questID = tonumber(pending.questID)
+    if not questID then
+        clearPendingHubChain()
+        return nil
+    end
+
+    if (byID and byID[questID]) or isQuestCompleted(questID) then
+        clearPendingHubChain()
+        return nil
+    end
+
+    local createdAt = tonumber(pending.createdAt) or 0
+    if GetTime and createdAt > 0 and (GetTime() - createdAt) > 600 then
+        clearPendingHubChain()
+        return nil
+    end
+
+    local nextStep = getStepByQuestID(questID)
+    if nextStep and not routeStepEligible(nextStep) then
+        clearPendingHubChain()
+        return nil
+    end
+
+    local waypoint = pending.waypoint
+    local distance = waypoint and waypointDistanceNormalized(waypoint) or nil
+    if not waypoint or not distance or distance > 0.08 then
+        return nil
+    end
+
+    return {
+        questID = questID,
+        title = pending.title or (nextStep and nextStep.title) or ("Quest " .. tostring(questID)),
+        classification = "PICK UP NOW",
+        rank = 0,
+        distance = distance,
+        hubChain = true,
+        pickup = {
+            npc = pending.npc,
+            role = pending.role or "Quest giver",
+            zone = pending.zone,
+            coords = pending.coords,
+            locationType = pending.locationType or "FOLLOW-UP QUEST",
+            locationNote = pending.locationNote,
+            approach = pending.approach,
+            waypoint = waypoint,
+        },
+        step = nextStep,
+    }
+end
+
 local function render()
     if not playerSupported() then
         routeText:SetText("Current build: Horde Shaman + Rogue levels 1–30")
@@ -2452,16 +2541,22 @@ local function render()
     end
     currentRouteStep = step
     currentPickupSuggestions = getPickupSuggestions(currentByID, step)
+    currentHubChainPickup = getPendingHubChainSuggestion(currentByID)
     currentQuickPickupSuggestion = nil
     currentArrivalState = nil
-    for _, suggestion in ipairs(currentPickupSuggestions or {}) do
-        if suggestion.classification == "PICK UP NOW"
-            and suggestion.pickup
-            and suggestion.pickup.waypoint
-            and suggestion.distance
-            and suggestion.distance <= 0.05 then
-            currentQuickPickupSuggestion = suggestion
-            break
+
+    if currentHubChainPickup then
+        currentQuickPickupSuggestion = currentHubChainPickup
+    else
+        for _, suggestion in ipairs(currentPickupSuggestions or {}) do
+            if suggestion.classification == "PICK UP NOW"
+                and suggestion.pickup
+                and suggestion.pickup.waypoint
+                and suggestion.distance
+                and suggestion.distance <= 0.05 then
+                currentQuickPickupSuggestion = suggestion
+                break
+            end
         end
     end
     currentTurnInDecision = nil
@@ -2650,7 +2745,9 @@ local function render()
 
     -- Lazy play UI: show only the quest/task name plus ONE immediate action.
     -- Location is communicated by the safe same-zone arrow/local travel handoff.
-    if currentQuickPickupSuggestion then
+    if currentHubChainPickup then
+        routeText:SetText("Pick up follow-up")
+    elseif currentQuickPickupSuggestion then
         routeText:SetText("Quick pickup")
     elseif currentTurnInBatch then
         routeText:SetText("Return to " .. tostring(currentTurnInBatch.hub or "turn-in hub"))
@@ -2702,9 +2799,9 @@ local function render()
     if currentQuickPickupSuggestion then
         local pickup = currentQuickPickupSuggestion.pickup or {}
         cardData[#cardData + 1] = {
-            label = "QUICK",
+            label = currentHubChainPickup and "FOLLOW-UP" or "QUICK",
             step = 1,
-            status = "PICK UP NOW",
+            status = currentHubChainPickup and "PICK UP NEXT" or "PICK UP NOW",
             title = tostring(currentQuickPickupSuggestion.title or "Quest"),
             action = pickup.npc and ("TALK TO " .. string.upper(tostring(pickup.npc))) or "PICK UP QUEST",
             pickup = true,
@@ -3151,6 +3248,9 @@ exportSnapshot = function()
         "TurnInBatchHub=" .. tostring(currentTurnInBatch and currentTurnInBatch.hub or "none"),
         "TurnInBatchCount=" .. tostring(currentTurnInBatch and currentTurnInBatch.count or 0),
         "TurnInBatchNext=" .. tostring(currentTurnInBatch and currentTurnInBatch.first and currentTurnInBatch.first.step and currentTurnInBatch.first.step.title or "none"),
+        "HubChainPickup=" .. tostring(currentHubChainPickup and currentHubChainPickup.title or "none"),
+        "HubChainQuestID=" .. tostring(currentHubChainPickup and currentHubChainPickup.questID or "none"),
+        "HubChainSourceQuestID=" .. tostring(DB and DB.pendingHubChain and DB.pendingHubChain.sourceQuestID or "none"),
         "MarkedPersonRole=" .. tostring(currentPersonTarget and currentPersonTarget.role or "none"),
         "MarkedPersonName=" .. tostring(currentPersonTarget and currentPersonTarget.name or "none"),
         "MarkedPersonZone=" .. tostring(currentPersonTarget and currentPersonTarget.zone or "none"),
@@ -4274,6 +4374,14 @@ FLC:SetScript("OnEvent", function(_, event, arg1)
         syncQuests()
     elseif event == "QUEST_COMPLETE" then
         flcHandleQuestComplete()
+        syncQuests()
+    elseif event == "QUEST_TURNED_IN" then
+        capturePendingHubChain(arg1)
+        syncQuests()
+    elseif event == "QUEST_ACCEPTED" then
+        if DB and DB.pendingHubChain and tonumber(arg1) == tonumber(DB.pendingHubChain.questID) then
+            clearPendingHubChain()
+        end
         syncQuests()
     elseif event == "TAXIMAP_OPENED" then
         taxiOpenSerial = taxiOpenSerial + 1
