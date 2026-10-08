@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.25.0",
+    version = "0.25.1",
     supported = {
         faction = "Horde",
         classes = {
@@ -2358,6 +2358,29 @@ ForeverLevelingCoach_Data = {
             cluster = "ASHENVALE_THISTLEFUR",
             clusterPriority = 1,
             note = "Efficient kill quest that stacks with Troll Charm and Logging Rope.",
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Karang Amakkar",
+                zone = "Zoram'gar Outpost, Ashenvale",
+                coords = "11.9, 34.5",
+                locationType = "QUEST TURN-IN",
+                locationNote = "Karang Amakkar starts and receives Between a Rock and a Thistlefur.",
+                approach = "Return west to Zoram'gar Outpost.",
+                instruction = "Return to Karang Amakkar at Zoram'gar Outpost around 11.9, 34.5.",
+                action = "TURN IN BETWEEN A ROCK AND A THISTLEFUR",
+                useArrow = true,
+                waypoint = { mapID = 1440, x = 0.119, y = 0.345, label = "Karang Amakkar" },
+            },
+            nextPickup = {
+                title = "King of the Foulweald",
+                npc = "Karang Amakkar",
+                role = "Quest giver",
+                zone = "Zoram'gar Outpost, Ashenvale",
+                coords = "11.9, 34.5",
+                locationType = "FOLLOW-UP QUEST",
+                locationNote = "Follow-up after Between a Rock and a Thistlefur.",
+                waypoint = { mapID = 1440, x = 0.119, y = 0.345, label = "Karang Amakkar" },
+            },
             objectiveTargets = {
                 {
                     objectiveContains = "Thistlefur",
@@ -2423,6 +2446,19 @@ ForeverLevelingCoach_Data = {
             cluster = "ASHENVALE_THISTLEFUR",
             clusterPriority = 2,
             note = "Stacks with Thistlefur kills; collect charms from chests in Thistlefur Hold.",
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Mitsuwa",
+                zone = "Zoram'gar Outpost, Ashenvale",
+                coords = "11.6, 34.9",
+                locationType = "QUEST TURN-IN",
+                locationNote = "Mitsuwa starts and receives Troll Charm.",
+                approach = "Return west to Zoram'gar Outpost.",
+                instruction = "Return to Mitsuwa at Zoram'gar Outpost around 11.6, 34.9.",
+                action = "TURN IN TROLL CHARM",
+                useArrow = true,
+                waypoint = { mapID = 1440, x = 0.116, y = 0.349, label = "Mitsuwa" },
+            },
             objectiveTargets = {
                 {
                     objectiveContains = "Troll Charm",
