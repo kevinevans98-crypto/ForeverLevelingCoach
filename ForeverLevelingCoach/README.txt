@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.15.2
+Forever Leveling Coach v0.16.0
 
 Current scope
 -------------
@@ -316,3 +316,11 @@ Roadmap
 - The navigation arrow is now the location layer: it points only to a safe target on the current map/zone, or to a verified local travel handoff for cross-zone travel
 - Main window default height reduced to 120px
 - Detailed route diagnostics remain in /flc export
+
+- Undead Rogue fastest-route foundation added for levels 1-30
+- Expanded verified Tirisfal coverage from Forever DB: Scavenging Deathknell, A Rogue's Deal, A New Plague chain, Scarlet Crusade chain, and The Family Crypt
+- Added 1-30 fallback zone progression: Deathknell -> Brill/Tirisfal -> Silverpine -> Barrens -> Stonetalon/Ashenvale -> Thousand Needles
+- Rogue Gear Advisor now enforces Rogue armor/weapon rules: Leather preferred; no mail/plate; no 2H weapons
+- Rogue melee whitelist: daggers, 1H swords, 1H maces, fist weapons
+- Rogue ranged whitelist: thrown, bows, crossbows, guns
+- Rogue stat scoring now prioritizes Agility and ignores Intellect/Spirit for leveling
