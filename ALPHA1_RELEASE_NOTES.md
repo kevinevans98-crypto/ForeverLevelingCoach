@@ -1,6 +1,6 @@
 # Forever Leveling Coach — Alpha 1 Release Notes
 
-## Alpha 1 — v0.54.0
+## Alpha 1 — v0.55.0
 
 Forever Leveling Coach Alpha 1 is an early tester build focused on validating the core leveling experience before wider class and route expansion.
 
@@ -27,7 +27,14 @@ Forever Leveling Coach Alpha 1 is an early tester build focused on validating th
 - Talent guidance
 - Full `/flc export` diagnostics
 
-### New in v0.54.0
+### New in v0.55.0
+- Normalized Shaman onto the generic class talent and gear services.
+- Added an Enhancement 1–30 Shaman talent path and class gear profile.
+- Normalized Rogue onto the generic class trainer service.
+- Added Rogue trainer routing for Undercity and Orgrimmar.
+- All supported classes now use the same profile-driven service architecture for talents, gear, and trainers when configured.
+
+### Retained from v0.54.0
 - Added Druid as an optimized class on the generic class framework.
 - Added the current Feral 1–30 leveling talent path.
 - Added Druid-specific Feral stat weights and leather/weapon rules.
