@@ -1,6 +1,6 @@
 # Forever Leveling Coach — Alpha 1 Release Notes
 
-## Alpha 1 — v0.47.0
+## Alpha 1 — v0.48.0
 
 Forever Leveling Coach Alpha 1 is an early tester build focused on validating the core leveling experience before wider class and route expansion.
 
@@ -27,7 +27,15 @@ Forever Leveling Coach Alpha 1 is an early tester build focused on validating th
 - Talent guidance
 - Full `/flc export` diagnostics
 
-### New in v0.47.0
+### New in v0.48.0
+- Added Warrior as the first newly optimized class on the generic class framework.
+- Added a current WoW Forever Warrior leveling talent path, including the level-16 Protection respec handoff.
+- Added Warrior-specific leveling stat weights and armor/weapon rules.
+- Added Warrior class trainer routing for Orgrimmar and Thunder Bluff.
+- Warrior training reminders use the generic class trainer service.
+- Shields are handled as valid Warrior gear instead of receiving a mail-preference warning.
+
+### Retained from v0.47.0
 - Moved talent-guide lookup behind the generic class profile.
 - Moved class gear restrictions behind the generic class profile.
 - `/flc spec` now reads the active class profile instead of directly referencing Rogue data.
