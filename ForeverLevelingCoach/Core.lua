@@ -927,6 +927,10 @@ local function getWorthwhileCurrentMapObjective(excludeQuestID)
 
     local level = UnitLevel("player") or 1
     local _, playerClass = UnitClass("player")
+    local weights = Data.scoring or {}
+    local tagScores = weights.tag or {}
+    local clusterCounts = getActiveClusterCounts(currentByID)
+    local bestStep, bestWaypoint, bestScore = nil, nil, nil
 
     for _, otherStep in ipairs(Data.route or {}) do
         local otherActive = currentByID[otherStep.questID]
@@ -944,12 +948,62 @@ local function getWorthwhileCurrentMapObjective(excludeQuestID)
             local waypoint = target and target.waypoint or otherStep.waypoint
 
             if waypoint and waypoint.mapID == playerMapID then
-                return otherStep, waypoint
+                -- Mirror the normal unfinished-quest scoring path without
+                -- calling scoreRouteStep(), which would recurse back through
+                -- completed-turn-in deferral.
+                local score = tagScores[tag] or 0
+
+                local progress = getObjectiveProgress(otherActive)
+                if progress > 0 then
+                    score = score + math.floor((weights.partialProgressMax or 0) * progress)
+                end
+
+                if otherStep.cluster then
+                    local count = clusterCounts[otherStep.cluster] or 1
+                    if count > 1 then
+                        score = score + ((count - 1) * (weights.clusterQuest or 0))
+                    end
+                    if zoneMatchesCluster(otherStep.cluster) then
+                        score = score + (weights.currentZoneCluster or 0)
+                    elseif DB and DB.lastCluster == otherStep.cluster then
+                        score = score + (weights.rememberedCluster or 0)
+                    end
+                end
+
+                if otherStep.clusterPriority then
+                    local maxPriority = weights.clusterPriorityMax or 0
+                    score = score + math.max(0, maxPriority - ((otherStep.clusterPriority - 1) * 5))
+                end
+
+                local waypointBonus = getWaypointProximityBonus(otherStep, otherActive)
+                score = score + (waypointBonus or 0)
+
+                if otherStep.speedXP and tonumber(otherStep.speedXP) and tonumber(otherStep.speedXP) > 0 then
+                    score = score + math.min(weights.speedXPMax or 120, tonumber(otherStep.speedXP))
+                end
+
+                if otherStep.questLevel then
+                    local freeLevels = weights.staleQuestFreeLevels or 4
+                    local over = level - (tonumber(otherStep.questLevel) or level) - freeLevels
+                    if over > 0 then
+                        score = score - (over * (weights.staleQuestPenaltyPerLevel or 35))
+                    end
+                end
+
+                if not bestScore or score > bestScore then
+                    bestStep, bestWaypoint, bestScore = otherStep, waypoint, score
+                elseif score == bestScore and bestStep then
+                    local currentPriority = tonumber(otherStep.clusterPriority) or 999
+                    local bestPriority = tonumber(bestStep.clusterPriority) or 999
+                    if currentPriority < bestPriority then
+                        bestStep, bestWaypoint = otherStep, waypoint
+                    end
+                end
             end
         end
     end
 
-    return nil
+    return bestStep, bestWaypoint, bestScore
 end
 
 local function getCompletedTurnInDecision(step, active, quickPickup)
@@ -3524,6 +3578,14 @@ exportSnapshot = function()
         "ArrivalState=" .. tostring(currentArrivalState or "none"),
         "TurnInDecision=" .. tostring(currentTurnInDecision or "none"),
         "TurnInDecisionReason=" .. tostring(currentTurnInDecisionReason or "none"),
+        "CrossZoneDeferBestLocal=" .. tostring((function()
+            if currentRouteStep and currentByID and currentByID[currentRouteStep.questID]
+                and currentByID[currentRouteStep.questID].isComplete then
+                local localStep = getWorthwhileCurrentMapObjective(currentRouteStep.questID)
+                return localStep and localStep.title or "none"
+            end
+            return "none"
+        end)()),
         "TurnInBatchHub=" .. tostring(currentTurnInBatch and currentTurnInBatch.hub or "none"),
         "TurnInBatchCount=" .. tostring(currentTurnInBatch and currentTurnInBatch.count or 0),
         "TurnInBatchNext=" .. tostring(currentTurnInBatch and currentTurnInBatch.first and currentTurnInBatch.first.step and currentTurnInBatch.first.step.title or "none"),
