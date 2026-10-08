@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.17.9
+Forever Leveling Coach v0.18.0
 
 Current scope
 -------------
@@ -396,3 +396,7 @@ Roadmap
 - TalentBuild gives a quick per-tree summary (for example Elemental=0 | Enhancement=14 | Restoration=0)
 - SpentTalents lists each invested talent and rank so builds can be checked directly from the export without screenshots
 - Uses feature-detected Classic talent APIs and reports unavailable instead of erroring if the client changes the API
+
+- Talent export now supports WoW Forever 1.60.1's C_ClassTalents/C_Traits API as a fallback when legacy GetTalentTabInfo/GetTalentInfo are unavailable
+- /flc export now reports TalentAPI=classic or TalentAPI=traits
+- Trait-based exports include learned talent name, rank, node ID, and spell ID so Forever builds can be checked directly
