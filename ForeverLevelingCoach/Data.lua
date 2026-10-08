@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.16.4",
+    version = "0.16.5",
     supported = {
         faction = "Horde",
         classes = {
@@ -279,7 +279,7 @@ ForeverLevelingCoach_Data = {
             questID = 6395,
             class = "ROGUE",
             cluster = "TIRISFAL_DEATHKNELL",
-            clusterPriority = 2,
+            clusterPriority = 3,
             title = "Marla's Last Wish",
             tag = "DO",
             minLevel = 3,
@@ -329,7 +329,7 @@ ForeverLevelingCoach_Data = {
             questID = 380,
             class = "ROGUE",
             cluster = "TIRISFAL_DEATHKNELL",
-            clusterPriority = 3,
+            clusterPriority = 2,
             title = "Night Web's Hollow",
             tag = "DO",
             minLevel = 2,
@@ -344,7 +344,7 @@ ForeverLevelingCoach_Data = {
                     coords = "around 27, 58",
                     locationType = "SPIDER CAVE",
                     instruction = "Kill the required spiders around and inside Night Web's Hollow.",
-                    action = "KILL NIGHT WEB SPIDERS",
+                    action = "KILL 10 YOUNG + 8 NIGHT WEB SPIDERS",
                     useArrow = true,
                     waypoint = { mapID = 1420, x = 0.27, y = 0.58, label = "Night Web's Hollow" },
                 },
