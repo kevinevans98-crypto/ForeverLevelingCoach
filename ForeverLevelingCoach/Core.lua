@@ -1196,6 +1196,14 @@ local function getBestObjectiveTarget(step, active)
             for _, target in ipairs(step.objectiveTargets) do
                 local match = target.objectiveContains and string.lower(target.objectiveContains)
                 if match and string.find(objectiveLower, match, 1, true) then
+                    local itemGateOK = true
+                    if target.requireItemID and type(GetItemCount) == "function" then
+                        local okCount, count = pcall(GetItemCount, target.requireItemID)
+                        count = (okCount and count) or 0
+                        if target.requireItemPresent and count <= 0 then itemGateOK = false end
+                        if target.requireItemMissing and count > 0 then itemGateOK = false end
+                    end
+                    if itemGateOK then
                     local distance = nil
                     if target.waypoint and playerMapID and target.waypoint.mapID == playerMapID then
                         distance = waypointDistanceNormalized(target.waypoint)
@@ -1207,6 +1215,7 @@ local function getBestObjectiveTarget(step, active)
                         or (distance and (not bestDistance or distance < bestDistance)) then
                         bestTarget = target
                         bestDistance = distance
+                    end
                     end
                 end
             end
