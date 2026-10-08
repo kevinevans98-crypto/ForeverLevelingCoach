@@ -2,7 +2,7 @@
 ## Title: Forever Leveling Coach
 ## Notes: Beginner-friendly leveling coach for WoW Forever Beta.
 ## Author: Kevin Evans / ChatGPT
-## Version: 0.42.0
+## Version: 0.43.0
 ## SavedVariables: ForeverLevelingCoachDB
 
 Data.lua
