@@ -373,3 +373,7 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Torek's Assault now includes the verified quest giver, assault start, Splintertree turn-in, and pickup metadata, so it no longer appears as NEW/UNVERIFIED.
 
 - v0.29.2: Hotfixed a pickup-card UI crash caused by `stepNumber` being scoped inside the cluster queue block. Pickup suggestions can now render safely when present.
+
+- v0.29.3: Added situational escort/event urgency scoring for verified active quests. The bonus only applies while the event start/objective is genuinely nearby and fades to zero outside the configured radius.
+
+- Torek's Assault now uses the event-urgency rule after pickup, helping FLC recommend doing the nearby assault before leaving the area without globally overvaluing escort quests.
