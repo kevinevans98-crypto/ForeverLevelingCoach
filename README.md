@@ -381,3 +381,9 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - v0.29.4: Compact HUD pass. Reduced default main-window height from 190 to 170, tightened the header/objective strip, shrank top controls, and reduced card height/padding.
 
 - Existing default-sized windows migrate to the new compact height while intentionally taller resized windows are preserved.
+
+- v0.29.5: Added QUICK PICKUP navigation. A very-close verified PICK UP NOW quest can temporarily own the arrow while the current routed quest remains STEP 1.
+
+- Quick pickup suggestions now render directly under STEP 1 and disappear automatically once accepted; ordinary queued quests remain below them.
+
+- Added the verified Ashenvale Outrunners turn-in target: Kuray'bin at 71.1, 68.1.
