@@ -1,6 +1,6 @@
 # Forever Leveling Coach — Alpha 1 Release Notes
 
-## Alpha 1 — v0.49.0
+## Alpha 1 — v0.50.0
 
 Forever Leveling Coach Alpha 1 is an early tester build focused on validating the core leveling experience before wider class and route expansion.
 
@@ -27,7 +27,14 @@ Forever Leveling Coach Alpha 1 is an early tester build focused on validating th
 - Talent guidance
 - Full `/flc export` diagnostics
 
-### New in v0.49.0
+### New in v0.50.0
+- Added Mage as an optimized class on the generic class framework.
+- Added the current Frost 1–30 leveling talent path.
+- Added Mage-specific caster stat weights and cloth/weapon rules.
+- Added Mage trainer routing for Orgrimmar and Thunder Bluff.
+- Mage now uses class-specific talent, gear, and trainer services instead of generic fallback.
+
+### Retained from v0.49.0
 - Added Hunter as an optimized class on the generic class framework.
 - Added the current Beast Mastery 1–30 leveling talent path.
 - Added Hunter-specific leveling stat weights and weapon/armor rules.
