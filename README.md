@@ -315,3 +315,11 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Navigation is now a minimal teal pointer with plain target/distance text and no bordered fantasy-style label box.
 
 - v0.27.1: Hotfix a malformed Talent color string introduced by the v0.27.0 modern UI theme; addon now loads normally.
+
+- v0.28.0: Replaced the compact guide's formatted quest text with reusable modern quest-card frames.
+
+- STEP 1 now has a stronger active card; queued quests use smaller muted cards and background quests are visually de-emphasized as WHILE QUESTING.
+
+- The navigation marker now sits on a small flat high-contrast plate so it remains readable against terrain without returning to stock WoW chrome.
+
+- Main toolbar buttons received slightly more vertical padding for the modern layout.
