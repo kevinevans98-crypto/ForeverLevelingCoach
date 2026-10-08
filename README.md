@@ -207,3 +207,9 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Background quests never own STEP 1, the navigation arrow, or the Go button; they remain visible in the local quest queue.
 
 - The Lost Pages [6504] is now a background quest and is prioritized as STEP 2 while a real Thistlefur objective drives navigation.
+
+- v0.21.2: Background quests are explicitly labeled in exports and the Lazy Mode queue.
+
+- Thistlefur routing now finishes incomplete real local objectives before sending the player away for completed quest turn-ins.
+
+- Queue ordering is now: STEP 1 primary navigation, STEP 2 while-questing background objective, remaining primary objectives, then deferred completed turn-ins.
