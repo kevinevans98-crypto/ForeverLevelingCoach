@@ -413,3 +413,9 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Verified same-hub follow-ups can temporarily own navigation as PICK UP NEXT, then automatically clear when the follow-up is accepted or becomes active/completed.
 
 - Added verified follow-up quest IDs to existing route chains for Vital Intelligence, Fields of Grief, The Great Outdoors, Rattling the Rattlecages, and In Nightmares.
+
+- v0.33.0: Added completed known-quest route-data gap detection. FLC now identifies completed quests that are known to the addon but lack a routable verified turn-in definition.
+
+- Route data gaps appear as non-disruptive warning cards beneath the live route and never steal STEP 1 or arrow ownership.
+
+- Export now includes RouteDataGapCount, RouteDataGapTop, and a RouteDataGaps section distinguishing missing route entries from missing turn-in targets/waypoints.
