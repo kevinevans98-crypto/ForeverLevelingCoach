@@ -517,6 +517,17 @@ local function scoreRouteStep(step, active, clusterCounts)
         local bonus = weights.completedTurnIn or 0
         score = score + bonus
         reasons[#reasons + 1] = string.format("ready to turn in (+%d)", bonus)
+
+        if step.deferTurnInForQuestIDs then
+            for _, deferQuestID in ipairs(step.deferTurnInForQuestIDs) do
+                local deferActive = currentByID and currentByID[deferQuestID]
+                if deferActive and not deferActive.isComplete and not isQuestCompleted(deferQuestID) then
+                    score = score - 400
+                    reasons[#reasons + 1] = "finish nearby objective before leaving (-400)"
+                    break
+                end
+            end
+        end
     else
         local progress = getObjectiveProgress(active)
         if progress > 0 then
