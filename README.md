@@ -159,3 +159,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Added per-spec Rogue talent guides with switchable Combat, Assassination, and Subtlety community-recommended builds
 
 - Added The Red Messenger [382] and Vital Intelligence [383] to bridge Deathknell into Brill
+
+- Added Undead Forever camping chain The Adventurer [96656] / The Great Outdoors [96607], with Sticks and Bones [86784] optional
