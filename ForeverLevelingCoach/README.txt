@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.17.3
+Forever Leveling Coach v0.17.4
 
 Current scope
 -------------
@@ -369,3 +369,8 @@ Roadmap
 - Meven Korgal is routed at 36.6,68.5 in the same Scarlet camp; turn-in is Executor Arren at 32.2,66.0
 - Added Vital Intelligence [383] as the natural transition from Deathknell to Brill, turning in to Executor Zygand at 60.6,51.8
 - The route now stays in Deathknell for the Scarlet follow-up before using Brill as the next hub
+
+- Added Forever-exclusive Undead camping chain The Adventurer [96656] -> The Great Outdoors [96607]
+- The Adventurer points to Eleanor Shackleton at 57.2,55.4 southwest of Brill
+- The Great Outdoors gives explicit /sit then wait-for-Boosted-Rest steps at the same campfire
+- Added Sticks and Bones [86784] as OPTIONAL only; do it opportunistically at Eleanor's hill because branch spawns can make it inefficient
