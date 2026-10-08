@@ -1,13 +1,34 @@
 ForeverLevelingCoach_Data = {
-    version = "0.44.0",
+    version = "0.45.0",
     supported = {
         faction = "Horde",
         classes = {
-            SHAMAN = true,
+            WARRIOR = true,
+            HUNTER = true,
             ROGUE = true,
+            PRIEST = true,
+            SHAMAN = true,
+            MAGE = true,
+            WARLOCK = true,
+            DRUID = true,
         },
         minLevel = 1,
         maxLevel = 30,
+    },
+
+    -- Universal class foundation. Every Horde class can use the shared
+    -- routing/navigation engine. "optimized" only means FLC currently has
+    -- extra class-specific intelligence such as talent, trainer, relic, or
+    -- weapon rules; it is not required for core routing support.
+    classProfiles = {
+        WARRIOR = { name = "Warrior", optimized = false },
+        HUNTER = { name = "Hunter", optimized = false },
+        ROGUE = { name = "Rogue", optimized = true, gearProfile = "rogue" },
+        PRIEST = { name = "Priest", optimized = false },
+        SHAMAN = { name = "Shaman", optimized = true, usesRelics = true, weaponPreference = "shaman" },
+        MAGE = { name = "Mage", optimized = false },
+        WARLOCK = { name = "Warlock", optimized = false },
+        DRUID = { name = "Druid", optimized = false },
     },
 
     knownQuestIDs = {
