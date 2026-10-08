@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.15.2",
+    version = "0.15.3",
     supported = {
         faction = "Horde",
         classes = {
@@ -12,6 +12,9 @@ ForeverLevelingCoach_Data = {
 
     knownQuestIDs = {
         [364] = true, -- The Mindless Ones (Undead starter, live-verified on Ms)
+        [3096] = true, -- Encrypted Scroll (live-verified on Ms)
+        [3901] = true, -- Rattling the Rattlecages (live-verified on Ms)
+        [376] = true, -- The Damned (live-verified on Ms)
         [1527] = true,  -- Call of Fire: Horde Shaman Fire Totem / Totem of Charged Flames
         [2986] = true,
         [1534] = true,
@@ -185,6 +188,112 @@ ForeverLevelingCoach_Data = {
     -- Optional waypoint format for VERIFIED coordinates only:
     -- waypoint = { mapID = 123, x = 0.50, y = 0.50, label = "NPC / objective" }
     route = {
+        {
+            questID = 376,
+            class = "ROGUE",
+            cluster = "TIRISFAL_DEATHKNELL",
+            clusterPriority = 1,
+            title = "The Damned",
+            tag = "DO",
+            minLevel = 2,
+            maxLevel = 5,
+            note = "Fast Deathknell collection quest. Stack it with nearby starter kills.",
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Novice Elreth",
+                zone = "Deathknell, Tirisfal Glades",
+                coords = "30.9, 66.1",
+                locationType = "QUEST TURN-IN",
+                instruction = "Return to Novice Elreth at 30.9, 66.1.",
+                action = "TURN IN THE DAMNED",
+                useArrow = true,
+                waypoint = { mapID = 1420, x = 0.309, y = 0.661, label = "Novice Elreth" },
+            },
+            objectiveTargets = {
+                {
+                    objectiveContains = "Scavenger Paw",
+                    role = "Kill / loot",
+                    name = "Scavengers and Duskbats",
+                    zone = "Deathknell, Tirisfal Glades",
+                    coords = "around 33, 64",
+                    locationType = "MOBS — south/east of Deathknell",
+                    instruction = "Kill nearby scavengers and duskbats around 33, 64.",
+                    action = "LOOT 6 SCAVENGER PAWS + 6 DUSKBAT WINGS",
+                    useArrow = true,
+                    waypoint = { mapID = 1420, x = 0.33, y = 0.64, label = "Scavengers / Duskbats" },
+                },
+                {
+                    objectiveContains = "Duskbat Wing",
+                    role = "Kill / loot",
+                    name = "Scavengers and Duskbats",
+                    zone = "Deathknell, Tirisfal Glades",
+                    coords = "around 33, 64",
+                    locationType = "MOBS — south/east of Deathknell",
+                    instruction = "Kill nearby scavengers and duskbats around 33, 64.",
+                    action = "LOOT 6 SCAVENGER PAWS + 6 DUSKBAT WINGS",
+                    useArrow = true,
+                    waypoint = { mapID = 1420, x = 0.33, y = 0.64, label = "Scavengers / Duskbats" },
+                },
+            },
+        },
+        {
+            questID = 3901,
+            class = "ROGUE",
+            cluster = "TIRISFAL_DEATHKNELL",
+            clusterPriority = 2,
+            title = "Rattling the Rattlecages",
+            tag = "DO",
+            minLevel = 1,
+            maxLevel = 6,
+            note = "Fast Deathknell kill quest that stacks with nearby starter work.",
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Shadow Priest Sarvis",
+                zone = "Deathknell, Tirisfal Glades",
+                coords = "30.8, 66.2",
+                locationType = "QUEST TURN-IN",
+                instruction = "Return to Shadow Priest Sarvis at 30.8, 66.2.",
+                action = "TURN IN RATTLING THE RATTLECAGES",
+                useArrow = true,
+                waypoint = { mapID = 1420, x = 0.308, y = 0.662, label = "Shadow Priest Sarvis" },
+            },
+            objectiveTargets = {
+                {
+                    objectiveContains = "Rattlecage Skeleton",
+                    role = "Kill",
+                    name = "Rattlecage Skeletons",
+                    zone = "Deathknell, Tirisfal Glades",
+                    coords = "around 33, 62",
+                    locationType = "MOBS — graveyard/field",
+                    instruction = "Kill Rattlecage Skeletons around 33, 62.",
+                    action = "KILL 12 RATTLECAGE SKELETONS",
+                    useArrow = true,
+                    waypoint = { mapID = 1420, x = 0.33, y = 0.62, label = "Rattlecage Skeletons" },
+                },
+            },
+        },
+        {
+            questID = 3096,
+            class = "ROGUE",
+            cluster = "TIRISFAL_DEATHKNELL",
+            clusterPriority = 0,
+            title = "Encrypted Scroll",
+            tag = "IMPORTANT",
+            minLevel = 1,
+            maxLevel = 4,
+            note = "Rogue class introduction. Read the provided scroll and speak to David Trias.",
+            turnInTarget = {
+                role = "Rogue trainer",
+                name = "David Trias",
+                zone = "Deathknell, Tirisfal Glades",
+                coords = "32.5, 65.7",
+                locationType = "CLASS QUEST TURN-IN",
+                instruction = "Speak to David Trias in Deathknell at 32.5, 65.7.",
+                action = "SPEAK TO DAVID TRIAS",
+                useArrow = true,
+                waypoint = { mapID = 1420, x = 0.325, y = 0.657, label = "David Trias" },
+            },
+        },
         {
             questID = 364,
             class = "ROGUE",
