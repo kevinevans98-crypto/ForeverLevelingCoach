@@ -271,3 +271,9 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Settings includes clickable ON/OFF controls for Lazy Mode, auto accept, auto turn-in, gear advice, navigation arrow, flight assist, Beginner Mode, and Relic Advisor.
 
 - Settings also includes Lock/Unlock UI, Gear Summary, and Mark Class Training Done actions.
+
+- v0.25.1: Added verified Zoram'gar turn-in targets for Between a Rock and a Thistlefur and Troll Charm.
+
+- Completed Thistlefur quests now provide a real navigation target and arrow instead of leaving STEP 1 with no waypoint.
+
+- Between a Rock and a Thistlefur now also exposes the verified King of the Foulweald follow-up pickup at Karang Amakkar.
