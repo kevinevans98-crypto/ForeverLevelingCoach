@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.17.0",
+    version = "0.17.1",
     supported = {
         faction = "Horde",
         classes = {
@@ -313,6 +313,43 @@ ForeverLevelingCoach_Data = {
                 action = "TURN IN A LIGHT IN THE DARKNESS",
                 useArrow = true,
                 waypoint = { mapID = 1420, x = 0.311, y = 0.664, label = "Aramis Hammerhand" },
+            },
+        },
+        {
+            questID = 381,
+            class = "ROGUE",
+            cluster = "TIRISFAL_DEATHKNELL",
+            clusterPriority = 1,
+            title = "The Scarlet Crusade",
+            tag = "DO",
+            minLevel = 2,
+            maxLevel = 7,
+            note = "Efficient Deathknell follow-up after Night Web's Hollow. Do this local Scarlet camp before leaving for farther objectives.",
+            waypoint = { mapID = 1420, x = 0.370, y = 0.680, label = "Scarlet camp" },
+            objectiveTargets = {
+                {
+                    objectiveContains = "Scarlet Armband",
+                    role = "Kill / loot",
+                    name = "Scarlet Converts / Initiates",
+                    zone = "Tirisfal Glades",
+                    coords = "around 37, 68",
+                    locationType = "SCARLET CAMP — southeast of Deathknell",
+                    instruction = "Kill Scarlet Converts and Initiates around 37, 68.",
+                    action = "LOOT 12 SCARLET ARMBANDS",
+                    useArrow = true,
+                    waypoint = { mapID = 1420, x = 0.370, y = 0.680, label = "Scarlet camp" },
+                },
+            },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Executor Arren",
+                zone = "Deathknell, Tirisfal Glades",
+                coords = "32.2, 66.0",
+                locationType = "QUEST TURN-IN",
+                instruction = "Return to Executor Arren at 32.2, 66.0.",
+                action = "TURN IN THE SCARLET CRUSADE",
+                useArrow = true,
+                waypoint = { mapID = 1420, x = 0.322, y = 0.660, label = "Executor Arren" },
             },
         },
         {
