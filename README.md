@@ -391,3 +391,7 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - v0.29.6: Fixed Quick Pickup visual ownership so the top card now always matches the arrow/navigation target.
 
 - While Quick Pickup is active, the pickup becomes the emphasized first card and the saved route moves directly underneath as ROUTE. Once the quest is accepted, normal STEP 1 presentation returns automatically.
+
+- v0.29.7: Added live Quick Pickup arrival handling. Within 8 meters of the verified quest giver, FLC hides the arrow and changes the top HUD prompt to INTERACT NOW.
+
+- If the player backs away before accepting the quest, FLC automatically restores normal Quick Pickup arrow navigation; accepting the quest still returns control to the saved route.
