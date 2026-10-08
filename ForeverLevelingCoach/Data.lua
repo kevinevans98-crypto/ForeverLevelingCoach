@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.17.3",
+    version = "0.17.4",
     supported = {
         faction = "Horde",
         classes = {
@@ -27,6 +27,9 @@ ForeverLevelingCoach_Data = {
         [381] = true, -- The Scarlet Crusade (verified in Forever DB)
         [382] = true, -- The Red Messenger (live-verified on Ms; Forever DB cross-check)
         [383] = true, -- Vital Intelligence (Forever DB chain follow-up)
+        [86784] = true, -- Sticks and Bones (Forever-exclusive Brill side quest)
+        [96607] = true, -- The Great Outdoors (Forever-exclusive Undead camping tutorial follow-up)
+        [96656] = true, -- The Adventurer (Forever-exclusive Undead camping intro; live-verified on Ms)
         [3902] = true, -- Scavenging Deathknell (verified in Forever DB)
         [3096] = true, -- Encrypted Scroll (live-verified on Ms)
         [3901] = true, -- Rattling the Rattlecages (live-verified on Ms)
@@ -412,6 +415,129 @@ ForeverLevelingCoach_Data = {
                 coords = "32.2, 66.0",
                 showWhileActive = false,
                 waypoint = { mapID = 1420, x = 0.322, y = 0.660, label = "Executor Arren" },
+            },
+        },
+        {
+            questID = 96656,
+            class = "ROGUE",
+            cluster = "TIRISFAL_BRILL",
+            clusterPriority = 1,
+            title = "The Adventurer",
+            tag = "DO",
+            minLevel = 4,
+            maxLevel = 9,
+            note = "Forever-exclusive camping intro. Efficient on the Deathknell-to-Brill transition because Eleanor is directly on the route.",
+            waypoint = { mapID = 1420, x = 0.572, y = 0.554, label = "Eleanor Shackleton" },
+            personTarget = {
+                role = "Quest turn-in",
+                name = "Eleanor Shackleton",
+                zone = "Tirisfal Glades, southwest of Brill",
+                coords = "57.2, 55.4",
+                locationType = "QUEST TURN-IN / CAMPING",
+                instruction = "Speak to Eleanor Shackleton near Brill at 57.2, 55.4.",
+                action = "TURN IN THE ADVENTURER",
+                useArrow = true,
+                waypoint = { mapID = 1420, x = 0.572, y = 0.554, label = "Eleanor Shackleton" },
+            },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Eleanor Shackleton",
+                zone = "Tirisfal Glades, southwest of Brill",
+                coords = "57.2, 55.4",
+                action = "TURN IN THE ADVENTURER",
+                useArrow = true,
+                waypoint = { mapID = 1420, x = 0.572, y = 0.554, label = "Eleanor Shackleton" },
+            },
+            nextPickup = {
+                title = "The Great Outdoors",
+                npc = "Eleanor Shackleton",
+                role = "Quest giver",
+                zone = "Tirisfal Glades, southwest of Brill",
+                coords = "57.2, 55.4",
+                showWhileActive = false,
+                waypoint = { mapID = 1420, x = 0.572, y = 0.554, label = "Eleanor Shackleton" },
+            },
+        },
+        {
+            questID = 96607,
+            class = "ROGUE",
+            cluster = "TIRISFAL_BRILL",
+            clusterPriority = 2,
+            title = "The Great Outdoors",
+            tag = "DO",
+            minLevel = 4,
+            maxLevel = 9,
+            note = "Forever camping tutorial. Very fast XP because the whole objective is at Eleanor's camp.",
+            waypoint = { mapID = 1420, x = 0.572, y = 0.554, label = "Eleanor's Campfire" },
+            objectiveTargets = {
+                {
+                    objectiveContains = "Use the /sit emote near the campfire",
+                    role = "Camping tutorial",
+                    name = "Eleanor's Campfire",
+                    zone = "Tirisfal Glades",
+                    coords = "57.2, 55.4",
+                    locationType = "CAMPFIRE",
+                    instruction = "Stand by Eleanor's campfire and use /sit.",
+                    action = "TYPE /SIT BY THE CAMPFIRE",
+                    useArrow = true,
+                    waypoint = { mapID = 1420, x = 0.572, y = 0.554, label = "Eleanor's Campfire" },
+                },
+                {
+                    objectiveContains = "Boosted Rest",
+                    role = "Camping tutorial",
+                    name = "Eleanor's Campfire",
+                    zone = "Tirisfal Glades",
+                    coords = "57.2, 55.4",
+                    locationType = "CAMPFIRE",
+                    instruction = "Remain seated by the campfire until Boosted Rest is gained.",
+                    action = "STAY SEATED UNTIL BOOSTED REST",
+                    useArrow = true,
+                    waypoint = { mapID = 1420, x = 0.572, y = 0.554, label = "Eleanor's Campfire" },
+                },
+            },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Eleanor Shackleton",
+                zone = "Tirisfal Glades",
+                coords = "57.2, 55.4",
+                action = "TURN IN THE GREAT OUTDOORS",
+                useArrow = true,
+                waypoint = { mapID = 1420, x = 0.572, y = 0.554, label = "Eleanor Shackleton" },
+            },
+        },
+        {
+            questID = 86784,
+            class = "ROGUE",
+            cluster = "TIRISFAL_BRILL",
+            clusterPriority = 8,
+            title = "Sticks and Bones",
+            tag = "OPTIONAL",
+            minLevel = 4,
+            maxLevel = 10,
+            note = "Forever-exclusive side quest. Only do it while already at Eleanor's hill; branch spawns can make it slower than the main route.",
+            waypoint = { mapID = 1420, x = 0.565, y = 0.535, label = "Dry Branches" },
+            objectiveTargets = {
+                {
+                    objectiveContains = "Dry Branch",
+                    role = "Ground loot",
+                    name = "Dry Branches",
+                    zone = "Tirisfal Glades",
+                    coords = "around 56.5, 53.5",
+                    locationType = "GROUND OBJECTS",
+                    instruction = "Pick up Dry Branches around Eleanor's hill only if they are easy to find.",
+                    action = "OPTIONAL: LOOT 6 DRY BRANCHES",
+                    useArrow = true,
+                    waypoint = { mapID = 1420, x = 0.565, y = 0.535, label = "Dry Branches" },
+                },
+            },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Eleanor Shackleton",
+                zone = "Tirisfal Glades",
+                coords = "57.2, 55.4",
+                action = "TURN IN STICKS AND BONES",
+                useArrow = true,
+                waypoint = { mapID = 1420, x = 0.572, y = 0.554, label = "Eleanor Shackleton" },
             },
         },
         {
