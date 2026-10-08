@@ -574,6 +574,29 @@ local function getWaypointProximityBonus(step, active)
     return 0, nil
 end
 
+local function hasIncompletePrimaryInCluster(step)
+    if not step or not step.cluster or not currentByID then return false end
+
+    local cluster = Data.clusters and Data.clusters[step.cluster]
+    if not cluster or not cluster.finishBeforeTurnIn then return false end
+
+    local level = UnitLevel("player") or 1
+    local _, playerClass = UnitClass("player")
+    for _, otherStep in ipairs(Data.route or {}) do
+        if otherStep.questID ~= step.questID
+            and otherStep.cluster == step.cluster
+            and not otherStep.backgroundQuest
+            and routeStepEligible(otherStep, level, playerClass) then
+            local otherActive = currentByID[otherStep.questID]
+            if otherActive and not otherActive.isComplete and not isQuestCompleted(otherStep.questID) then
+                return true
+            end
+        end
+    end
+
+    return false
+end
+
 local function scoreRouteStep(step, active, clusterCounts)
     local weights = Data.scoring or {}
     local score = 0
@@ -598,6 +621,12 @@ local function scoreRouteStep(step, active, clusterCounts)
                     break
                 end
             end
+        end
+
+        if hasIncompletePrimaryInCluster(step) then
+            local penalty = weights.finishClusterBeforeTurnInPenalty or 400
+            score = score - penalty
+            reasons[#reasons + 1] = string.format("finish local cluster before turn-in (-%d)", penalty)
         end
     else
         local progress = getObjectiveProgress(active)
@@ -689,8 +718,14 @@ local function getNearbyClusterQuestNames(step, byID)
     end
 
     table.sort(names, function(a, b)
-        if a.complete ~= b.complete then return a.complete end
-        if a.background ~= b.background then return a.background end
+        local function queueRank(item)
+            if item.complete then return 3 end
+            if item.background then return 1 end
+            return 2
+        end
+
+        local rankA, rankB = queueRank(a), queueRank(b)
+        if rankA ~= rankB then return rankA < rankB end
         if a.priority ~= b.priority then return a.priority < b.priority end
         return tostring(a.title) < tostring(b.title)
     end)
@@ -1767,7 +1802,8 @@ local function render()
             end
 
             detailLines[#detailLines + 1] = ""
-            detailLines[#detailLines + 1] = "STEP " .. tostring(stepNumber) .. ": " .. tostring(q.title or "Quest")
+            local queueLabel = q.background and " (WHILE QUESTING)" or ""
+            detailLines[#detailLines + 1] = "STEP " .. tostring(stepNumber) .. ": " .. tostring(q.title or "Quest") .. queueLabel
             if qAction and qAction ~= "" then
                 detailLines[#detailLines + 1] = "DO: " .. tostring(qAction)
             end
@@ -1987,6 +2023,7 @@ exportSnapshot = function()
         "ClusterActiveQuestCount=" .. tostring(currentClusterCount or 0),
         "RecommendedScore=" .. tostring(currentRouteScore or 0),
         "RecommendedReasons=" .. table.concat(currentRouteReasons or {}, " | "),
+        "QueuePolicy=STEP 1 primary navigation | STEP 2 background while-questing when available | then next primary objectives | deferred turn-ins last",
         "CurrentZone=" .. tostring((GetZoneText and GetZoneText()) or "?"),
         "CurrentSubZone=" .. tostring((GetSubZoneText and GetSubZoneText()) or "?"),
         "CurrentTravelStep=" .. tostring(currentTravelInstruction or "none"),
@@ -2093,19 +2130,23 @@ exportSnapshot = function()
     for _, step in ipairs(Data.route or {}) do
         local active = currentByID[step.questID]
         local level = UnitLevel("player") or 1
-        local inRange = level >= (step.minLevel or 1) and level <= (step.maxLevel or 999)
         local _, playerClass = UnitClass("player")
-        local classMatch = (not step.class) or step.class == playerClass
-        if active and inRange and classMatch and not isQuestCompleted(step.questID) then
+        if active and routeStepEligible(step, level, playerClass) and not isQuestCompleted(step.questID) then
             local score, reasons = scoreRouteStep(step, active, clusterCounts)
-            scored[#scored + 1] = { step = step, score = score, reasons = reasons }
+            scored[#scored + 1] = {
+                step = step,
+                score = score,
+                reasons = reasons,
+                candidateType = step.backgroundQuest and "BACKGROUND | not eligible for STEP 1" or "PRIMARY",
+            }
         end
     end
     table.sort(scored, function(a, b) return a.score > b.score end)
     for _, item in ipairs(scored) do
-        lines[#lines + 1] = string.format("- %d | %s | score=%d | %s",
+        lines[#lines + 1] = string.format("- %d | %s | %s | score=%d | %s",
             item.step.questID or 0,
             item.step.title or "?",
+            item.candidateType or "PRIMARY",
             item.score,
             table.concat(item.reasons or {}, " | "))
     end
