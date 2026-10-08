@@ -2208,6 +2208,16 @@ exportSnapshot = function()
                 tostring(item.levelGap or "none"),
                 tonumber(item.score) or 0,
                 tostring(item.reason or ""))
+            if item.upgrade and item.upgrade.target then
+                local target = item.upgrade.target
+                lines[#lines + 1] = string.format("  upgrade=%s | estBetter=+%d%% | sourceType=%s | source=%s | routeFriendly=%s | %s",
+                    tostring(target.name or "?"),
+                    math.floor((item.upgrade.pct or 0) + 0.5),
+                    tostring(target.sourceType or "?"),
+                    tostring(target.source or "?"),
+                    tostring(target.routeFriendly and true or false),
+                    tostring(target.sourceNote or ""))
+            end
         end
     end
 
@@ -2477,6 +2487,83 @@ local function flcItemScore(link, tooltip)
     return score
 end
 
+local function flcStaticUpgradeScore(target)
+    if not target then return 0 end
+    local stats = target.stats or {}
+    local score = 0
+    local _, playerClass = UnitClass("player")
+
+    local function weight(name)
+        if playerClass == "ROGUE" then
+            if name == "Agility" then return 2.2 end
+            if name == "Stamina" then return 0.8 end
+            if name == "Strength" then return 0.5 end
+            if name == "Intellect" or name == "Spirit" then return 0 end
+        end
+
+        local weights = {
+            Strength = 2.0,
+            Agility = 1.4,
+            Stamina = 0.7,
+            Intellect = 0.5,
+            Spirit = 0.2,
+            AttackPower = 0.5,
+            Crit = 0.6,
+            Hit = 0.8,
+            Haste = 0.4,
+            ArmorPen = 0.4,
+            SpellPower = 0.15,
+            DPS = 10.0,
+        }
+        return weights[name] or 0
+    end
+
+    for statName, value in pairs(stats) do
+        score = score + ((tonumber(value) or 0) * weight(statName))
+    end
+
+    score = score + ((tonumber(target.itemLevel) or 0) * 0.08)
+    return score
+end
+
+local function flcBestUpgradeTarget(slot, currentScore)
+    local _, playerClass = UnitClass("player")
+    local classTargets = Data.gearUpgradeTargets and Data.gearUpgradeTargets[playerClass]
+    local targets = classTargets and classTargets[slot]
+    if not targets then return nil end
+
+    local playerLevel = UnitLevel("player") or 1
+    local best, bestValue = nil, -999999
+
+    for _, target in ipairs(targets) do
+        if playerLevel >= (target.requiredLevel or 1) then
+            local targetScore = flcStaticUpgradeScore(target)
+            local delta = targetScore - (currentScore or 0)
+            local denom = math.max(targetScore, currentScore or 0, 1)
+            local pct = (delta / denom) * 100
+
+            -- Source practicality breaks near-ties, but never makes a worse
+            -- item into an "upgrade". Route-friendly quest rewards are favored
+            -- over optional farms when their actual gear value is comparable.
+            if pct >= 1 then
+                local practicalBonus = target.routeFriendly and 12 or 0
+                local sourceBonus = (tonumber(target.sourcePriority) or 0) * 0.05
+                local value = pct + practicalBonus + sourceBonus
+                if value > bestValue then
+                    bestValue = value
+                    best = {
+                        target = target,
+                        score = targetScore,
+                        pct = pct,
+                    }
+                end
+            end
+        end
+    end
+
+    return best
+end
+
 local function flcEquippedScore(slot)
     local link = GetInventoryItemLink and GetInventoryItemLink("player", slot)
     if not link then return 0, nil end
@@ -2616,6 +2703,13 @@ local function flcGearSlotStatus(slotDef, playerLevel)
         end
     end
 
+    local upgrade = flcBestUpgradeTarget(slot, score or 0)
+    if (status == "WEAK" or status == "WATCH") and not upgrade then
+        status = "HOLD"
+        reason = "Item level is behind, but no verified worthwhile replacement currently beats its leveling score"
+        priority = 0
+    end
+
     return {
         slot = slot,
         slotName = slotDef.name,
@@ -2628,6 +2722,7 @@ local function flcGearSlotStatus(slotDef, playerLevel)
         score = score or 0,
         priority = priority,
         expected = true,
+        upgrade = upgrade,
     }
 end
 
@@ -2710,6 +2805,19 @@ flcRenderGearScannerView = function()
             )
             lines[#lines + 1] = "   " .. tostring(item.itemName or "EMPTY")
             lines[#lines + 1] = "   " .. tostring(item.reason or "")
+            if item.upgrade and item.upgrade.target then
+                local target = item.upgrade.target
+                lines[#lines + 1] = string.format(
+                    "   UPGRADE: %s  (~+%d%%)",
+                    tostring(target.name or "?"),
+                    math.floor((item.upgrade.pct or 0) + 0.5)
+                )
+                lines[#lines + 1] = "   SOURCE: " .. tostring(target.source or "unknown")
+                lines[#lines + 1] = "   " .. (target.routeFriendly and "|cff33ff99ROUTE-FRIENDLY|r" or "|cffffcc00OPTIONAL FARM/AH|r")
+                if target.sourceNote then
+                    lines[#lines + 1] = "   " .. tostring(target.sourceNote)
+                end
+            end
         end
     end
 
@@ -2725,7 +2833,7 @@ flcRenderGearScannerView = function()
         end
 
         local color = "|cffaaaaaa"
-        if status == "OK" or status == "N/A" or status == "NOT EXPECTED YET" then
+        if status == "OK" or status == "N/A" or status == "NOT EXPECTED YET" or status == "HOLD" then
             color = "|cff33ff99"
         elseif status == "OPTIONAL EMPTY" then
             color = "|cffaaaaaa"
