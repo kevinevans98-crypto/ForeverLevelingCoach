@@ -1459,6 +1459,81 @@ end
 
 local questCards = {}
 
+local function isQuestInCleanup(questID)
+    questID = tonumber(questID)
+    if not questID then return false end
+    for _, item in ipairs(currentQuestCleanup or {}) do
+        if tonumber(item.questID) == questID then
+            return true
+        end
+    end
+    return false
+end
+
+local function abandonCleanupQuest(questID)
+    questID = tonumber(questID)
+    if not questID or not isQuestInCleanup(questID) then
+        print("|cffffcc00FLC:|r That quest is no longer marked safe to drop.")
+        return
+    end
+    if not currentByID or not currentByID[questID] then
+        print("|cffffcc00FLC:|r That quest is no longer in your quest log.")
+        return
+    end
+
+    local selected = false
+    if C_QuestLog and type(C_QuestLog.SetSelectedQuest) == "function" then
+        local ok = pcall(C_QuestLog.SetSelectedQuest, questID)
+        selected = ok and true or false
+    end
+
+    local prepared = false
+    if C_QuestLog and type(C_QuestLog.SetAbandonQuest) == "function" then
+        prepared = pcall(C_QuestLog.SetAbandonQuest)
+    elseif type(SetAbandonQuest) == "function" then
+        prepared = pcall(SetAbandonQuest)
+    end
+
+    local abandoned = false
+    if C_QuestLog and type(C_QuestLog.AbandonQuest) == "function" then
+        abandoned = pcall(C_QuestLog.AbandonQuest)
+    elseif type(AbandonQuest) == "function" then
+        abandoned = pcall(AbandonQuest)
+    end
+
+    if abandoned then
+        print("|cff33ff99FLC:|r Dropped " .. tostring(currentByID[questID] and currentByID[questID].title or ("Quest " .. tostring(questID))) .. ".")
+        if C_Timer and type(C_Timer.After) == "function" then
+            C_Timer.After(0.2, function()
+                if syncQuests then syncQuests() end
+            end)
+        elseif syncQuests then
+            syncQuests()
+        end
+    elseif selected or prepared then
+        print("|cffffcc00FLC:|r The client did not allow FLC to finish abandoning this quest automatically.")
+    else
+        print("|cffffcc00FLC:|r Quest abandon API is unavailable on this client.")
+    end
+end
+
+if StaticPopupDialogs then
+    StaticPopupDialogs["FLC_CONFIRM_DROP_QUEST"] = {
+        text = "Drop %s?\n\nForever Leveling Coach marked this optional quest safe to abandon.",
+        button1 = "Drop Quest",
+        button2 = "Cancel",
+        OnAccept = function(_, data)
+            if data and data.questID then
+                abandonCleanupQuest(data.questID)
+            end
+        end,
+        timeout = 0,
+        whileDead = true,
+        hideOnEscape = true,
+        preferredIndex = 3,
+    }
+end
+
 local function createQuestCard(index)
     local card = CreateFrame("Frame", nil, mainScrollChild, "BackdropTemplate")
     card:SetHeight(index == 1 and 50 or 42)
@@ -1496,6 +1571,35 @@ local function createQuestCard(index)
     card.action:SetJustifyH("LEFT")
     card.action:SetWordWrap(false)
 
+    card.dropButton = CreateFrame("Button", nil, card, "UIPanelButtonTemplate")
+    card.dropButton:SetSize(50, 20)
+    card.dropButton:SetPoint("RIGHT", card, "RIGHT", -6, 0)
+    card.dropButton:SetText("DROP")
+    card.dropButton:Hide()
+    card.dropButton:SetScript("OnClick", function(self)
+        local questID = self.questID
+        if not questID then return end
+
+        local title = currentByID and currentByID[questID] and currentByID[questID].title
+            or ("Quest " .. tostring(questID))
+        if StaticPopup_Show and StaticPopupDialogs and StaticPopupDialogs["FLC_CONFIRM_DROP_QUEST"] then
+            StaticPopup_Show("FLC_CONFIRM_DROP_QUEST", title, nil, { questID = questID })
+        else
+            abandonCleanupQuest(questID)
+        end
+    end)
+    card.dropButton:SetScript("OnEnter", function(self)
+        if GameTooltip then
+            GameTooltip:SetOwner(self, "ANCHOR_TOP")
+            GameTooltip:SetText("Drop this quest")
+            GameTooltip:AddLine("Only shown for quests FLC currently marks safe to abandon.", 0.75, 0.82, 0.85, true)
+            GameTooltip:Show()
+        end
+    end)
+    card.dropButton:SetScript("OnLeave", function()
+        if GameTooltip then GameTooltip:Hide() end
+    end)
+
     card:Hide()
     return card
 end
@@ -1529,6 +1633,12 @@ local function renderQuestCards(cards)
             card.title:SetText(info.title or "")
             card.action:SetText(info.action or "")
             card.action:SetShown(info.action and info.action ~= "")
+
+            local showDrop = info.dropQuestID and true or false
+            card.dropButton.questID = showDrop and tonumber(info.dropQuestID) or nil
+            card.dropButton:SetShown(showDrop)
+            card.title:SetPoint("TOPRIGHT", showDrop and -62 or -7, primary and -19 or -17)
+            card.action:SetPoint("TOPRIGHT", showDrop and -62 or -7, primary and -34 or -29)
 
             if primary then
                 card.accent:SetVertexColor(0.20, 0.82, 0.74, 1.0)
@@ -1566,6 +1676,8 @@ local function renderQuestCards(cards)
             card:Show()
             previous = card
         else
+            card.dropButton.questID = nil
+            card.dropButton:Hide()
             card:Hide()
         end
     end
@@ -3028,10 +3140,11 @@ local function render()
             cardData[#cardData + 1] = {
                 label = "CLEANUP",
                 step = stepNumber,
-                status = "IGNORE / DROP",
+                status = "SAFE TO DROP",
                 title = tostring(item.title or ("Quest " .. tostring(item.questID or "?"))),
-                action = "OPTIONAL QUEST IS NOW BELOW ROUTE VALUE",
+                action = "Optional quest is below route value",
                 background = true,
+                dropQuestID = item.questID,
             }
             stepNumber = stepNumber + 1
         end
@@ -3537,6 +3650,7 @@ exportSnapshot = function()
         end
     end
 
+    lines[#lines + 1] = "QuestCleanupDropButtons=" .. tostring(currentQuestCleanup and #currentQuestCleanup > 0 and "enabled" or "none")
     lines[#lines + 1] = "QuestCleanup:"
     if not currentQuestCleanup or #currentQuestCleanup == 0 then
         lines[#lines + 1] = "- none"
