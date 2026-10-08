@@ -225,6 +225,7 @@ local currentFastTravelSuggestion = nil
 local currentFastTravelMode = nil
 local currentNextQuestPickup = nil
 local currentPickupSuggestions = {}
+local currentQuickPickupSuggestion = nil
 local currentPersonTarget = nil
 local currentObjectiveTarget = nil
 local currentTravelTarget = nil
@@ -2276,6 +2277,17 @@ local function render()
     end
     currentRouteStep = step
     currentPickupSuggestions = getPickupSuggestions(currentByID, step)
+    currentQuickPickupSuggestion = nil
+    for _, suggestion in ipairs(currentPickupSuggestions or {}) do
+        if suggestion.classification == "PICK UP NOW"
+            and suggestion.pickup
+            and suggestion.pickup.waypoint
+            and suggestion.distance
+            and suggestion.distance <= 0.05 then
+            currentQuickPickupSuggestion = suggestion
+            break
+        end
+    end
     local routeFlightTarget = step and step.flightTarget or nil
     if active and active.isComplete and step and step.turnInFlightTarget then
         routeFlightTarget = step.turnInFlightTarget
@@ -2381,6 +2393,33 @@ local function render()
         end
     end
 
+    if currentQuickPickupSuggestion
+        and currentQuickPickupSuggestion.pickup
+        and currentQuickPickupSuggestion.pickup.waypoint
+        and C_Map and C_Map.GetBestMapForUnit
+        and C_Map.GetBestMapForUnit("player") == currentQuickPickupSuggestion.pickup.waypoint.mapID then
+
+        local pickup = currentQuickPickupSuggestion.pickup
+        currentNavigationWaypoint = pickup.waypoint
+        currentTravelTarget = nil
+        currentFastTravelSuggestion = nil
+        currentFastTravelMode = "quick-pickup"
+        currentAutoFlightTarget = nil
+        currentAutoFlightStatus = "quick-pickup"
+        currentPersonTarget = {
+            role = pickup.role or "Quest giver",
+            name = pickup.npc or currentQuickPickupSuggestion.title,
+            zone = pickup.zone,
+            coords = pickup.coords,
+            locationType = pickup.locationType or "QUICK PICKUP",
+            locationNote = pickup.locationNote,
+            approach = pickup.approach,
+            useArrow = true,
+            waypoint = pickup.waypoint,
+        }
+        currentTravelInstruction = "Quick pickup: " .. tostring(currentQuickPickupSuggestion.title or "quest")
+    end
+
     local insideDungeonRoute = step and step.dungeon and step.cluster and zoneMatchesCluster(step.cluster)
     local insideDungeonObjectiveMode = insideDungeonRoute and active and not active.isComplete
     if insideDungeonObjectiveMode then
@@ -2405,7 +2444,9 @@ local function render()
 
     -- Lazy play UI: show only the quest/task name plus ONE immediate action.
     -- Location is communicated by the safe same-zone arrow/local travel handoff.
-    if currentTravelTarget and DB and DB.lazyMode ~= false then
+    if currentQuickPickupSuggestion then
+        routeText:SetText("Quick pickup")
+    elseif currentTravelTarget and DB and DB.lazyMode ~= false then
         routeText:SetText("Travel")
     elseif active and active.isComplete then
         routeText:SetText("Turn in quest")
@@ -2450,13 +2491,28 @@ local function render()
         },
     }
 
+    local stepNumber = 2
+    if currentQuickPickupSuggestion and #cardData < #questCards then
+        local pickup = currentQuickPickupSuggestion.pickup or {}
+        cardData[#cardData + 1] = {
+            label = "QUICK",
+            step = stepNumber,
+            status = "PICK UP NOW",
+            title = tostring(currentQuickPickupSuggestion.title or "Quest"),
+            action = pickup.npc and ("TALK TO " .. string.upper(tostring(pickup.npc))) or "PICK UP QUEST",
+            pickup = true,
+            pickupClass = "PICK UP NOW",
+            background = false,
+        }
+        stepNumber = stepNumber + 1
+    end
+
     local detailLines = {}
     local specName, talentPick = flcTalentRecommendation()
     if specName and talentPick then
         detailLines[#detailLines + 1] = "|cff6bb8d9Talent:|r " .. tostring(specName) .. " — " .. tostring(talentPick)
     end
 
-    local stepNumber = 2
     if DB and DB.lazyMode ~= false and step and step.cluster then
         local clusterQuests = getNearbyClusterQuestNames(step, currentByID)
         for _, q in ipairs(clusterQuests) do
@@ -2497,7 +2553,7 @@ local function render()
     if DB and DB.lazyMode ~= false and currentPickupSuggestions then
         for _, suggestion in ipairs(currentPickupSuggestions) do
             if #cardData >= #questCards then break end
-            if suggestion.classification ~= "SKIP" then
+            if suggestion ~= currentQuickPickupSuggestion and suggestion.classification ~= "SKIP" then
                 local pickup = suggestion.pickup or {}
                 local actionText = "PICK UP QUEST"
                 if pickup.npc then
@@ -2836,6 +2892,8 @@ exportSnapshot = function()
         "NextQuestPickupZone=" .. tostring(currentNextQuestPickup and currentNextQuestPickup.zone or "none"),
         "NextQuestPickupCoords=" .. tostring(currentNextQuestPickup and currentNextQuestPickup.coords or "none"),
         "PickupSuggestionCount=" .. tostring(#(currentPickupSuggestions or {})),
+        "QuickPickup=" .. tostring(currentQuickPickupSuggestion and currentQuickPickupSuggestion.title or "none"),
+        "QuickPickupQuestID=" .. tostring(currentQuickPickupSuggestion and currentQuickPickupSuggestion.questID or "none"),
         "MarkedPersonRole=" .. tostring(currentPersonTarget and currentPersonTarget.role or "none"),
         "MarkedPersonName=" .. tostring(currentPersonTarget and currentPersonTarget.name or "none"),
         "MarkedPersonZone=" .. tostring(currentPersonTarget and currentPersonTarget.zone or "none"),
