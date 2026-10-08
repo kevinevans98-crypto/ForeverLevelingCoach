@@ -323,3 +323,9 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - The navigation marker now sits on a small flat high-contrast plate so it remains readable against terrain without returning to stock WoW chrome.
 
 - Main toolbar buttons received slightly more vertical padding for the modern layout.
+
+- v0.28.1: Removed the navigation marker's black backing square and increased pointer contrast/size for better in-world readability.
+
+- The top objective header now shows route context (Current route / Travel / Turn in quest / Class training) while the STEP 1 card owns the quest title, removing duplicate quest names.
+
+- Tightened spacing above the quest cards so the compact guide uses screen space more efficiently.
