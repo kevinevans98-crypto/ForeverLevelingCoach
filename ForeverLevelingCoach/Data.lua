@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.16.1",
+    version = "0.16.2",
     supported = {
         faction = "Horde",
         classes = {
@@ -12,6 +12,9 @@ ForeverLevelingCoach_Data = {
 
     knownQuestIDs = {
         [364] = true, -- The Mindless Ones (Undead starter, live-verified on Ms)
+        [380] = true, -- Night Web's Hollow
+        [6395] = true, -- Marla's Last Wish
+        [98389] = true, -- A Light in the Darkness
         [408] = true, -- The Family Crypt (verified in Forever DB)
         [372] = true, -- At War With The Scarlet Crusade (verified in Forever DB)
         [371] = true, -- At War With The Scarlet Crusade (verified in Forever DB)
@@ -236,6 +239,126 @@ ForeverLevelingCoach_Data = {
     -- Optional waypoint format for VERIFIED coordinates only:
     -- waypoint = { mapID = 123, x = 0.50, y = 0.50, label = "NPC / objective" }
     route = {
+        {
+            questID = 98389,
+            class = "ROGUE",
+            cluster = "TIRISFAL_DEATHKNELL",
+            clusterPriority = 1,
+            title = "A Light in the Darkness",
+            tag = "DO",
+            minLevel = 2,
+            maxLevel = 6,
+            note = "Forever-specific Deathknell quest. Free webbed Forsaken in Night Web's Hollow; stacks with the spider cave route.",
+            objectiveTargets = {
+                {
+                    objectiveContains = "Webbed Forsaken freed",
+                    role = "Free captives",
+                    name = "Webbed Forsaken",
+                    zone = "Night Web's Hollow, Tirisfal Glades",
+                    coords = "around 27, 58",
+                    locationType = "CAVE OBJECTIVES",
+                    instruction = "Enter Night Web's Hollow around 27, 58 and free webbed Forsaken.",
+                    action = "FREE 6 WEBBED FORSAKEN",
+                    useArrow = true,
+                    waypoint = { mapID = 1420, x = 0.27, y = 0.58, label = "Night Web's Hollow" },
+                },
+            },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Aramis Hammerhand",
+                zone = "Deathknell, Tirisfal Glades",
+                coords = "31.1, 66.4",
+                locationType = "QUEST TURN-IN",
+                instruction = "Return to Aramis Hammerhand at 31.1, 66.4.",
+                action = "TURN IN A LIGHT IN THE DARKNESS",
+                useArrow = true,
+                waypoint = { mapID = 1420, x = 0.311, y = 0.664, label = "Aramis Hammerhand" },
+            },
+        },
+        {
+            questID = 6395,
+            class = "ROGUE",
+            cluster = "TIRISFAL_DEATHKNELL",
+            clusterPriority = 2,
+            title = "Marla's Last Wish",
+            tag = "DO",
+            minLevel = 3,
+            maxLevel = 7,
+            note = "Short Deathknell chain after The Damned. Kill Samuel, loot his remains, bury them at Marla's grave, then return to Novice Elreth.",
+            objectiveTargets = {
+                {
+                    objectiveContains = "Samuel's Remains Buried",
+                    requireItemID = 16333,
+                    requireItemMissing = true,
+                    role = "Kill / loot",
+                    name = "Samuel Fipps",
+                    zone = "Tirisfal Glades",
+                    coords = "36.7, 61.7",
+                    locationType = "NAMED MOB",
+                    instruction = "Kill Samuel Fipps around 36.7, 61.7 and loot Samuel's Remains.",
+                    action = "KILL SAMUEL FIPPS + LOOT REMAINS",
+                    useArrow = true,
+                    waypoint = { mapID = 1420, x = 0.367, y = 0.617, label = "Samuel Fipps" },
+                },
+                {
+                    objectiveContains = "Samuel's Remains Buried",
+                    requireItemID = 16333,
+                    requireItemPresent = true,
+                    role = "Use quest object",
+                    name = "Marla's Grave",
+                    zone = "Deathknell graveyard",
+                    coords = "31.2, 65.0",
+                    locationType = "GRAVE — click the dirt mound",
+                    instruction = "Click Marla's grave at 31.2, 65.0 to bury Samuel's Remains.",
+                    action = "CLICK MARLA'S GRAVE",
+                    useArrow = true,
+                    waypoint = { mapID = 1420, x = 0.312, y = 0.650, label = "Marla's Grave" },
+                },
+            },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Novice Elreth",
+                zone = "Deathknell, Tirisfal Glades",
+                coords = "30.9, 66.1",
+                action = "TURN IN MARLA'S LAST WISH",
+                useArrow = true,
+                waypoint = { mapID = 1420, x = 0.309, y = 0.661, label = "Novice Elreth" },
+            },
+        },
+        {
+            questID = 380,
+            class = "ROGUE",
+            cluster = "TIRISFAL_DEATHKNELL",
+            clusterPriority = 3,
+            title = "Night Web's Hollow",
+            tag = "DO",
+            minLevel = 2,
+            maxLevel = 7,
+            note = "Efficient spider cave quest that stacks directly with A Light in the Darkness.",
+            objectiveTargets = {
+                {
+                    objectiveContains = "Night Web Spider",
+                    role = "Kill",
+                    name = "Night Web's Hollow",
+                    zone = "Tirisfal Glades",
+                    coords = "around 27, 58",
+                    locationType = "SPIDER CAVE",
+                    instruction = "Kill the required spiders around and inside Night Web's Hollow.",
+                    action = "KILL NIGHT WEB SPIDERS",
+                    useArrow = true,
+                    waypoint = { mapID = 1420, x = 0.27, y = 0.58, label = "Night Web's Hollow" },
+                },
+            },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Executor Arren",
+                zone = "Deathknell, Tirisfal Glades",
+                coords = "32.2, 65.6",
+                action = "TURN IN NIGHT WEB'S HOLLOW",
+                useArrow = true,
+                waypoint = { mapID = 1420, x = 0.322, y = 0.656, label = "Executor Arren" },
+            },
+        },
         {
             questID = 376,
             class = "ROGUE",
