@@ -10,7 +10,7 @@ local defaults = {
     x = 0,
     y = 0,
     width = 430,
-    height = 190,
+    height = 170,
     scale = 1,
     alpha = 0.95,
     locked = false,
@@ -143,6 +143,13 @@ local function copyDefaults()
         end
         charDB.alpha = 1
         charDB.lastUIVersion = "0.26.1"
+    end
+
+    if charDB.lastCompactUIVersion ~= "0.29.4" then
+        if not charDB.height or (charDB.height >= 180 and charDB.height <= 205) then
+            charDB.height = 170
+        end
+        charDB.lastCompactUIVersion = "0.29.4"
     end
 
     DB = charDB
@@ -1051,7 +1058,7 @@ frame:SetMovable(true)
 frame:SetResizable(true)
 frame:EnableMouse(true)
 frame:SetClampedToScreen(true)
-frame:SetResizeBounds(340, 120, 700, 300)
+frame:SetResizeBounds(340, 140, 700, 300)
 frame:SetBackdrop({
     bgFile = "Interface/Buttons/WHITE8x8",
     edgeFile = "Interface/Buttons/WHITE8x8",
@@ -1065,7 +1072,7 @@ frame:SetBackdropBorderColor(0.16, 0.20, 0.23, 1.0)
 local headerBar = frame:CreateTexture(nil, "BACKGROUND")
 headerBar:SetPoint("TOPLEFT", 1, -1)
 headerBar:SetPoint("TOPRIGHT", -1, -1)
-headerBar:SetHeight(34)
+headerBar:SetHeight(28)
 headerBar:SetTexture("Interface/Buttons/WHITE8x8")
 headerBar:SetVertexColor(0.055, 0.070, 0.082, 1.0)
 
@@ -1077,15 +1084,15 @@ headerAccent:SetTexture("Interface/Buttons/WHITE8x8")
 headerAccent:SetVertexColor(0.20, 0.82, 0.74, 0.95)
 
 local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-title:SetPoint("TOPLEFT", 16, -15)
+title:SetPoint("TOPLEFT", 14, -11)
 title:SetText("|cff64d8c8Forever Leveling Coach|r")
 
 local subtitle = frame:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-subtitle:SetPoint("LEFT", title, "RIGHT", 8, 0)
+subtitle:SetPoint("LEFT", title, "RIGHT", 6, 0)
 subtitle:SetText("|cff73808aHorde • 1-30|r")
 
 local versionText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-versionText:SetPoint("TOPRIGHT", -14, -16)
+versionText:SetPoint("TOPRIGHT", -12, -11)
 versionText:SetText("v" .. tostring(Data.version or "?"))
 
 local function focusCurrentQuest()
@@ -1157,21 +1164,21 @@ local function flcStyleFlatButton(button, accent)
 end
 
 local exportButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-exportButton:SetSize(58, 24)
-exportButton:SetPoint("TOPRIGHT", -12, -42)
+exportButton:SetSize(54, 20)
+exportButton:SetPoint("TOPRIGHT", -10, -32)
 exportButton:SetText("Export")
 flcStyleFlatButton(exportButton, false)
 
 local goButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-goButton:SetSize(40, 24)
-goButton:SetPoint("RIGHT", exportButton, "LEFT", -5, 0)
+goButton:SetSize(36, 20)
+goButton:SetPoint("RIGHT", exportButton, "LEFT", -4, 0)
 goButton:SetText("Go")
 flcStyleFlatButton(goButton, true)
 goButton:SetScript("OnClick", focusCurrentQuest)
 
 local settingsButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-settingsButton:SetSize(62, 24)
-settingsButton:SetPoint("RIGHT", goButton, "LEFT", -5, 0)
+settingsButton:SetSize(58, 20)
+settingsButton:SetPoint("RIGHT", goButton, "LEFT", -4, 0)
 settingsButton:SetText("Settings")
 flcStyleFlatButton(settingsButton, false)
 
@@ -1181,13 +1188,13 @@ exportButton:SetScript("OnClick", function()
 end)
 
 local routeLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-routeLabel:SetPoint("TOPLEFT", 16, -44)
+routeLabel:SetPoint("TOPLEFT", 14, -34)
 routeLabel:SetText("|cff6f7f88CURRENT OBJECTIVE|r")
 
 local objectiveHighlight = frame:CreateTexture(nil, "BACKGROUND")
-objectiveHighlight:SetPoint("TOPLEFT", 11, -58)
-objectiveHighlight:SetPoint("TOPRIGHT", -11, -58)
-objectiveHighlight:SetHeight(30)
+objectiveHighlight:SetPoint("TOPLEFT", 10, -46)
+objectiveHighlight:SetPoint("TOPRIGHT", -10, -46)
+objectiveHighlight:SetHeight(24)
 objectiveHighlight:SetTexture("Interface/Buttons/WHITE8x8")
 objectiveHighlight:SetVertexColor(0.060, 0.078, 0.090, 0.95)
 
@@ -1199,8 +1206,8 @@ objectiveAccent:SetTexture("Interface/Buttons/WHITE8x8")
 objectiveAccent:SetVertexColor(0.20, 0.82, 0.74, 1.0)
 
 local routeText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-routeText:SetPoint("TOPLEFT", 16, -64)
-routeText:SetPoint("TOPRIGHT", -16, -64)
+routeText:SetPoint("TOPLEFT", 14, -50)
+routeText:SetPoint("TOPRIGHT", -14, -50)
 routeText:SetJustifyH("LEFT")
 routeText:SetText("Loading route...")
 routeText:SetTextColor(0.38, 0.82, 0.76)
@@ -1222,8 +1229,8 @@ routeClickButton:SetScript("OnLeave", function()
 end)
 
 local mainScroll = CreateFrame("ScrollFrame", "ForeverLevelingCoachMainScroll", frame, "UIPanelScrollFrameTemplate")
-mainScroll:SetPoint("TOPLEFT", routeText, "BOTTOMLEFT", 0, -10)
-mainScroll:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -28, 18)
+mainScroll:SetPoint("TOPLEFT", routeText, "BOTTOMLEFT", 0, -6)
+mainScroll:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -24, 10)
 mainScroll:EnableMouseWheel(true)
 
 local mainScrollChild = CreateFrame("Frame", nil, mainScroll)
@@ -1241,7 +1248,7 @@ local questCards = {}
 
 local function createQuestCard(index)
     local card = CreateFrame("Frame", nil, mainScrollChild, "BackdropTemplate")
-    card:SetHeight(index == 1 and 62 or 48)
+    card:SetHeight(index == 1 and 50 or 42)
     card:SetBackdrop({
         bgFile = "Interface/Buttons/WHITE8x8",
         edgeFile = "Interface/Buttons/WHITE8x8",
@@ -1259,20 +1266,20 @@ local function createQuestCard(index)
     card.accent:SetTexture("Interface/Buttons/WHITE8x8")
 
     card.step = card:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    card.step:SetPoint("TOPLEFT", 10, -7)
+    card.step:SetPoint("TOPLEFT", 9, -5)
 
     card.status = card:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    card.status:SetPoint("LEFT", card.step, "RIGHT", 8, 0)
+    card.status:SetPoint("LEFT", card.step, "RIGHT", 6, 0)
 
     card.title = card:CreateFontString(nil, "OVERLAY", index == 1 and "GameFontNormal" or "GameFontHighlightSmall")
-    card.title:SetPoint("TOPLEFT", 10, index == 1 and -23 or -20)
-    card.title:SetPoint("TOPRIGHT", -8, index == 1 and -23 or -20)
+    card.title:SetPoint("TOPLEFT", 9, index == 1 and -19 or -17)
+    card.title:SetPoint("TOPRIGHT", -7, index == 1 and -19 or -17)
     card.title:SetJustifyH("LEFT")
     card.title:SetWordWrap(false)
 
     card.action = card:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    card.action:SetPoint("TOPLEFT", 10, index == 1 and -43 or -34)
-    card.action:SetPoint("TOPRIGHT", -8, index == 1 and -43 or -34)
+    card.action:SetPoint("TOPLEFT", 9, index == 1 and -34 or -29)
+    card.action:SetPoint("TOPRIGHT", -7, index == 1 and -34 or -29)
     card.action:SetJustifyH("LEFT")
     card.action:SetWordWrap(false)
 
@@ -1295,10 +1302,10 @@ local function renderQuestCards(cards)
         if info then
             shown = shown + 1
             local primary = i == 1
-            card:SetHeight(primary and 62 or 48)
+            card:SetHeight(primary and 50 or 42)
             if previous then
-                card:SetPoint("TOPLEFT", previous, "BOTTOMLEFT", 0, -6)
-                card:SetPoint("TOPRIGHT", previous, "BOTTOMRIGHT", 0, -6)
+                card:SetPoint("TOPLEFT", previous, "BOTTOMLEFT", 0, -4)
+                card:SetPoint("TOPRIGHT", previous, "BOTTOMRIGHT", 0, -4)
             else
                 card:SetPoint("TOPLEFT", mainScrollChild, "TOPLEFT", 0, 0)
                 card:SetPoint("TOPRIGHT", mainScrollChild, "TOPRIGHT", 0, 0)
@@ -1347,7 +1354,7 @@ local function renderQuestCards(cards)
     if shown == 0 then
         cardListHeight = 0
     else
-        cardListHeight = 62 + math.max(0, shown - 1) * 54
+        cardListHeight = 50 + math.max(0, shown - 1) * 46
     end
 end
 
