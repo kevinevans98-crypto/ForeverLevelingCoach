@@ -10,7 +10,7 @@ local defaults = {
     x = 0,
     y = 0,
     width = 430,
-    height = 138,
+    height = 190,
     scale = 1,
     alpha = 0.95,
     locked = false,
@@ -134,11 +134,15 @@ local function copyDefaults()
     charDB.knownFlightPaths = charDB.knownFlightPaths or {}
     charDB.navigationProgress = charDB.navigationProgress or {}
 
-    if charDB.lastUIVersion ~= "0.16.1" then
-        charDB.width = 410
-        charDB.height = 138
+    if charDB.lastUIVersion ~= "0.26.1" then
+        if not charDB.width or charDB.width < 410 then
+            charDB.width = 430
+        end
+        if not charDB.height or charDB.height < 180 then
+            charDB.height = 190
+        end
         charDB.alpha = 1
-        charDB.lastUIVersion = "0.16.1"
+        charDB.lastUIVersion = "0.26.1"
     end
 
     DB = charDB
@@ -934,10 +938,10 @@ title:SetText("Forever Leveling Coach")
 
 local subtitle = frame:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
 subtitle:SetPoint("LEFT", title, "RIGHT", 8, 0)
-subtitle:SetText("Horde 1-30")
+subtitle:SetText("Horde • 1-30")
 
 local versionText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-versionText:SetPoint("TOPRIGHT", -14, -17)
+versionText:SetPoint("TOPRIGHT", -14, -16)
 versionText:SetText("v" .. tostring(Data.version or "?"))
 
 local function focusCurrentQuest()
@@ -980,7 +984,7 @@ end
 
 local exportButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
 exportButton:SetSize(62, 22)
-exportButton:SetPoint("TOPRIGHT", -12, -38)
+exportButton:SetPoint("TOPRIGHT", -12, -42)
 exportButton:SetText("Export")
 
 local goButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
@@ -1000,12 +1004,12 @@ exportButton:SetScript("OnClick", function()
 end)
 
 local routeLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-routeLabel:SetPoint("TOPLEFT", 16, -43)
+routeLabel:SetPoint("TOPLEFT", 16, -44)
 routeLabel:SetText("CURRENT OBJECTIVE")
 
 local routeText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-routeText:SetPoint("TOPLEFT", 16, -57)
-routeText:SetPoint("TOPRIGHT", -214, -57)
+routeText:SetPoint("TOPLEFT", 16, -66)
+routeText:SetPoint("TOPRIGHT", -16, -66)
 routeText:SetJustifyH("LEFT")
 routeText:SetText("Loading route...")
 
@@ -1026,7 +1030,7 @@ routeClickButton:SetScript("OnLeave", function()
 end)
 
 local mainScroll = CreateFrame("ScrollFrame", "ForeverLevelingCoachMainScroll", frame, "UIPanelScrollFrameTemplate")
-mainScroll:SetPoint("TOPLEFT", routeText, "BOTTOMLEFT", 0, -12)
+mainScroll:SetPoint("TOPLEFT", routeText, "BOTTOMLEFT", 0, -14)
 mainScroll:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -28, 18)
 mainScroll:EnableMouseWheel(true)
 
@@ -2148,7 +2152,7 @@ local function render()
 
     if DB and DB.displayMode ~= "DETAILED" then
         detailLines[#detailLines + 1] = ""
-        detailLines[#detailLines + 1] = "|cff777777Compact view • Settings > View for more detail|r"
+        detailLines[#detailLines + 1] = "|cff777777Compact • Settings > View for details|r"
     end
 
     detailText:SetText(table.concat(detailLines, "\n"))
