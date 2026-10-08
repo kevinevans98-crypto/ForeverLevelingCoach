@@ -161,3 +161,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Added The Red Messenger [382] and Vital Intelligence [383] to bridge Deathknell into Brill
 
 - Added Undead Forever camping chain The Adventurer [96656] / The Great Outdoors [96607], with Sticks and Bones [86784] optional
+
+- Added Fields of Grief [365]/[407], A Rogue's Deal [8] routing, and local-objective-before-hub turn-in deferral
