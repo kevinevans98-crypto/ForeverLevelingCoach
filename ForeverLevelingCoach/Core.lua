@@ -1019,20 +1019,20 @@ local function flcStyleFlatButton(button, accent)
 end
 
 local exportButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-exportButton:SetSize(62, 22)
+exportButton:SetSize(62, 24)
 exportButton:SetPoint("TOPRIGHT", -12, -42)
 exportButton:SetText("Export")
 flcStyleFlatButton(exportButton, false)
 
 local goButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-goButton:SetSize(42, 22)
+goButton:SetSize(42, 24)
 goButton:SetPoint("RIGHT", exportButton, "LEFT", -4, 0)
 goButton:SetText("Go")
 flcStyleFlatButton(goButton, true)
 goButton:SetScript("OnClick", focusCurrentQuest)
 
 local settingsButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-settingsButton:SetSize(64, 22)
+settingsButton:SetSize(64, 24)
 settingsButton:SetPoint("RIGHT", goButton, "LEFT", -4, 0)
 settingsButton:SetText("Settings")
 flcStyleFlatButton(settingsButton, false)
@@ -1098,26 +1098,145 @@ if legacyScrollBar and legacyScrollBar.SetAlpha then
     legacyScrollBar:SetAlpha(0.38)
 end
 
+local questCards = {}
+
+local function createQuestCard(index)
+    local card = CreateFrame("Frame", nil, mainScrollChild, "BackdropTemplate")
+    card:SetHeight(index == 1 and 58 or 48)
+    card:SetBackdrop({
+        bgFile = "Interface/Buttons/WHITE8x8",
+        edgeFile = "Interface/Buttons/WHITE8x8",
+        tile = false,
+        edgeSize = 1,
+        insets = { left = 1, right = 1, top = 1, bottom = 1 },
+    })
+    card:SetBackdropColor(index == 1 and 0.050 or 0.043, index == 1 and 0.070 or 0.055, index == 1 and 0.080 or 0.064, 0.98)
+    card:SetBackdropBorderColor(0.12, 0.16, 0.18, 1.0)
+
+    card.accent = card:CreateTexture(nil, "ARTWORK")
+    card.accent:SetPoint("TOPLEFT", 0, 0)
+    card.accent:SetPoint("BOTTOMLEFT", 0, 0)
+    card.accent:SetWidth(index == 1 and 3 or 2)
+    card.accent:SetTexture("Interface/Buttons/WHITE8x8")
+
+    card.step = card:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    card.step:SetPoint("TOPLEFT", 10, -7)
+
+    card.status = card:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    card.status:SetPoint("LEFT", card.step, "RIGHT", 8, 0)
+
+    card.title = card:CreateFontString(nil, "OVERLAY", index == 1 and "GameFontNormal" or "GameFontHighlightSmall")
+    card.title:SetPoint("TOPLEFT", 10, index == 1 and -21 or -20)
+    card.title:SetPoint("TOPRIGHT", -8, index == 1 and -21 or -20)
+    card.title:SetJustifyH("LEFT")
+    card.title:SetWordWrap(false)
+
+    card.action = card:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    card.action:SetPoint("TOPLEFT", 10, index == 1 and -39 or -34)
+    card.action:SetPoint("TOPRIGHT", -8, index == 1 and -39 or -34)
+    card.action:SetJustifyH("LEFT")
+    card.action:SetWordWrap(false)
+
+    card:Hide()
+    return card
+end
+
+for i = 1, 8 do
+    questCards[i] = createQuestCard(i)
+end
+
+local cardListHeight = 0
+
+local function renderQuestCards(cards)
+    local previous = nil
+    local shown = 0
+    for i, card in ipairs(questCards) do
+        local info = cards and cards[i] or nil
+        card:ClearAllPoints()
+        if info then
+            shown = shown + 1
+            local primary = i == 1
+            card:SetHeight(primary and 58 or 48)
+            if previous then
+                card:SetPoint("TOPLEFT", previous, "BOTTOMLEFT", 0, -6)
+                card:SetPoint("TOPRIGHT", previous, "BOTTOMRIGHT", 0, -6)
+            else
+                card:SetPoint("TOPLEFT", mainScrollChild, "TOPLEFT", 0, 0)
+                card:SetPoint("TOPRIGHT", mainScrollChild, "TOPRIGHT", 0, 0)
+            end
+
+            card.step:SetText("STEP " .. tostring(info.step or i))
+            card.status:SetText(info.status or "")
+            card.title:SetText(info.title or "")
+            card.action:SetText(info.action or "")
+            card.action:SetShown(info.action and info.action ~= "")
+
+            if primary then
+                card.accent:SetVertexColor(0.20, 0.82, 0.74, 1.0)
+                card.step:SetTextColor(0.38, 0.82, 0.76)
+                card.status:SetTextColor(0.46, 0.90, 0.69)
+                card.title:SetTextColor(0.95, 0.97, 0.98)
+                card.action:SetTextColor(0.76, 0.82, 0.85)
+            elseif info.background then
+                card.accent:SetVertexColor(0.32, 0.38, 0.41, 0.55)
+                card.step:SetTextColor(0.42, 0.48, 0.51)
+                card.status:SetTextColor(0.45, 0.52, 0.55)
+                card.title:SetTextColor(0.55, 0.60, 0.62)
+                card.action:SetTextColor(0.45, 0.50, 0.52)
+            else
+                card.accent:SetVertexColor(0.24, 0.42, 0.43, 0.70)
+                card.step:SetTextColor(0.45, 0.52, 0.55)
+                card.status:SetTextColor(0.55, 0.66, 0.69)
+                card.title:SetTextColor(0.76, 0.81, 0.83)
+                card.action:SetTextColor(0.58, 0.64, 0.67)
+            end
+
+            card:Show()
+            previous = card
+        else
+            card:Hide()
+        end
+    end
+
+    if shown == 0 then
+        cardListHeight = 0
+    else
+        cardListHeight = 58 + math.max(0, shown - 1) * 54
+    end
+end
+
 local detailText = mainScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-detailText:SetPoint("TOPLEFT", 0, 0)
-detailText:SetPoint("TOPRIGHT", 0, 0)
+detailText:SetPoint("TOPLEFT", mainScrollChild, "TOPLEFT", 0, -4)
+detailText:SetPoint("TOPRIGHT", mainScrollChild, "TOPRIGHT", 0, -4)
 detailText:SetJustifyH("LEFT")
 detailText:SetJustifyV("TOP")
 detailText:SetText("")
 
 local questText = mainScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-questText:SetPoint("TOPLEFT", detailText, "BOTTOMLEFT", 0, -14)
-questText:SetPoint("TOPRIGHT", detailText, "BOTTOMRIGHT", 0, -14)
-questText:SetJustifyH("LEFT")
-questText:SetJustifyV("TOP")
 questText:SetText("")
 questText:Hide()
 
 local function refreshMainScroll()
     local width = math.max(120, mainScroll:GetWidth())
     mainScrollChild:SetWidth(width)
-    detailText:SetWidth(width)
-    local contentHeight = (detailText:GetStringHeight() or 0) + 18
+
+    detailText:ClearAllPoints()
+    if cardListHeight > 0 then
+        local lastVisible = nil
+        for _, card in ipairs(questCards) do
+            if card:IsShown() then lastVisible = card end
+        end
+        if lastVisible then
+            detailText:SetPoint("TOPLEFT", lastVisible, "BOTTOMLEFT", 4, -8)
+            detailText:SetPoint("TOPRIGHT", lastVisible, "BOTTOMRIGHT", -4, -8)
+        end
+    else
+        detailText:SetPoint("TOPLEFT", mainScrollChild, "TOPLEFT", 0, 0)
+        detailText:SetPoint("TOPRIGHT", mainScrollChild, "TOPRIGHT", 0, 0)
+    end
+
+    local detailHeight = detailText:IsShown() and (detailText:GetStringHeight() or 0) or 0
+    local contentHeight = cardListHeight + (detailHeight > 0 and (detailHeight + 12) or 0)
     mainScrollChild:SetHeight(math.max(mainScroll:GetHeight(), contentHeight))
 end
 
@@ -1145,7 +1264,13 @@ arrowFrame:EnableMouse(true)
 arrowFrame:SetClampedToScreen(true)
 arrowFrame:SetFrameStrata("HIGH")
 
--- Minimal FLC navigation marker: no fantasy frame, no bordered label box.
+-- Minimal FLC navigation marker with a flat contrast plate.
+local arrowPlate = arrowFrame:CreateTexture(nil, "BACKGROUND")
+arrowPlate:SetSize(52, 52)
+arrowPlate:SetPoint("TOP", 0, 2)
+arrowPlate:SetTexture("Interface/Buttons/WHITE8x8")
+arrowPlate:SetVertexColor(0.015, 0.025, 0.030, 0.72)
+
 local arrowShadow = arrowFrame:CreateTexture(nil, "BACKGROUND")
 arrowShadow:SetSize(48, 48)
 arrowShadow:SetPoint("TOP", 1, -1)
@@ -1153,14 +1278,14 @@ arrowShadow:SetTexture("Interface\\WorldMap\\WorldMapArrow")
 arrowShadow:SetVertexColor(0, 0, 0, 0.45)
 
 local arrowTexture = arrowFrame:CreateTexture(nil, "ARTWORK")
-arrowTexture:SetSize(44, 44)
+arrowTexture:SetSize(40, 40)
 arrowTexture:SetPoint("TOP", 0, 0)
 local arrowTextureOK = arrowTexture:SetTexture("Interface\\WorldMap\\WorldMapArrow")
 if arrowTextureOK == false then
     arrowTexture:SetTexture("Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Up")
     arrowShadow:SetTexture("Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Up")
 end
-arrowTexture:SetVertexColor(0.34, 0.90, 0.82, 1.0)
+arrowTexture:SetVertexColor(0.32, 0.95, 0.84, 1.0)
 
 local arrowLabel = arrowFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 arrowLabel:SetPoint("TOP", arrowTexture, "BOTTOM", 0, -4)
@@ -1969,7 +2094,9 @@ end
 local function render()
     if not playerSupported() then
         routeText:SetText("Current build: Horde Shaman + Rogue levels 1–30")
+        renderQuestCards({})
         detailText:SetText("This character is outside the currently supported route.")
+        detailText:Show()
         questText:SetText("")
         questText:Hide()
         return
@@ -2148,11 +2275,17 @@ local function render()
     end
 
     local primaryState = active and active.isComplete and "TURN IN" or "DO NOW"
-    local detailLines = {
-        "|cff64d8c8STEP 1|r  |cff75e0b0" .. tostring(primaryState) .. "|r",
-        "|cffffffff" .. tostring(action) .. "|r",
+    local cardData = {
+        {
+            step = 1,
+            status = primaryState,
+            title = step.title or "Next step",
+            action = tostring(action or ""),
+            background = false,
+        },
     }
 
+    local detailLines = {}
     local specName, talentPick = flcTalentRecommendation()
     if specName and talentPick then
         detailLines[#detailLines + 1] = "|cff6bb8d9Talent:|r " .. tostring(specName) .. " — " .. tostring(talentPick)
@@ -2162,6 +2295,8 @@ local function render()
         local clusterQuests = getNearbyClusterQuestNames(step, currentByID)
         local stepNumber = 2
         for _, q in ipairs(clusterQuests) do
+            if #cardData >= #questCards then break end
+
             local qAction = nil
             if q.active and q.active.isComplete then
                 qAction = (q.step and q.step.turnInTarget and q.step.turnInTarget.action)
@@ -2171,22 +2306,25 @@ local function render()
                 qAction = (qTarget and qTarget.action) or objectiveSummary(q.active)
             end
 
-            detailLines[#detailLines + 1] = ""
-            local queueLabel = q.background and "  |cff707070WHILE QUESTING|r" or ""
-            local statusLabel = q.active and q.active.isComplete and "|cff75e0b0TURN IN|r" or "|cff7f929cNEXT|r"
-            local titleColor = q.background and "|cff68747b" or "|cffb9c4c9"
-            detailLines[#detailLines + 1] = string.format(
-                "|cff6f7f88STEP %d|r  %s%s|r%s",
-                stepNumber,
-                titleColor,
-                tostring(q.title or "Quest"),
-                queueLabel
-            )
-            if DB and DB.displayMode == "DETAILED" and qAction and qAction ~= "" then
-                detailLines[#detailLines + 1] = "   " .. statusLabel .. "  |cffaaaaaa" .. tostring(qAction) .. "|r"
-            elseif not q.background and qAction and qAction ~= "" then
-                detailLines[#detailLines + 1] = "   " .. statusLabel .. "  |cffaaaaaa" .. tostring(qAction) .. "|r"
+            local statusLabel
+            if q.background then
+                statusLabel = "WHILE QUESTING"
+            elseif q.active and q.active.isComplete then
+                statusLabel = "TURN IN"
+            else
+                statusLabel = "NEXT"
             end
+
+            local showAction = qAction and qAction ~= ""
+                and ((DB and DB.displayMode == "DETAILED") or not q.background)
+
+            cardData[#cardData + 1] = {
+                step = stepNumber,
+                status = statusLabel,
+                title = tostring(q.title or "Quest"),
+                action = showAction and tostring(qAction) or "",
+                background = q.background and true or false,
+            }
             stepNumber = stepNumber + 1
         end
     end
@@ -2238,7 +2376,9 @@ local function render()
         end
     end
 
+    renderQuestCards(cardData)
     detailText:SetText(table.concat(detailLines, "\n"))
+    detailText:SetShown(#detailLines > 0)
     refreshMainScroll()
 
     -- Lazy window is an ordered checklist. STEP 1 is the live routed objective
