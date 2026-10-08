@@ -4703,9 +4703,7 @@ local function flcAddGearAdvice(tooltip, tooltipData)
         elseif grade == "UNUSABLE" then
             tooltip:AddLine("FLC: CANNOT USE", 1.0, 0.25, 0.25)
         elseif grade == "PREFERENCE" then
-            tooltip:AddLine("FLC: NOT YOUR 2H TARGET", 1.0, 0.82, 0.2)
-        elseif grade == "ROGUE_CLOTH" then
-            tooltip:AddLine("FLC: SKIP — LEATHER IS BETTER", 1.0, 0.82, 0.2)
+            tooltip:AddLine("FLC: CLASS PREFERENCE", 1.0, 0.82, 0.2)
         else
             tooltip:AddLine("FLC: KEEP CURRENT ITEM", 1.0, 0.35, 0.35)
         end
@@ -4884,24 +4882,41 @@ SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
         syncQuests()
         exportSnapshot()
     elseif msg == "spec" then
-        local current = DB.rogueTalentSpec or "Combat"
-        print("|cff33ff99FLC:|r Rogue talent spec: " .. tostring(current) .. ". Use /flc spec combat, assassination, or subtlety.")
-    elseif msg:match("^spec%s+") then
-        local wanted = msg:match("^spec%s+(%S+)")
-        local map = {
-            combat = "Combat",
-            assassination = "Assassination",
-            subtlety = "Subtlety",
-            sub = "Subtlety",
-            assa = "Assassination",
-        }
-        local chosen = map[wanted or ""]
-        if chosen and Data.rogueTalentBuilds and Data.rogueTalentBuilds[chosen] then
-            DB.rogueTalentSpec = chosen
-            render()
-            print("|cff33ff99FLC:|r Rogue talent guide set to " .. chosen .. ".")
+        local profile = getClassProfile()
+        local builds, setting = profile.talentBuilds, profile.talentSetting
+        if not builds or not setting then
+            print("|cffffcc00FLC:|r no class-specific talent guide is configured for " .. tostring(profile.className) .. " yet.")
         else
-            print("|cffffcc00FLC:|r use /flc spec combat, assassination, or subtlety.")
+            local specs = {}
+            for name, build in pairs(builds) do
+                if name ~= "defaultSpec" and type(build) == "table" then specs[#specs + 1] = name end
+            end
+            table.sort(specs)
+            local current = DB[setting] or builds.defaultSpec or "none"
+            print("|cff33ff99FLC:|r " .. tostring(profile.className) .. " talent spec: "
+                .. tostring(current) .. ". Available: " .. table.concat(specs, ", ") .. ".")
+        end
+    elseif msg:match("^spec%s+") then
+        local profile = getClassProfile()
+        local builds, setting = profile.talentBuilds, profile.talentSetting
+        local wanted = string.lower(msg:match("^spec%s+(%S+)") or "")
+        local chosen = nil
+        if builds then
+            for name, build in pairs(builds) do
+                if name ~= "defaultSpec" and type(build) == "table" and string.lower(name) == wanted then
+                    chosen = name
+                    break
+                end
+            end
+            if not chosen and wanted == "sub" and builds.Subtlety then chosen = "Subtlety" end
+            if not chosen and wanted == "assa" and builds.Assassination then chosen = "Assassination" end
+        end
+        if chosen and setting then
+            DB[setting] = chosen
+            render()
+            print("|cff33ff99FLC:|r " .. tostring(profile.className) .. " talent guide set to " .. chosen .. ".")
+        else
+            print("|cffffcc00FLC:|r that class/spec guide is not configured yet. Use /flc spec to see available specs.")
         end
     elseif msg == "gearscan" then
         local scan = flcGearScanSnapshot and flcGearScanSnapshot() or nil
