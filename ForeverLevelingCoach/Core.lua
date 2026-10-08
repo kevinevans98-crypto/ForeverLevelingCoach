@@ -352,14 +352,18 @@ local function zoneMatchesCluster(clusterID)
     local cluster = Data.clusters and Data.clusters[clusterID]
     if not cluster then return false end
 
-    local zone = (GetZoneText and GetZoneText()) or ""
-    local subZone = (GetSubZoneText and GetSubZoneText()) or ""
-    zone = string.lower(zone or "")
-    subZone = string.lower(subZone or "")
+    local zone = string.lower((GetZoneText and GetZoneText()) or "")
+    local subZone = string.lower((GetSubZoneText and GetSubZoneText()) or "")
 
-    for _, alias in ipairs(cluster.zoneAliases or {}) do
+    -- Some clusters share one large parent zone but represent very different
+    -- leveling hubs. localAliases keeps the large current-area score scoped to
+    -- the actual hub instead of treating the entire parent zone as "nearby".
+    local aliases = cluster.localAliases or cluster.zoneAliases or {}
+    for _, alias in ipairs(aliases) do
         local a = string.lower(alias)
-        if zone == a or subZone == a or string.find(zone, a, 1, true) or string.find(subZone, a, 1, true) then
+        if zone == a or subZone == a
+            or string.find(zone, a, 1, true)
+            or string.find(subZone, a, 1, true) then
             return true
         end
     end
