@@ -550,7 +550,9 @@ local function chooseRouteStep(byID)
         for _, step in ipairs(Data.route or {}) do
             local active = byID[step.questID]
             local inRange = level >= (step.minLevel or 1) and level <= (step.maxLevel or 999)
-            if step.dungeon and step.cluster == insideDungeonCluster and active and inRange
+            local _, playerClass = UnitClass("player")
+            local classMatch = (not step.class) or step.class == playerClass
+            if step.dungeon and step.cluster == insideDungeonCluster and active and inRange and classMatch
                 and not active.isComplete and not isQuestCompleted(step.questID) then
                 local score, reasons = scoreRouteStep(step, active, clusterCounts)
                 score = score + 1000
@@ -567,7 +569,9 @@ local function chooseRouteStep(byID)
         local active = byID[step.questID]
         local inRange = level >= (step.minLevel or 1) and level <= (step.maxLevel or 999)
 
-        if active and inRange and not isQuestCompleted(step.questID) then
+        local _, playerClass = UnitClass("player")
+        local classMatch = (not step.class) or step.class == playerClass
+        if active and inRange and classMatch and not isQuestCompleted(step.questID) then
             local score, reasons = scoreRouteStep(step, active, clusterCounts)
             if score > bestScore then
                 bestStep = step
@@ -1731,7 +1735,9 @@ exportSnapshot = function()
         local active = currentByID[step.questID]
         local level = UnitLevel("player") or 1
         local inRange = level >= (step.minLevel or 1) and level <= (step.maxLevel or 999)
-        if active and inRange and not isQuestCompleted(step.questID) then
+        local _, playerClass = UnitClass("player")
+        local classMatch = (not step.class) or step.class == playerClass
+        if active and inRange and classMatch and not isQuestCompleted(step.questID) then
             local score, reasons = scoreRouteStep(step, active, clusterCounts)
             scored[#scored + 1] = { step = step, score = score, reasons = reasons }
         end
