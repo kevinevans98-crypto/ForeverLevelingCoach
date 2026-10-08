@@ -257,3 +257,9 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Added verified Shaman wrist targets including Witherbite Bracers from Witherfang in Ruins of Lordaeron and Wolfmane Wristguards from Earthen Arise.
 
 - Added verified hand candidates including The Lost Pages rewards and Brawler Gloves; weak-looking gear becomes HOLD when no verified candidate actually beats its leveling score.
+
+- v0.24.1: Replaced the dedicated Gear tab with a compact Gear Upgrades section inside the normal Guide view.
+
+- The live window now shows at most two actionable gear upgrades with current item, recommended item, estimated gain, and source; optional empty slots stay hidden during gameplay.
+
+- Full equipped-slot diagnostics remain in `/flc export`, while `/flc gearscan` prints only a compact upgrade summary.
