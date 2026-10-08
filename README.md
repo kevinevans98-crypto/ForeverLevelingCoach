@@ -455,3 +455,9 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - The local defer target is ranked with the same unfinished-quest factors used by normal routing: priority, progress, cluster value, proximity, local order, XP/min, and stale-level penalty.
 
 - Export now includes CrossZoneDeferBestLocal for easier validation of cross-zone defer explanations.
+
+- v0.40.0: Filled verified turn-in navigation gaps for Naga at the Zoram Strand (Marukai 11.7, 34.9), Vorsha the Lasher (Warsong Runner 12.2, 34.2), The Lost Pages (Gurda Ragescar 70.0, 71.2), Warsong Supplies (Locke Okarr 71.4, 67.6), and Leaders of the Fang (Nara Wildmane 75.6, 31.6 in Thunder Bluff).
+
+- Vorsha the Lasher now also has an explicit verified pickup/escort start at Muglash 12.1, 34.6.
+
+- These quests can now transition from objective routing to verified turn-in arrows instead of becoming navigation dead ends when completed.
