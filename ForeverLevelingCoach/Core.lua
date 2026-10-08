@@ -2481,22 +2481,14 @@ local function render()
     end
 
     local primaryState = active and active.isComplete and "TURN IN" or "DO NOW"
-    local cardData = {
-        {
-            step = 1,
-            status = primaryState,
-            title = step.title or "Next step",
-            action = tostring(action or ""),
-            background = false,
-        },
-    }
+    local cardData = {}
+    local stepNumber = 1
 
-    local stepNumber = 2
-    if currentQuickPickupSuggestion and #cardData < #questCards then
+    if currentQuickPickupSuggestion then
         local pickup = currentQuickPickupSuggestion.pickup or {}
         cardData[#cardData + 1] = {
             label = "QUICK",
-            step = stepNumber,
+            step = 1,
             status = "PICK UP NOW",
             title = tostring(currentQuickPickupSuggestion.title or "Quest"),
             action = pickup.npc and ("TALK TO " .. string.upper(tostring(pickup.npc))) or "PICK UP QUEST",
@@ -2504,7 +2496,25 @@ local function render()
             pickupClass = "PICK UP NOW",
             background = false,
         }
-        stepNumber = stepNumber + 1
+
+        cardData[#cardData + 1] = {
+            label = "ROUTE",
+            step = 2,
+            status = primaryState,
+            title = step.title or "Next step",
+            action = tostring(action or ""),
+            background = false,
+        }
+        stepNumber = 3
+    else
+        cardData[#cardData + 1] = {
+            step = 1,
+            status = primaryState,
+            title = step.title or "Next step",
+            action = tostring(action or ""),
+            background = false,
+        }
+        stepNumber = 2
     end
 
     local detailLines = {}
