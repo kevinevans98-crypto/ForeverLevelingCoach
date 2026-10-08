@@ -193,3 +193,11 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Added The Spirits of Stonetalon [1061], Boulderslide Ravine [6421], Blood Feeders [6461], and Report to Kadrak [6542] as the Shaman bridge into the existing Ashenvale route.
 
 - Shaman levels 1–10 remain intentionally race-specific; a later race-aware router will cover Orc/Troll, Tauren, and Skyborne starter zones without mixing incompatible quest paths.
+
+- v0.21.0: Added race-aware Horde Shaman starter routing.
+
+- Orc/Troll Shamans now use verified Durotar starter quests; Tauren Shamans use verified Mulgore starter quests.
+
+- Added race filtering to the route engine so starter quests from the wrong race can never win scoring.
+
+- Skyborne Shamans now receive Zephras Isle-specific level 1-12 fallback guidance without fabricated quest IDs.
