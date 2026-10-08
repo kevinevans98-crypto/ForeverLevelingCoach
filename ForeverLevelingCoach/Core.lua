@@ -36,6 +36,7 @@ local defaults = {
     autoAccept = true,
     autoTurnIn = true,
     rogueTalentSpec = "Combat",
+    shamanTalentSpec = "Enhancement",
     warriorTalentSpec = "Protection",
     hunterTalentSpec = "Beast Mastery",
     mageTalentSpec = "Frost",
