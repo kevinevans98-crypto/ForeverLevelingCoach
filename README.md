@@ -371,3 +371,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - v0.29.1: Added verified Torek's Assault (6544) route data after live discovery on Shamm.
 
 - Torek's Assault now includes the verified quest giver, assault start, Splintertree turn-in, and pickup metadata, so it no longer appears as NEW/UNVERIFIED.
+
+- v0.29.2: Hotfixed a pickup-card UI crash caused by `stepNumber` being scoped inside the cluster queue block. Pickup suggestions can now render safely when present.
