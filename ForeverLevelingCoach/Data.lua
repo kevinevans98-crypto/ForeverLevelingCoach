@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.17.6",
+    version = "0.17.7",
     supported = {
         faction = "Horde",
         classes = {
@@ -1453,6 +1453,17 @@ ForeverLevelingCoach_Data = {
             minLevel = 18,
             maxLevel = 30,
             note = "Shadowfang Keep dungeon quest. Get The Book of Ur during the run before leaving the instance.",
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Keeper Bel'dugur",
+                zone = "The Apothecarium, Undercity",
+                coords = "53.7, 54.5",
+                locationType = "QUEST TURN-IN",
+                instruction = "Return The Book of Ur to Keeper Bel'dugur in the Undercity at 53.7, 54.5.",
+                action = "TURN IN THE BOOK OF UR",
+                useArrow = true,
+                waypoint = { mapID = 1458, x = 0.537, y = 0.545, label = "Keeper Bel'dugur" },
+            },
         },
         {
             questID = 1014,
@@ -1464,6 +1475,17 @@ ForeverLevelingCoach_Data = {
             minLevel = 18,
             maxLevel = 30,
             note = "Shadowfang Keep dungeon quest. Kill Arugal and loot his head before leaving.",
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Dalar Dawnweaver",
+                zone = "The Sepulcher, Silverpine Forest",
+                coords = "44.2, 39.8",
+                locationType = "QUEST TURN-IN",
+                instruction = "Return Arugal's head to Dalar Dawnweaver at The Sepulcher, 44.2, 39.8.",
+                action = "TURN IN ARUGAL MUST DIE",
+                useArrow = true,
+                waypoint = { mapID = 1421, x = 0.442, y = 0.398, label = "Dalar Dawnweaver" },
+            },
         },
         {
             questID = 1098,
