@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.21.2",
+    version = "0.22.0",
     supported = {
         faction = "Horde",
         classes = {
@@ -299,6 +299,7 @@ ForeverLevelingCoach_Data = {
         staleQuestPenaltyPerLevel = 35,
         staleQuestFreeLevels = 4,
         finishClusterBeforeTurnInPenalty = 400,
+        routeSwitchMargin = 20,
     },
 
     -- Quest clusters let the router keep you in one area and stack nearby
