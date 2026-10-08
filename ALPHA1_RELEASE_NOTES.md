@@ -1,6 +1,6 @@
 # Forever Leveling Coach — Alpha 1 Release Notes
 
-## Alpha 1 — v0.55.0
+## Alpha 1 — v0.57.0
 
 Forever Leveling Coach Alpha 1 is an early tester build focused on validating the core leveling experience before wider class and route expansion.
 
@@ -27,7 +27,16 @@ Forever Leveling Coach Alpha 1 is an early tester build focused on validating th
 - Talent guidance
 - Full `/flc export` diagnostics
 
-### New in v0.55.0
+### New in v0.57.0
+- Promoted verified normal leveling quests from old Shaman/Rogue route packages into shared all-class routes.
+- Durotar and Mulgore starter quests now use race filters instead of Shaman-only filters.
+- Tirisfal and Silverpine normal quests now work for any compatible class that has them.
+- Barrens and Stonetalon route data now works across classes.
+- Kept true Rogue class quests and Shaman Call of Water quests class-restricted.
+- Fixed Call of Water steps 96 and 1103 so they cannot leak to non-Shamans.
+- Generalized starter fallback guidance by race for Orc/Troll, Tauren, and Skyborne characters.
+
+### Retained from v0.55.0
 - Normalized Shaman onto the generic class talent and gear services.
 - Added an Enhancement 1–30 Shaman talent path and class gear profile.
 - Normalized Rogue onto the generic class trainer service.
