@@ -1,6 +1,6 @@
 # Forever Leveling Coach — Alpha 1 Testing Guide
 
-**Build:** v0.45.0  
+**Build:** v0.46.0  
 **Status:** Early Alpha  
 **Core support:** All standard Horde classes, levels 1–30  
 **Class-optimized support:** Shaman and Rogue  
