@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.17.6
+Forever Leveling Coach v0.17.7
 
 Current scope
 -------------
@@ -383,3 +383,8 @@ Roadmap
 - Added Gordo's Task [5481], live-verified on Ms
 - Gloom Weed objective routes along the Deathknell-to-Brill road around 46.3,53.5; turn-in is Junior Apothecary Holland in the Brill graveyard around 57.4,48.8
 - Brill-bound hand-ins now defer while Gordo's Task or Fields of Grief still has nearby collection work, reducing backtracking
+
+- SFK completed-quest exit fix: completed dungeon quests no longer keep the addon in "stay inside dungeon" mode
+- Added verified turn-ins for The Book of Ur [1013] -> Keeper Bel'dugur, Undercity 53.7,54.5
+- Added verified turn-in for Arugal Must Die [1014] -> Dalar Dawnweaver, The Sepulcher 44.2,39.8
+- DungeonMode export now reports active only when there is an unfinished current dungeon objective
