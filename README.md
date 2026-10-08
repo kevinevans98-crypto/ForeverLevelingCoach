@@ -173,3 +173,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Added talent build export with per-tree point totals and detailed invested talent ranks
 
 - Added WoW Forever 1.60.1 SharedTraits fallback for talent build export
+
+- Added speed-first Shaman 23-30 routing, Lost Pages [6504], stale-quest XP penalties, and better Ashenvale objective guidance
