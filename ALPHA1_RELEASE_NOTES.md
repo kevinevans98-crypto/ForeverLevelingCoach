@@ -1,6 +1,6 @@
 # Forever Leveling Coach — Alpha 1 Release Notes
 
-## Alpha 1 — v0.46.0
+## Alpha 1 — v0.47.0
 
 Forever Leveling Coach Alpha 1 is an early tester build focused on validating the core leveling experience before wider class and route expansion.
 
@@ -27,7 +27,14 @@ Forever Leveling Coach Alpha 1 is an early tester build focused on validating th
 - Talent guidance
 - Full `/flc export` diagnostics
 
-### New in v0.46.0
+### New in v0.47.0
+- Moved talent-guide lookup behind the generic class profile.
+- Moved class gear restrictions behind the generic class profile.
+- `/flc spec` now reads the active class profile instead of directly referencing Rogue data.
+- Generic classes safely report that no class-specific talent guide is configured yet.
+- Replaced Rogue-only gear preference handling with a reusable class preference path.
+
+### Retained from v0.46.0
 - Refactored class training into a reusable generic class service.
 - Removed Shaman-only trainer calls from the core render path.
 - Class profiles now declare whether trainer guidance exists and when training reminders should trigger.
