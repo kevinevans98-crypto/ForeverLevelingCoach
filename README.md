@@ -151,3 +151,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Step-by-step Lazy guide with STEP 1 owning the arrow and later clustered quests queued below it
 
 - Improved same-cave ordering for Deathknell Rogue route and exact Night Web kill counts
+
+- Rogue talent/spec advisor with a level-by-level Combat 10-30 leveling path ending in Blade Flurry
