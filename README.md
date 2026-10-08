@@ -343,3 +343,9 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - v0.28.5: Replaced the multi-piece navigation marker with a custom single-piece FLC arrow texture stored in the addon.
 
 - The navigation arrow now rotates as one texture, eliminating the Y-shape, wing separation, and geometry glitches from the previous construction.
+
+- v0.28.6: Polished the single-piece navigation arrow by shrinking it slightly, softening its visual weight, and adding more spacing before the target label.
+
+- The active STEP 1 card now has a little more height and contrast, while the top toolbar buttons are tighter and more evenly spaced.
+
+- Main guide scroll controls now hide automatically when the visible content fits without scrolling.
