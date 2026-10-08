@@ -1517,16 +1517,15 @@ local function chooseRouteStep(byID)
     end
 
     local fallback
-    local _, playerClass = UnitClass("player")
-    if playerClass == "SHAMAN" and Data.shamanRaceFallback then
+    if Data.raceFallback then
         local raceKeys = getPlayerRaceKeys()
         local raceFallback
         if raceKeys.ORC or raceKeys.TROLL then
-            raceFallback = Data.shamanRaceFallback.DUROTAR
+            raceFallback = Data.raceFallback.DUROTAR
         elseif raceKeys.TAUREN then
-            raceFallback = Data.shamanRaceFallback.MULGORE
+            raceFallback = Data.raceFallback.MULGORE
         elseif raceKeys.SKYBORNE then
-            raceFallback = Data.shamanRaceFallback.ZEPHRAS
+            raceFallback = Data.raceFallback.ZEPHRAS
         end
         fallback = raceFallback and raceFallback[level]
     end
