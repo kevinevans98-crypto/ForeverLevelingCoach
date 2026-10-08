@@ -171,3 +171,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Added turn-in proximity scoring so local completed quest hand-ins beat farther/cross-map turn-ins
 
 - Added talent build export with per-tree point totals and detailed invested talent ranks
+
+- Added WoW Forever 1.60.1 SharedTraits fallback for talent build export
