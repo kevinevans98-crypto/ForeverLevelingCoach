@@ -2475,10 +2475,34 @@ local function flcKnownRelicScore(link)
     return 0, nil
 end
 
+local function flcSafeGetItemInfo(link)
+    if not link then return nil end
+
+    if type(GetItemInfo) == "function" then
+        local ok, a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q = pcall(GetItemInfo, link)
+        if ok then return a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q end
+    end
+
+    if C_Item and type(C_Item.GetItemInfo) == "function" then
+        local ok, a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q = pcall(C_Item.GetItemInfo, link)
+        if ok then return a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q end
+    end
+
+    return nil
+end
+
 local function flcItemScore(link, tooltip)
     if not link then return 0 end
     local score = 0
-    local stats = GetItemStats and GetItemStats(link)
+    local stats = nil
+    if type(GetItemStats) == "function" then
+        local ok, value = pcall(GetItemStats, link)
+        if ok then stats = value end
+    elseif C_Item and type(C_Item.GetItemStats) == "function" then
+        local ok, value = pcall(C_Item.GetItemStats, link)
+        if ok then stats = value end
+    end
+    local _, classFile = UnitClass("player")
     if stats then
         for stat, value in pairs(stats) do
             local weight = FLC_GEAR_WEIGHTS[stat]
@@ -2495,7 +2519,7 @@ local function flcItemScore(link, tooltip)
         end
     end
 
-    local _, _, _, itemLevel, _, _, _, _, equipLoc = GetItemInfo(link)
+    local _, _, _, itemLevel, _, _, _, _, equipLoc = flcSafeGetItemInfo(link)
     if itemLevel then score = score + (itemLevel * 0.08) end
 
     local relicScore = flcKnownRelicScore(link)
@@ -2627,7 +2651,7 @@ local function flcEquippedItemLevel(link)
         if ok and value then return tonumber(value) end
     end
     if type(GetItemInfo) == "function" then
-        local _, _, _, itemLevel = GetItemInfo(link)
+        local _, _, _, itemLevel = flcSafeGetItemInfo(link)
         return tonumber(itemLevel)
     end
     return nil
@@ -2642,7 +2666,7 @@ local function flcGearSlotStatus(slotDef, playerLevel)
     if slotDef.optionalFor2H and weaponPreference and weaponPreference.mode == "2H_ONLY" then
         local mainLink = GetInventoryItemLink and GetInventoryItemLink("player", 16)
         if mainLink and GetItemInfo then
-            local _, _, _, _, _, itemType, _, _, equipLoc = GetItemInfo(mainLink)
+            local _, _, _, _, _, itemType, _, _, equipLoc = flcSafeGetItemInfo(mainLink)
             if itemType == "Weapon" and equipLoc == "INVTYPE_2HWEAPON" then
                 return {
                     slot = slot, slotName = slotDef.name, status = "N/A",
@@ -2696,7 +2720,7 @@ local function flcGearSlotStatus(slotDef, playerLevel)
         }
     end
 
-    local itemName = GetItemInfo and select(1, GetItemInfo(link)) or link
+    local itemName = select(1, flcSafeGetItemInfo(link)) or link
     local itemLevel = flcEquippedItemLevel(link)
     local gap = itemLevel and math.max(0, playerLevel - itemLevel) or nil
 
@@ -2857,8 +2881,8 @@ local function flcRogueGearReason(itemType, itemSubType, equipLoc)
 end
 
 local function flcGearEvaluateItem(link, sourceTooltip)
-    if not link or not GetItemInfo then return nil end
-    local _, _, _, _, requiredLevel, itemType, itemSubType, _, equipLoc = GetItemInfo(link)
+    if not link then return nil end
+    local _, _, _, _, requiredLevel, itemType, itemSubType, _, equipLoc = flcSafeGetItemInfo(link)
     if not equipLoc or equipLoc == "" then return nil end
 
     local slots = FLC_EQUIP_SLOTS[equipLoc]
