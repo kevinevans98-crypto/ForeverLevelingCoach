@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.29.2",
+    version = "0.29.3",
     supported = {
         faction = "Horde",
         classes = {
@@ -303,6 +303,8 @@ ForeverLevelingCoach_Data = {
         staleQuestFreeLevels = 4,
         finishClusterBeforeTurnInPenalty = 400,
         routeSwitchMargin = 20,
+        eventUrgencyMax = 85,
+        eventUrgencyDistance = 0.08,
     },
 
     -- Quest clusters let the router keep you in one area and stack nearby
@@ -2423,6 +2425,7 @@ ForeverLevelingCoach_Data = {
             questID = 6544,
             questLevel = 24,
             speedXP = 70,
+            eventUrgency = true,
             title = "Torek's Assault",
             tag = "DO",
             minLevel = 20,
