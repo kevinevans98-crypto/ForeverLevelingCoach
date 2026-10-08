@@ -1,10 +1,10 @@
 # Forever Leveling Coach — Alpha 1 Testing Guide
 
-**Build:** v0.55.0  
+**Build:** v0.57.0  
 **Status:** Early Alpha  
 **Core support:** All standard Horde classes, levels 1–30  
 **Class-optimized support:** Warrior, Hunter, Rogue, Priest, Paladin, Shaman, Mage, Warlock, and Druid  
-**Coverage note:** All supported classes now use the same profile-based talent, gear, and trainer service architecture where verified data is available.
+**Coverage note:** All supported classes use the same profile-based talent, gear, and trainer architecture. Verified Durotar, Mulgore, Tirisfal, Silverpine, Barrens, and Stonetalon quest data is now shared across compatible classes instead of being artificially locked to Shaman/Rogue.
 
 ## What Alpha 1 is testing
 
