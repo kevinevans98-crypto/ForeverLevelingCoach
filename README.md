@@ -337,3 +337,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Route context headers such as Travel now use the teal UI palette, and quest-card borders were softened slightly.
 
 - v0.28.3: Fixed the custom navigation chevron geometry so both wings rotate around one shared pivot instead of separating/crossing while the player turns; increased arrow refresh smoothness.
+
+- v0.28.4: Converted the custom navigation chevron into a true arrow by adding a rotating shaft and matching shadow, while preserving the modern FLC visual style.
