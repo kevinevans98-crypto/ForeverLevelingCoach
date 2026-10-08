@@ -137,3 +137,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Rogue character profile support with per-character state isolation and class-aware gear/relic logic
 
 - Rogue route started with The Mindless Ones [364] and class-specific route filtering
+
+- Ultra-clean Lazy window: quest/task + one immediate action; arrow handles location
