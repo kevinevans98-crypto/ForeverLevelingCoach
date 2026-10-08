@@ -425,3 +425,9 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Added verified follow-up quest 1093 Super Reaper 6000 with Ziz pickup/turn-in and Venture Co. Operator objective routing around 69, 54 in Stonetalon Mountains.
 
 - Ziz Fizziks should no longer appear as a completed known-quest route-data gap; after turn-in, hub chaining can surface Super Reaper 6000.
+
+- v0.35.0: Added automatic optional-quest cleanup. OPTIONAL quests stop competing for routing once the player reaches that quest's configured route cutoff level.
+
+- Active pruned quests are surfaced under QuestCleanup as SAFE TO IGNORE / ABANDON instead of silently remaining in route scoring.
+
+- Cleanup warnings are informational only; FLC does not automatically abandon quests from the player's quest log.
