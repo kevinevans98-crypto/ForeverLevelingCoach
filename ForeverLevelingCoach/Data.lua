@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.20.0",
+    version = "0.21.0",
     supported = {
         faction = "Horde",
         classes = {
@@ -72,6 +72,17 @@ ForeverLevelingCoach_Data = {
         [6421] = true, -- Boulderslide Ravine
         [6461] = true, -- Blood Feeders
         [6542] = true, -- Report to Kadrak
+        [5843] = true, -- Welcome! (Orc/Troll)
+        [4641] = true, -- Your Place In The World (Orc/Troll)
+        [5441] = true, -- Lazy Peons
+        [792] = true, -- Vile Familiars
+        [5844] = true, -- Welcome! (Tauren)
+        [752] = true, -- A Humble Task
+        [747] = true, -- The Hunt Begins
+        [781] = true, -- Attack on Camp Narache
+        [3376] = true, -- Break Sharptusk!
+        [748] = true, -- Poison Water
+        [745] = true, -- Sharing the Land
         [6503] = true, -- Ashenvale Outrunners
         [6504] = true, -- The Lost Pages (Classic quest live-verified on Shamm; 3650 XP in Forever)
         [6441] = true, -- Satyr Horns
@@ -306,6 +317,21 @@ ForeverLevelingCoach_Data = {
             name = "Tirisfal / Deathknell",
             zoneAliases = { "Tirisfal Glades", "Deathknell", "Shadow Grave" },
             note = "Undead starter cluster. Keep early Deathknell quests stacked together.",
+        },
+        DUROTAR_SHAMAN_START = {
+            name = "Durotar / Valley of Trials",
+            zoneAliases = { "Durotar", "Valley of Trials", "Sen'jin Village", "Razor Hill" },
+            note = "Orc/Troll Shaman starter route. Stack Valley of Trials quests before moving south/east through Durotar.",
+        },
+        MULGORE_SHAMAN_START = {
+            name = "Mulgore / Camp Narache",
+            zoneAliases = { "Mulgore", "Camp Narache", "Bloodhoof Village", "Red Cloud Mesa" },
+            note = "Tauren Shaman starter route. Clear Camp Narache efficiently, then continue through Bloodhoof Village.",
+        },
+        ZEPHRAS_SHAMAN_START = {
+            name = "Zephras Isle",
+            zoneAliases = { "Zephras Isle" },
+            note = "Skyborne Shaman starter route. Stay on the island's 1-12 quest chain until verified quest IDs can be added safely.",
         },
         ASHENVALE_ZORAM = {
             name = "Ashenvale / Zoram Strand",
@@ -1651,6 +1677,141 @@ ForeverLevelingCoach_Data = {
             note = "High-XP Silverpine material step. Gather the lake mosses and Hardened Tumor while doing nearby objectives, then turn the package in at Undercity when travel lines up.",
         },
 
+        -- Race-aware Horde Shaman starter routing.
+        {
+            questID = 5843,
+            class = "SHAMAN",
+            races = { ORC = true, TROLL = true },
+            cluster = "DUROTAR_SHAMAN_START",
+            clusterPriority = 0,
+            title = "Welcome!",
+            tag = "OPTIONAL",
+            minLevel = 1,
+            maxLevel = 3,
+            note = "Orc/Troll Valley of Trials gift-voucher quest. Free hand-in if you have the voucher; do not detour for it.",
+        },
+        {
+            questID = 4641,
+            class = "SHAMAN",
+            races = { ORC = true, TROLL = true },
+            cluster = "DUROTAR_SHAMAN_START",
+            clusterPriority = 0,
+            title = "Your Place In The World",
+            tag = "DO",
+            minLevel = 1,
+            maxLevel = 3,
+            note = "Fast Valley of Trials opener. Speak with Gornek in the Den and start the main starter chain.",
+        },
+        {
+            questID = 5441,
+            class = "SHAMAN",
+            races = { ORC = true, TROLL = true },
+            cluster = "DUROTAR_SHAMAN_START",
+            clusterPriority = 2,
+            title = "Lazy Peons",
+            tag = "DO",
+            minLevel = 3,
+            maxLevel = 7,
+            note = "Fast utility quest in the Valley of Trials. Wake 5 sleeping peons with the Foreman's Blackjack while doing nearby objectives.",
+        },
+        {
+            questID = 792,
+            class = "SHAMAN",
+            races = { ORC = true, TROLL = true },
+            cluster = "DUROTAR_SHAMAN_START",
+            clusterPriority = 1,
+            title = "Vile Familiars",
+            tag = "DO",
+            minLevel = 2,
+            maxLevel = 7,
+            note = "Strong starter kill quest. Kill 12 Vile Familiars and return to Zureetha Fargaze before leaving the Valley of Trials.",
+        },
+
+        {
+            questID = 5844,
+            class = "SHAMAN",
+            races = { TAUREN = true },
+            cluster = "MULGORE_SHAMAN_START",
+            clusterPriority = 0,
+            title = "Welcome!",
+            tag = "OPTIONAL",
+            minLevel = 1,
+            maxLevel = 3,
+            note = "Tauren Camp Narache gift-voucher hand-in. Free value if you have the voucher; do not make a detour for it.",
+        },
+        {
+            questID = 752,
+            class = "SHAMAN",
+            races = { TAUREN = true },
+            cluster = "MULGORE_SHAMAN_START",
+            clusterPriority = 1,
+            title = "A Humble Task",
+            tag = "DO",
+            minLevel = 1,
+            maxLevel = 5,
+            note = "Fast Camp Narache chain opener. Find Greatmother Hawkwind and continue the Rites of the Earthmother route.",
+        },
+        {
+            questID = 747,
+            class = "SHAMAN",
+            races = { TAUREN = true },
+            cluster = "MULGORE_SHAMAN_START",
+            clusterPriority = 1,
+            title = "The Hunt Begins",
+            tag = "DO",
+            minLevel = 1,
+            maxLevel = 5,
+            note = "Efficient starter collection quest. Gather Plainstrider meat and feathers while clearing the Camp Narache area.",
+        },
+        {
+            questID = 781,
+            class = "SHAMAN",
+            races = { TAUREN = true },
+            cluster = "MULGORE_SHAMAN_START",
+            clusterPriority = 2,
+            title = "Attack on Camp Narache",
+            tag = "DO",
+            minLevel = 2,
+            maxLevel = 7,
+            note = "Turn the Bristleback Attack Plans in to Chief Hawkwind while finishing the Camp Narache quest cluster.",
+        },
+        {
+            questID = 3376,
+            class = "SHAMAN",
+            races = { TAUREN = true },
+            cluster = "MULGORE_SHAMAN_START",
+            clusterPriority = 3,
+            title = "Break Sharptusk!",
+            tag = "DO",
+            minLevel = 3,
+            maxLevel = 8,
+            note = "High-value Camp Narache named-mob quest. Kill Chief Sharptusk Thornmantle and return his head to Brave Windfeather.",
+        },
+        {
+            questID = 748,
+            class = "SHAMAN",
+            races = { TAUREN = true },
+            cluster = "MULGORE_SHAMAN_START",
+            clusterPriority = 1,
+            title = "Poison Water",
+            tag = "DO",
+            minLevel = 4,
+            maxLevel = 9,
+            note = "Good Bloodhoof-area collection quest. Gather Prairie Wolf Paws and Plainstrider Talons while traveling toward other Mulgore objectives.",
+        },
+        {
+            questID = 745,
+            class = "SHAMAN",
+            races = { TAUREN = true },
+            cluster = "MULGORE_SHAMAN_START",
+            clusterPriority = 2,
+            title = "Sharing the Land",
+            tag = "DO",
+            minLevel = 5,
+            maxLevel = 10,
+            note = "Dense Palemane kill quest from Bloodhoof Village. Good XP while clearing the nearby gnoll camps.",
+        },
+
         -- Verified Horde Shaman universal route after the race-specific starter zone.
         -- Forever's Horde leveling route sends Orc/Troll/Tauren Shamans into
         -- The Barrens, then Stonetalon, before the existing Ashenvale package.
@@ -2554,6 +2715,47 @@ ForeverLevelingCoach_Data = {
                     instruction = "Travel to Thunder Bluff and go to Elder Rise. Turn In Nightmares in to Hamuul Runetotem.",
                 },
             },
+        },
+    },
+
+    shamanRaceFallback = {
+        DUROTAR = {
+            [1] = { tag = "DO", title = "Valley of Trials", note = "Orc/Troll Shaman: stack Valley of Trials starter quests around the Den." },
+            [2] = { tag = "DO", title = "Valley of Trials", note = "Stay local: starter kills, gathering, and Vile Familiars should overlap." },
+            [3] = { tag = "DO", title = "Valley of Trials", note = "Finish dense Valley quests before taking long Durotar travel steps." },
+            [4] = { tag = "DO", title = "Valley of Trials", note = "Finish Lazy Peons, cave/medallion work, and remaining nearby objectives." },
+            [5] = { tag = "DO", title = "Valley → Sen'jin", note = "Finish the starter chain, then follow the route toward Sen'jin Village." },
+            [6] = { tag = "DO", title = "Sen'jin / Durotar", note = "Stack Sen'jin coastal and local kill/loot quests." },
+            [7] = { tag = "DO", title = "Sen'jin / Razor Hill", note = "Finish efficient Sen'jin quests and begin the Razor Hill transition." },
+            [8] = { tag = "DO", title = "Durotar", note = "Use the densest active Durotar cluster; avoid isolated detours." },
+            [9] = { tag = "DO", title = "Durotar", note = "Finish high-value Durotar chains before moving to The Barrens." },
+            [10] = { tag = "DO", title = "Durotar → Barrens", note = "Wrap up efficient Durotar quests and transition toward Crossroads." },
+        },
+        MULGORE = {
+            [1] = { tag = "DO", title = "Camp Narache", note = "Tauren Shaman: stack Camp Narache starter quests tightly." },
+            [2] = { tag = "DO", title = "Camp Narache", note = "Combine The Hunt Begins and A Humble Task with nearby starter objectives." },
+            [3] = { tag = "DO", title = "Camp Narache", note = "Continue the hunt/Earthmother chains without leaving the local cluster early." },
+            [4] = { tag = "DO", title = "Camp Narache", note = "Finish Bristleback and Rite objectives before moving north." },
+            [5] = { tag = "DO", title = "Camp Narache → Bloodhoof", note = "Finish Sharptusk/Poison Water work and transition to Bloodhoof Village." },
+            [6] = { tag = "DO", title = "Bloodhoof Village", note = "Stack Palemane, cleansing, and local hunting quests." },
+            [7] = { tag = "DO", title = "Bloodhoof Village", note = "Stay on dense Mulgore loops and continue the Earthmother chain." },
+            [8] = { tag = "DO", title = "Mulgore", note = "Bundle Windfury, digging, caravan, and cleansing work where available." },
+            [9] = { tag = "DO", title = "Mulgore", note = "Finish strong local chains before Thunder Bluff/Barrens travel." },
+            [10] = { tag = "DO", title = "Mulgore → Thunder Bluff", note = "Finish Mulgore's best quests and prepare the Barrens transition." },
+        },
+        ZEPHRAS = {
+            [1] = { tag = "DO", title = "Zephras Isle", note = "Skyborne Shaman: stay on the Zephras Isle main quest path. FLC will not invent unverified quest IDs." },
+            [2] = { tag = "DO", title = "Zephras Isle", note = "Continue the island's main quest chain and nearby side quests." },
+            [3] = { tag = "DO", title = "Zephras Isle", note = "Keep questing on Zephras Isle; the zone is designed as a 1-12 starter experience." },
+            [4] = { tag = "DO", title = "Zephras Isle", note = "Continue the island route; prioritize clustered objectives." },
+            [5] = { tag = "DO", title = "Zephras Isle", note = "Stay on the main Skyborne progression path." },
+            [6] = { tag = "DO", title = "Zephras Isle", note = "Continue Zephras Isle questing; avoid leaving early unless you intentionally want another route." },
+            [7] = { tag = "DO", title = "Zephras Isle", note = "Keep following the verified in-game Skyborne quest chain." },
+            [8] = { tag = "DO", title = "Zephras Isle", note = "Continue the island's dense quest path." },
+            [9] = { tag = "DO", title = "Zephras Isle", note = "Stay on Zephras Isle and finish the active quest cluster." },
+            [10] = { tag = "DO", title = "Zephras Isle", note = "Continue the Skyborne starter story; the zone remains appropriate through level 12." },
+            [11] = { tag = "DO", title = "Zephras Isle", note = "Finish the remaining Skyborne island quests before transitioning to Horde mainland routing." },
+            [12] = { tag = "DO", title = "Zephras Isle → Barrens", note = "Finish the Zephras starter story, then transition to the Horde mainland and the Barrens route." },
         },
     },
 
