@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.29.4",
+    version = "0.29.5",
     supported = {
         faction = "Horde",
         classes = {
@@ -2823,6 +2823,17 @@ ForeverLevelingCoach_Data = {
                 role = "Quest giver",
                 zone = "Splintertree Post, Ashenvale",
                 coords = "71.1, 68.1",
+                waypoint = { mapID = 1440, x = 0.711, y = 0.681, label = "Kuray'bin" },
+            },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Kuray'bin",
+                zone = "Splintertree Post, Ashenvale",
+                coords = "71.1, 68.1",
+                locationType = "QUEST TURN-IN",
+                instruction = "Return to Kuray'bin at Splintertree Post around 71.1, 68.1.",
+                action = "TURN IN ASHENVALE OUTRUNNERS",
+                useArrow = true,
                 waypoint = { mapID = 1440, x = 0.711, y = 0.681, label = "Kuray'bin" },
             },
             objectiveTargets = {
