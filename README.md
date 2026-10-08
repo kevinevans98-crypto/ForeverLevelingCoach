@@ -227,3 +227,11 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - FLC now parses progress such as 6/12 or 1/4 and averages it with completed objectives instead of only counting fully finished objective lines.
 
 - Route reasons now show the calculated quest progress percentage, making near-complete quests easier to understand in exports.
+
+- v0.23.0: Added the first full equipped-gear weakness scanner.
+
+- `/flc gearscan` ranks weak, outdated, and expected-but-empty slots, with extra priority for an outdated weapon.
+
+- `/flc export` now includes GearTopPriority, GearScan priorities, and a complete equipped-slot status snapshot.
+
+- Gear scan is intentionally conservative: it identifies upgrade needs from the player's actual equipment and level without inventing unverified Forever item sources.
