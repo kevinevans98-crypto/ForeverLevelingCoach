@@ -3700,7 +3700,10 @@ end
 exportSnapshot = function()
     if not DB then copyDefaults() end
     local _, classFile = UnitClass("player")
+    local classProfile = getClassProfile()
+    local specName, talentRecommendation = flcTalentRecommendation()
     local talentSnapshot = flcTalentExportSnapshot()
+    local equippedRelic, knownRelicTarget, relicStatus = flcRelicStatus()
     local lines = {
         "Forever Leveling Coach Export",
         "AddonVersion=" .. tostring(Data.version or "?"),
@@ -3747,9 +3750,10 @@ exportSnapshot = function()
             local top = scan and scan.priorities and scan.priorities[1]
             return top and (tostring(top.slotName) .. " | " .. tostring(top.status) .. " | " .. tostring(top.reason)) or "none"
         end)()),
-        "WeaponPreference=" .. tostring((getClassProfile().weaponPreference and getClassProfile().weaponPreference.label) or "class-default"),
-        "RecommendedSpec=" .. tostring(select(1, flcTalentRecommendation()) or "none"),
-        "TalentRecommendation=" .. tostring(select(2, flcTalentRecommendation()) or "none"),
+        "ClassOptimization=" .. tostring(classProfile.optimized and "optimized" or "generic-core"),
+        "WeaponPreference=" .. tostring((classProfile.weaponPreference and classProfile.weaponPreference.label) or "class-default"),
+        "RecommendedSpec=" .. tostring(specName or "none"),
+        "TalentRecommendation=" .. tostring(talentRecommendation or "none"),
         "TalentAPI=" .. tostring(talentSnapshot.api or "none"),
         "TalentPointsSpent=" .. tostring(talentSnapshot.totalSpent or 0),
         "TalentBuild=" .. ((function()
@@ -3761,9 +3765,9 @@ exportSnapshot = function()
             return table.concat(parts, " | ")
         end)()),
         "RelicAdvisorEnabled=" .. tostring(DB and DB.relicAdvisor ~= false or false),
-        "EquippedRelic=" .. tostring(select(1, flcRelicStatus()) or (select(3, flcRelicStatus()) == "not-applicable" and "not-applicable" or "none")),
-        "KnownRelicTarget=" .. tostring(select(2, flcRelicStatus()) or (select(3, flcRelicStatus()) == "not-applicable" and "not-applicable" or "none")),
-        "RelicStatus=" .. tostring(select(3, flcRelicStatus()) or "unknown"),
+        "EquippedRelic=" .. tostring(equippedRelic or (relicStatus == "not-applicable" and "not-applicable" or "none")),
+        "KnownRelicTarget=" .. tostring(knownRelicTarget or (relicStatus == "not-applicable" and "not-applicable" or "none")),
+        "RelicStatus=" .. tostring(relicStatus or "unknown"),
         "AutoFlightEnabled=" .. tostring(DB and DB.autoFlight ~= false or false),
         "AutoFlightTarget=" .. tostring(currentAutoFlightTarget or "none"),
         "AutoFlightStatus=" .. tostring(currentAutoFlightStatus or "none"),
