@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.42.0",
+    version = "0.43.0",
     supported = {
         faction = "Horde",
         classes = {
@@ -2288,6 +2288,13 @@ ForeverLevelingCoach_Data = {
             minLevel = 18,
             maxLevel = 30,
             note = "Wailing Caverns dungeon quest. Complete all four Fang leaders in one run.",
+            pickupTarget = {
+                npc = "Nara Wildmane",
+                role = "Quest giver",
+                zone = "Thunder Bluff",
+                coords = "75.6, 31.6",
+                waypoint = { mapID = 1456, x = 0.756, y = 0.316, label = "Nara Wildmane" },
+            },
             waypoint = { mapID = 1413, x = 0.460, y = 0.360, label = "Wailing Caverns cave entrance" },
             personTarget = {
                 role = "Dungeon",
@@ -2788,6 +2795,20 @@ ForeverLevelingCoach_Data = {
                 useArrow = true,
                 waypoint = { mapID = 1440, x = 0.116, y = 0.343, label = "Je'neu Sancrea" },
             },
+            travelGuide = {
+                {
+                    zoneAliases = { "Ashenvale", "Zoram'gar Outpost", "Zoram Strand" },
+                    instruction = "Travel north from Zoram Strand into Darkshore toward the Blackfathom Deeps approach around 32, 94. Collect the sapphire clusters in the beginning tunnels.",
+                },
+                {
+                    zoneAliases = { "Darkshore" },
+                    instruction = "Head to the Blackfathom Deeps approach around 32, 94 and enter the beginning tunnels. Collect 20 Sapphires of Aku'Mai from the cave walls.",
+                    waypoint = { mapID = 1439, x = 0.320, y = 0.940, label = "Blackfathom Deeps approach" },
+                },
+                {
+                    instruction = "Travel to the Blackfathom Deeps approach in southern Darkshore around 32, 94, then collect 20 Sapphires of Aku'Mai in the beginning tunnels.",
+                },
+            },
         },
         {
             questID = 6921,
@@ -2994,6 +3015,24 @@ ForeverLevelingCoach_Data = {
                 action = "TURN IN WARSONG SUPPLIES",
                 useArrow = true,
                 waypoint = { mapID = 1440, x = 0.714, y = 0.676, label = "Locke Okarr" },
+            },
+            travelGuide = {
+                {
+                    zoneAliases = { "Ashenvale" },
+                    instruction = "Finish the local Ashenvale supplies first. For the Warsong Axe Shipment, travel to Ratchet and take the boat to Booty Bay; the crate is around 26.4, 73.3 beside Wharfmaster Lozgil.",
+                },
+                {
+                    zoneAliases = { "The Barrens", "Barrens", "Ratchet" },
+                    instruction = "Go to Ratchet and take the boat to Booty Bay for the Warsong Axe Shipment. The crate is around 26.4, 73.3 beside Wharfmaster Lozgil.",
+                },
+                {
+                    zoneAliases = { "Stranglethorn Vale", "Booty Bay" },
+                    instruction = "At Booty Bay, go to the docks around 26.4, 73.3 beside Wharfmaster Lozgil and loot the Warsong Axe Shipment.",
+                    waypoint = { mapID = 1434, x = 0.264, y = 0.733, label = "Warsong Axe Shipment" },
+                },
+                {
+                    instruction = "For the Axe Shipment, reach Ratchet, take the boat to Booty Bay, then loot the crate around 26.4, 73.3 beside Wharfmaster Lozgil.",
+                },
             },
         },
         {
