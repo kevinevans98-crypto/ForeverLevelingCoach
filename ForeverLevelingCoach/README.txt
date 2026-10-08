@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.17.8
+Forever Leveling Coach v0.17.9
 
 Current scope
 -------------
@@ -391,3 +391,8 @@ Roadmap
 
 - Added turn-in proximity scoring: completed quests are now scored using their actual turn-in waypoint instead of the quest's original objective waypoint
 - This makes local hand-ins win before cross-map hand-ins when both are complete (for example, Arugal Must Die at The Sepulcher before The Book of Ur in Undercity while still in Silverpine)
+
+- Added talent build export: /flc export now records points spent in every talent tree plus every learned talent/rank
+- TalentBuild gives a quick per-tree summary (for example Elemental=0 | Enhancement=14 | Restoration=0)
+- SpentTalents lists each invested talent and rank so builds can be checked directly from the export without screenshots
+- Uses feature-detected Classic talent APIs and reports unavailable instead of erroring if the client changes the API
