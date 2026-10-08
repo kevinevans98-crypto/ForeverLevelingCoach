@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.17.0
+Forever Leveling Coach v0.17.1
 
 Current scope
 -------------
@@ -354,3 +354,7 @@ Roadmap
 - Lazy window shows the exact talent rank to buy for the current level
 - Level 30 target ends at Blade Flurry with 21 Combat points
 - Export now includes RecommendedSpec and TalentRecommendation
+
+- Added The Scarlet Crusade [381] route to Deathknell
+- Objective arrow points to the local Scarlet camp around 37,68 and turn-in points to Executor Arren at 32.2,66.0
+- Because the route now has a verified objective waypoint, proximity scoring can correctly prefer this nearby quest before farther Deathknell work such as Marla's Last Wish
