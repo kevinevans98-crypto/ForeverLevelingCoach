@@ -401,3 +401,9 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Completed quests can now receive a real routing penalty when nearby unfinished route work should be finished first, allowing another active quest to become STEP 1 instead of merely displaying a defer message.
 
 - Export now includes TurnInDecision and TurnInDecisionReason for live route auditing.
+
+- v0.31.0: Added batched turn-ins. Multiple completed verified quests returning to the same hub are grouped into a single RETURN TO [HUB] flow.
+
+- Batched turn-ins sort verified NPCs by current same-map distance, navigate to the nearest turn-in first, and automatically recalculate after each quest leaves the log.
+
+- The compact HUD now shows the hub and turn-in count instead of duplicating individual completed quests, and export includes TurnInBatch details.
