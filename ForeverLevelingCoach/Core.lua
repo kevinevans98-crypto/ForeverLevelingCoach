@@ -1740,7 +1740,7 @@ end)
 
 local settingsButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
 settingsButton:SetSize(58, 20)
-settingsButton:SetPoint("RIGHT", goButton, "LEFT", -4, 0)
+settingsButton:SetPoint("RIGHT", smartTravelButton, "LEFT", -4, 0)
 settingsButton:SetText("Settings")
 flcStyleFlatButton(settingsButton, false)
 
