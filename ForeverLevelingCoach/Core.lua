@@ -1719,9 +1719,76 @@ local function applySettings()
     end
 end
 
+local function flcTalentExportSnapshot()
+    local snapshot = {
+        trees = {},
+        spent = {},
+        totalSpent = 0,
+        available = false,
+    }
+
+    if type(GetNumTalentTabs) ~= "function"
+        or type(GetTalentTabInfo) ~= "function"
+        or type(GetNumTalents) ~= "function"
+        or type(GetTalentInfo) ~= "function" then
+        return snapshot
+    end
+
+    local okTabs, numTabs = pcall(GetNumTalentTabs)
+    if not okTabs or not numTabs or numTabs <= 0 then
+        return snapshot
+    end
+
+    snapshot.available = true
+
+    for tab = 1, numTabs do
+        local tabName = "Tree " .. tostring(tab)
+        local okTab, name, _, pointsSpent = pcall(GetTalentTabInfo, tab)
+        if okTab then
+            if name and name ~= "" then tabName = name end
+            pointsSpent = tonumber(pointsSpent) or 0
+        else
+            pointsSpent = 0
+        end
+
+        snapshot.trees[#snapshot.trees + 1] = {
+            name = tabName,
+            points = pointsSpent,
+        }
+        snapshot.totalSpent = snapshot.totalSpent + pointsSpent
+
+        local okCount, numTalents = pcall(GetNumTalents, tab)
+        if okCount and numTalents then
+            for talentIndex = 1, numTalents do
+                local okTalent, talentName, _, tier, column, rank, maxRank = pcall(GetTalentInfo, tab, talentIndex)
+                if okTalent and talentName and tonumber(rank) and tonumber(rank) > 0 then
+                    snapshot.spent[#snapshot.spent + 1] = {
+                        tree = tabName,
+                        name = talentName,
+                        rank = tonumber(rank) or 0,
+                        maxRank = tonumber(maxRank) or 0,
+                        tier = tonumber(tier) or 0,
+                        column = tonumber(column) or 0,
+                    }
+                end
+            end
+        end
+    end
+
+    table.sort(snapshot.spent, function(a, b)
+        if a.tree ~= b.tree then return a.tree < b.tree end
+        if a.tier ~= b.tier then return a.tier < b.tier end
+        if a.column ~= b.column then return a.column < b.column end
+        return a.name < b.name
+    end)
+
+    return snapshot
+end
+
 exportSnapshot = function()
     if not DB then copyDefaults() end
     local _, classFile = UnitClass("player")
+    local talentSnapshot = flcTalentExportSnapshot()
     local lines = {
         "Forever Leveling Coach Export",
         "AddonVersion=" .. tostring(Data.version or "?"),
@@ -1763,6 +1830,15 @@ exportSnapshot = function()
         "WeaponPreference=" .. tostring((getClassProfile().weaponPreference and getClassProfile().weaponPreference.label) or "class-default"),
         "RecommendedSpec=" .. tostring(select(1, flcTalentRecommendation()) or "none"),
         "TalentRecommendation=" .. tostring(select(2, flcTalentRecommendation()) or "none"),
+        "TalentPointsSpent=" .. tostring(talentSnapshot.totalSpent or 0),
+        "TalentBuild=" .. ((function()
+            if not talentSnapshot.available or #talentSnapshot.trees == 0 then return "unavailable" end
+            local parts = {}
+            for _, tree in ipairs(talentSnapshot.trees) do
+                parts[#parts + 1] = tostring(tree.name) .. "=" .. tostring(tree.points or 0)
+            end
+            return table.concat(parts, " | ")
+        end)()),
         "RelicAdvisorEnabled=" .. tostring(DB and DB.relicAdvisor ~= false or false),
         "EquippedRelic=" .. tostring(select(1, flcRelicStatus()) or (select(3, flcRelicStatus()) == "not-applicable" and "not-applicable" or "none")),
         "KnownRelicTarget=" .. tostring(select(2, flcRelicStatus()) or (select(3, flcRelicStatus()) == "not-applicable" and "not-applicable" or "none")),
@@ -1790,6 +1866,25 @@ exportSnapshot = function()
         "ArrowTargetHeadingDeg=" .. (currentArrowDebug.targetAngle and string.format("%.1f", math.deg(currentArrowDebug.targetAngle)) or "none"),
         "ArrowRotationDeg=" .. (currentArrowDebug.relativeAngle and string.format("%.1f", math.deg(currentArrowDebug.relativeAngle)) or "none"),
     }
+
+    lines[#lines + 1] = "SpentTalents:"
+    if not talentSnapshot.available then
+        lines[#lines + 1] = "- unavailable on this client/API"
+    elseif #talentSnapshot.spent == 0 then
+        lines[#lines + 1] = "- none"
+    else
+        for _, talent in ipairs(talentSnapshot.spent) do
+            lines[#lines + 1] = string.format(
+                "- %s | %s | %d/%d | tier=%d | column=%d",
+                tostring(talent.tree),
+                tostring(talent.name),
+                tonumber(talent.rank) or 0,
+                tonumber(talent.maxRank) or 0,
+                tonumber(talent.tier) or 0,
+                tonumber(talent.column) or 0
+            )
+        end
+    end
 
     lines[#lines + 1] = "KnownFlightPaths:"
     local knownFlights = {}
