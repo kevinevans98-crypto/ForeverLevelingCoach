@@ -473,10 +473,21 @@ local function getActiveClusterCounts(byID)
     return counts
 end
 
-local function getWaypointProximityBonus(step)
+local function getWaypointProximityBonus(step, active)
     local weights = Data.scoring or {}
     local maxBonus = weights.waypointNearMax or 0
-    local waypoint = step and step.waypoint
+
+    -- Score the place the player actually needs to go next. For completed
+    -- quests this is the turn-in, not the original quest/objective waypoint.
+    local waypoint = nil
+    local targetLabel = "verified target"
+    if step and active and active.isComplete and step.turnInTarget and step.turnInTarget.waypoint then
+        waypoint = step.turnInTarget.waypoint
+        targetLabel = "turn-in nearby"
+    elseif step then
+        waypoint = step.waypoint
+    end
+
     if not waypoint or not waypoint.mapID or not waypoint.x or not waypoint.y then
         return 0, nil
     end
@@ -498,7 +509,7 @@ local function getWaypointProximityBonus(step)
     local normalized = math.max(0, 1 - math.min(distance / 0.35, 1))
     local bonus = math.floor(maxBonus * normalized)
     if bonus > 0 then
-        return bonus, string.format("verified target nearby (+%d)", bonus)
+        return bonus, string.format("%s (+%d)", targetLabel, bonus)
     end
     return 0, nil
 end
@@ -565,7 +576,7 @@ local function scoreRouteStep(step, active, clusterCounts)
         end
     end
 
-    local waypointBonus, waypointReason = getWaypointProximityBonus(step)
+    local waypointBonus, waypointReason = getWaypointProximityBonus(step, active)
     if waypointBonus > 0 then
         score = score + waypointBonus
         reasons[#reasons + 1] = waypointReason
