@@ -226,6 +226,7 @@ local taxiOpenSerial = 0
 local exportSnapshot
 local syncQuests
 local getBestObjectiveTarget
+local flcGearScanSnapshot
 
 local function isKnownQuest(questID)
     if Data.knownQuestIDs and Data.knownQuestIDs[questID] then return true end
@@ -2106,6 +2107,12 @@ exportSnapshot = function()
         "AutoTurnInEnabled=" .. tostring(DB and DB.autoTurnIn ~= false or false),
         "LazyTravelTarget=" .. tostring(currentTravelTarget and currentTravelTarget.name or "none"),
         "GearAdvisorEnabled=" .. tostring(DB and DB.gearAdvisor ~= false or false),
+        "GearScanEnabled=true",
+        "GearTopPriority=" .. tostring((function()
+            local scan = flcGearScanSnapshot and flcGearScanSnapshot() or nil
+            local top = scan and scan.priorities and scan.priorities[1]
+            return top and (tostring(top.slotName) .. " | " .. tostring(top.status) .. " | " .. tostring(top.reason)) or "none"
+        end)()),
         "WeaponPreference=" .. tostring((getClassProfile().weaponPreference and getClassProfile().weaponPreference.label) or "class-default"),
         "RecommendedSpec=" .. tostring(select(1, flcTalentRecommendation()) or "none"),
         "TalentRecommendation=" .. tostring(select(2, flcTalentRecommendation()) or "none"),
@@ -2146,6 +2153,37 @@ exportSnapshot = function()
         "ArrowTargetHeadingDeg=" .. (currentArrowDebug.targetAngle and string.format("%.1f", math.deg(currentArrowDebug.targetAngle)) or "none"),
         "ArrowRotationDeg=" .. (currentArrowDebug.relativeAngle and string.format("%.1f", math.deg(currentArrowDebug.relativeAngle)) or "none"),
     }
+
+    lines[#lines + 1] = "GearScan:"
+    local gearScan = flcGearScanSnapshot and flcGearScanSnapshot() or nil
+    if not gearScan or not gearScan.slots then
+        lines[#lines + 1] = "- unavailable"
+    else
+        lines[#lines + 1] = string.format("- playerLevel=%d | weakCount=%d | emptyExpected=%d",
+            tonumber(gearScan.playerLevel) or 0,
+            tonumber(gearScan.weakCount) or 0,
+            tonumber(gearScan.emptyExpected) or 0)
+        for _, item in ipairs(gearScan.priorities or {}) do
+            lines[#lines + 1] = string.format("- PRIORITY | %s | %s | %s | item=%s | ilvl=%s | gap=%s",
+                tostring(item.slotName or "?"),
+                tostring(item.status or "?"),
+                tostring(item.reason or "?"),
+                tostring(item.itemName or "EMPTY"),
+                tostring(item.itemLevel or "none"),
+                tostring(item.levelGap or "none"))
+        end
+        lines[#lines + 1] = "GearSlots:"
+        for _, item in ipairs(gearScan.slots or {}) do
+            lines[#lines + 1] = string.format("- %s | %s | item=%s | ilvl=%s | gap=%s | score=%.1f | %s",
+                tostring(item.slotName or "?"),
+                tostring(item.status or "?"),
+                tostring(item.itemName or "EMPTY"),
+                tostring(item.itemLevel or "none"),
+                tostring(item.levelGap or "none"),
+                tonumber(item.score) or 0,
+                tostring(item.reason or ""))
+        end
+    end
 
     lines[#lines + 1] = "SpentTalents:"
     if not talentSnapshot.available then
@@ -2419,6 +2457,164 @@ local function flcEquippedScore(slot)
     flcGearScanTooltip:ClearLines()
     flcGearScanTooltip:SetInventoryItem("player", slot)
     return flcItemScore(link, flcGearScanTooltip), link
+end
+
+
+local FLC_GEAR_SCAN_SLOTS = {
+    { slot = 1,  name = "Head",      expectedLevel = 20 },
+    { slot = 2,  name = "Neck",      expectedLevel = 16 },
+    { slot = 3,  name = "Shoulders", expectedLevel = 18 },
+    { slot = 5,  name = "Chest",     expectedLevel = 1 },
+    { slot = 6,  name = "Waist",     expectedLevel = 8 },
+    { slot = 7,  name = "Legs",      expectedLevel = 1 },
+    { slot = 8,  name = "Feet",      expectedLevel = 1 },
+    { slot = 9,  name = "Wrist",     expectedLevel = 8 },
+    { slot = 10, name = "Hands",     expectedLevel = 1 },
+    { slot = 11, name = "Ring 1",    expectedLevel = 18 },
+    { slot = 12, name = "Ring 2",    expectedLevel = 22 },
+    { slot = 13, name = "Trinket 1", expectedLevel = 20 },
+    { slot = 14, name = "Trinket 2", expectedLevel = 28 },
+    { slot = 15, name = "Back",      expectedLevel = 8 },
+    { slot = 16, name = "Weapon",    expectedLevel = 1, weapon = true },
+    { slot = 17, name = "Off Hand",  expectedLevel = 1, optionalFor2H = true },
+    { slot = 18, name = "Relic/Ranged", expectedLevel = 18, relic = true },
+}
+
+local function flcEquippedItemLevel(link)
+    if not link then return nil end
+    if type(GetDetailedItemLevelInfo) == "function" then
+        local ok, value = pcall(GetDetailedItemLevelInfo, link)
+        if ok and value then return tonumber(value) end
+    end
+    if type(GetItemInfo) == "function" then
+        local _, _, _, itemLevel = GetItemInfo(link)
+        return tonumber(itemLevel)
+    end
+    return nil
+end
+
+local function flcGearSlotStatus(slotDef, playerLevel)
+    local slot = slotDef.slot
+    local score, link = flcEquippedScore(slot)
+    local classProfile = getClassProfile()
+    local weaponPreference = classProfile and classProfile.weaponPreference
+
+    if slotDef.optionalFor2H and weaponPreference and weaponPreference.mode == "2H_ONLY" then
+        local mainLink = GetInventoryItemLink and GetInventoryItemLink("player", 16)
+        if mainLink and GetItemInfo then
+            local _, _, _, _, _, itemType, _, _, equipLoc = GetItemInfo(mainLink)
+            if itemType == "Weapon" and equipLoc == "INVTYPE_2HWEAPON" then
+                return {
+                    slot = slot, slotName = slotDef.name, status = "N/A",
+                    reason = "2H weapon equipped; off-hand correctly empty",
+                    score = score or 0,
+                }
+            end
+        end
+    end
+
+    if not link then
+        local expected = playerLevel >= (slotDef.expectedLevel or 1)
+        if expected then
+            local priority = slotDef.weapon and 140 or (slotDef.relic and 90 or 100)
+            return {
+                slot = slot,
+                slotName = slotDef.name,
+                status = "EMPTY",
+                reason = "Expected leveling slot is empty",
+                score = 0,
+                priority = priority,
+                expected = true,
+            }
+        end
+        return {
+            slot = slot, slotName = slotDef.name, status = "NOT EXPECTED YET",
+            reason = "Empty slot is normal at this level",
+            score = 0,
+            expected = false,
+        }
+    end
+
+    local itemName = GetItemInfo and select(1, GetItemInfo(link)) or link
+    local itemLevel = flcEquippedItemLevel(link)
+    local gap = itemLevel and math.max(0, playerLevel - itemLevel) or nil
+
+    local status, reason, priority = "OK", "Item level is reasonable for your level", 0
+    if gap then
+        if slotDef.weapon then
+            if gap >= 7 then
+                status, reason, priority = "CRITICAL", "Weapon is far behind your character level", 130 + gap
+            elseif gap >= 4 then
+                status, reason, priority = "WEAK", "Weapon is behind your character level", 105 + gap
+            elseif gap >= 2 then
+                status, reason, priority = "WATCH", "Weapon is starting to fall behind", 55 + gap
+            end
+        else
+            if gap >= 10 then
+                status, reason, priority = "CRITICAL", "Item is far behind your character level", 100 + gap
+            elseif gap >= 6 then
+                status, reason, priority = "WEAK", "Item is behind your character level", 75 + gap
+            elseif gap >= 4 then
+                status, reason, priority = "WATCH", "Item is starting to fall behind", 40 + gap
+            end
+        end
+    end
+
+    if slotDef.relic then
+        local _, knownRelic = flcKnownRelicScore(link)
+        if knownRelic then
+            status = "OK"
+            reason = "Known Shaman relic equipped"
+            priority = 0
+        end
+    end
+
+    return {
+        slot = slot,
+        slotName = slotDef.name,
+        status = status,
+        reason = reason,
+        link = link,
+        itemName = itemName,
+        itemLevel = itemLevel,
+        levelGap = gap,
+        score = score or 0,
+        priority = priority,
+        expected = true,
+    }
+end
+
+flcGearScanSnapshot = function()
+    local playerLevel = UnitLevel("player") or 1
+    local snapshot = {
+        playerLevel = playerLevel,
+        slots = {},
+        priorities = {},
+        weakCount = 0,
+        emptyExpected = 0,
+    }
+
+    for _, slotDef in ipairs(FLC_GEAR_SCAN_SLOTS) do
+        local item = flcGearSlotStatus(slotDef, playerLevel)
+        snapshot.slots[#snapshot.slots + 1] = item
+
+        if item.status == "EMPTY" then
+            snapshot.emptyExpected = snapshot.emptyExpected + 1
+            snapshot.weakCount = snapshot.weakCount + 1
+            snapshot.priorities[#snapshot.priorities + 1] = item
+        elseif item.status == "CRITICAL" or item.status == "WEAK" or item.status == "WATCH" then
+            snapshot.weakCount = snapshot.weakCount + 1
+            snapshot.priorities[#snapshot.priorities + 1] = item
+        end
+    end
+
+    table.sort(snapshot.priorities, function(a, b)
+        local pa, pb = tonumber(a.priority) or 0, tonumber(b.priority) or 0
+        if pa ~= pb then return pa > pb end
+        return tostring(a.slotName) < tostring(b.slotName)
+    end)
+
+    return snapshot
 end
 
 local function flcItemUsabilityReason(link, sourceTooltip)
@@ -2781,6 +2977,25 @@ SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
         else
             print("|cffffcc00FLC:|r use /flc spec combat, assassination, or subtlety.")
         end
+    elseif msg == "gearscan" then
+        local scan = flcGearScanSnapshot and flcGearScanSnapshot() or nil
+        if not scan or not scan.priorities then
+            print("|cffffcc00FLC:|r gear scan unavailable.")
+        elseif #scan.priorities == 0 then
+            print("|cff33ff99FLC:|r gear scan: no obvious weak slots for level " .. tostring(scan.playerLevel) .. ".")
+        else
+            print("|cff33ff99FLC:|r gear upgrade priorities:")
+            local limit = math.min(5, #scan.priorities)
+            for i = 1, limit do
+                local item = scan.priorities[i]
+                print(string.format("%d. %s — %s: %s%s",
+                    i,
+                    tostring(item.slotName),
+                    tostring(item.status),
+                    tostring(item.reason),
+                    item.itemName and (" [" .. tostring(item.itemName) .. "]") or ""))
+            end
+        end
     elseif msg == "gear" then
         DB.gearAdvisor = not DB.gearAdvisor
         print("|cff33ff99FLC:|r gear advisor " .. (DB.gearAdvisor and "enabled." or "disabled."))
@@ -2814,7 +3029,7 @@ SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
         syncQuests()
     else
         print("|cff33ff99Forever Leveling Coach v" .. tostring(Data.version) .. "|r")
-        print("/flc show, hide, go, lazy, spec, relic, trained, autoaccept, autoturnin, sync, export, gear, autoflight, arrow, lock, unlock, beginner")
+        print("/flc show, hide, go, lazy, spec, relic, trained, autoaccept, autoturnin, sync, export, gear, gearscan, autoflight, arrow, lock, unlock, beginner")
     end
 end
 
