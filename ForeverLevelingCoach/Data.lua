@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.17.5",
+    version = "0.17.6",
     supported = {
         faction = "Horde",
         classes = {
@@ -29,6 +29,7 @@ ForeverLevelingCoach_Data = {
         [383] = true, -- Vital Intelligence (Forever DB chain follow-up)
         [407] = true, -- Fields of Grief (Classic chain follow-up verified in Forever DB)
         [365] = true, -- Fields of Grief (Classic quest verified present on Ms)
+        [5481] = true, -- Gordo's Task (Classic quest live-verified on Ms)
         [86784] = true, -- Sticks and Bones (Forever-exclusive Brill side quest)
         [96607] = true, -- The Great Outdoors (Forever-exclusive Undead camping tutorial follow-up)
         [96656] = true, -- The Adventurer (Forever-exclusive Undead camping intro; live-verified on Ms)
@@ -422,7 +423,7 @@ ForeverLevelingCoach_Data = {
         {
             questID = 8,
             class = "ROGUE",
-            deferTurnInForQuestIDs = { 365 },
+            deferTurnInForQuestIDs = { 365, 5481 },
             cluster = "TIRISFAL_BRILL",
             clusterPriority = 4,
             title = "A Rogue's Deal",
@@ -440,6 +441,43 @@ ForeverLevelingCoach_Data = {
                 action = "TURN IN A ROGUE'S DEAL",
                 useArrow = true,
                 waypoint = { mapID = 1420, x = 0.617, y = 0.520, label = "Innkeeper Renee" },
+            },
+        },
+        {
+            questID = 5481,
+            class = "ROGUE",
+            cluster = "TIRISFAL_BRILL",
+            clusterPriority = 1,
+            title = "Gordo's Task",
+            tag = "DO",
+            minLevel = 5,
+            maxLevel = 10,
+            note = "Classic quest verified present in Forever. Very efficient on the Deathknell-to-Brill road; collect Gloom Weed while moving east.",
+            waypoint = { mapID = 1420, x = 0.463, y = 0.535, label = "Gloom Weed" },
+            objectiveTargets = {
+                {
+                    objectiveContains = "Gloom Weed",
+                    role = "Ground loot",
+                    name = "Gloom Weed",
+                    zone = "Tirisfal Glades",
+                    coords = "around 46.3, 53.5",
+                    locationType = "GROUND OBJECTS — roadside",
+                    instruction = "Collect 3 Gloom Weed along the road toward Brill, around 46.3, 53.5.",
+                    action = "LOOT 3 GLOOM WEED",
+                    useArrow = true,
+                    waypoint = { mapID = 1420, x = 0.463, y = 0.535, label = "Gloom Weed" },
+                },
+            },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Junior Apothecary Holland",
+                zone = "Brill graveyard, Tirisfal Glades",
+                coords = "57.4, 48.8",
+                locationType = "QUEST TURN-IN — roaming NPC",
+                instruction = "Turn in Gordo's Task to Junior Apothecary Holland in the Brill graveyard around 57.4, 48.8.",
+                action = "TURN IN GORDO'S TASK",
+                useArrow = true,
+                waypoint = { mapID = 1420, x = 0.574, y = 0.488, label = "Junior Apothecary Holland" },
             },
         },
         {
@@ -522,7 +560,7 @@ ForeverLevelingCoach_Data = {
         {
             questID = 96656,
             class = "ROGUE",
-            deferTurnInForQuestIDs = { 365 },
+            deferTurnInForQuestIDs = { 365, 5481 },
             cluster = "TIRISFAL_BRILL",
             clusterPriority = 1,
             title = "The Adventurer",
@@ -646,7 +684,7 @@ ForeverLevelingCoach_Data = {
         {
             questID = 383,
             class = "ROGUE",
-            deferTurnInForQuestIDs = { 365 },
+            deferTurnInForQuestIDs = { 365, 5481 },
             cluster = "TIRISFAL_BRILL",
             clusterPriority = 1,
             title = "Vital Intelligence",
