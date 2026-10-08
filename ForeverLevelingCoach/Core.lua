@@ -34,6 +34,7 @@ local defaults = {
     lazyMode = true,
     autoAccept = true,
     autoTurnIn = true,
+    rogueTalentSpec = "Combat",
     lastClassTrainerLevel = 0,
     lastUIVersion = "0.16.1",
     lastCluster = nil,
@@ -74,7 +75,11 @@ local function flcTalentRecommendation()
     local _, classFile = UnitClass("player")
     if classFile ~= "ROGUE" then return nil, nil end
 
-    local build = Data.rogueLevelingBuild
+    local builds = Data.rogueTalentBuilds
+    if not builds then return nil, nil end
+
+    local spec = (DB and DB.rogueTalentSpec) or builds.defaultSpec or "Combat"
+    local build = builds[spec] or builds.Combat
     if not build then return nil, nil end
 
     if level < 10 then
@@ -87,11 +92,9 @@ local function flcTalentRecommendation()
     end
 
     if level >= 30 then
-        return build.name, "Blade Flurry build complete for level 30"
+        return build.name, tostring(build.final30 or "Level 30 build complete")
     end
 
-    -- If the player levels past a point without checking the addon, surface the
-    -- latest intended pick for that level rather than inventing a new build.
     for l = level, 10, -1 do
         pick = build.talentsByLevel and build.talentsByLevel[l]
         if pick then
@@ -2346,6 +2349,26 @@ SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
     elseif msg == "export" then
         syncQuests()
         exportSnapshot()
+    elseif msg == "spec" then
+        local current = DB.rogueTalentSpec or "Combat"
+        print("|cff33ff99FLC:|r Rogue talent spec: " .. tostring(current) .. ". Use /flc spec combat, assassination, or subtlety.")
+    elseif msg:match("^spec%s+") then
+        local wanted = msg:match("^spec%s+(%S+)")
+        local map = {
+            combat = "Combat",
+            assassination = "Assassination",
+            subtlety = "Subtlety",
+            sub = "Subtlety",
+            assa = "Assassination",
+        }
+        local chosen = map[wanted or ""]
+        if chosen and Data.rogueTalentBuilds and Data.rogueTalentBuilds[chosen] then
+            DB.rogueTalentSpec = chosen
+            render()
+            print("|cff33ff99FLC:|r Rogue talent guide set to " .. chosen .. ".")
+        else
+            print("|cffffcc00FLC:|r use /flc spec combat, assassination, or subtlety.")
+        end
     elseif msg == "gear" then
         DB.gearAdvisor = not DB.gearAdvisor
         print("|cff33ff99FLC:|r gear advisor " .. (DB.gearAdvisor and "enabled." or "disabled."))
@@ -2379,7 +2402,7 @@ SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
         syncQuests()
     else
         print("|cff33ff99Forever Leveling Coach v" .. tostring(Data.version) .. "|r")
-        print("/flc show, hide, go, lazy, relic, trained, autoaccept, autoturnin, sync, export, gear, autoflight, arrow, lock, unlock, beginner")
+        print("/flc show, hide, go, lazy, spec, relic, trained, autoaccept, autoturnin, sync, export, gear, autoflight, arrow, lock, unlock, beginner")
     end
 end
 
