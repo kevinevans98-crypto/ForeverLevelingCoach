@@ -1,6 +1,6 @@
 # Forever Leveling Coach — Alpha 1 Release Notes
 
-## Alpha 1 — v0.53.0
+## Alpha 1 — v0.54.0
 
 Forever Leveling Coach Alpha 1 is an early tester build focused on validating the core leveling experience before wider class and route expansion.
 
@@ -27,7 +27,14 @@ Forever Leveling Coach Alpha 1 is an early tester build focused on validating th
 - Talent guidance
 - Full `/flc export` diagnostics
 
-### New in v0.53.0
+### New in v0.54.0
+- Added Druid as an optimized class on the generic class framework.
+- Added the current Feral 1–30 leveling talent path.
+- Added Druid-specific Feral stat weights and leather/weapon rules.
+- Added Thunder Bluff Druid trainer routing.
+- All current WoW Forever classes now exist in the universal support table.
+
+### Retained from v0.53.0
 - Added Paladin as an optimized class on the generic class framework.
 - Added the current Retribution 1–30 leveling talent path.
 - Added Paladin-specific melee/caster stat weights and mail/weapon rules.
