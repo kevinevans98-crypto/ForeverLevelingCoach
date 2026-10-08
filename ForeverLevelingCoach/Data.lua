@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.52.0",
+    version = "0.53.0",
     supported = {
         faction = "Horde",
         classes = {
@@ -26,7 +26,7 @@ ForeverLevelingCoach_Data = {
         HUNTER = { name = "Hunter", optimized = true, gearProfile = "hunterGearProfile", talentData = "hunterTalentBuilds", talentSetting = "hunterTalentSpec", trainerData = "hunterTrainers", trainingStart = 2, trainingInterval = 2 },
         ROGUE = { name = "Rogue", optimized = true, gearProfile = "rogueGearProfile", talentData = "rogueTalentBuilds", talentSetting = "rogueTalentSpec" },
         PRIEST = { name = "Priest", optimized = true, gearProfile = "priestGearProfile", talentData = "priestTalentBuilds", talentSetting = "priestTalentSpec", trainerData = "priestTrainers", trainingStart = 2, trainingInterval = 2 },
-        PALADIN = { name = "Paladin", optimized = false },
+        PALADIN = { name = "Paladin", optimized = true, gearProfile = "paladinGearProfile", talentData = "paladinTalentBuilds", talentSetting = "paladinTalentSpec", weaponPreference = "paladinWeaponPreference", trainerData = "paladinTrainers", trainingStart = 2, trainingInterval = 2 },
         SHAMAN = { name = "Shaman", optimized = true, usesRelics = true, weaponPreference = "shamanWeaponPreference", trainerData = "shamanTrainers", trainingStart = 24, trainingInterval = 2 },
         MAGE = { name = "Mage", optimized = true, gearProfile = "mageGearProfile", talentData = "mageTalentBuilds", talentSetting = "mageTalentSpec", trainerData = "mageTrainers", trainingStart = 2, trainingInterval = 2 },
         WARLOCK = { name = "Warlock", optimized = true, gearProfile = "warlockGearProfile", talentData = "warlockTalentBuilds", talentSetting = "warlockTalentSpec", trainerData = "warlockTrainers", trainingStart = 2, trainingInterval = 2 },
@@ -141,6 +141,95 @@ ForeverLevelingCoach_Data = {
             ["Two-Handed Maces"] = true,
         },
         label = "2H Axe / 2H Mace",
+    },
+
+    paladinWeaponPreference = {
+        mode = "2H_ONLY",
+        allowedSubTypes = {
+            ["Two-Handed Maces"] = true,
+            ["Two-Handed Swords"] = true,
+            ["Polearms"] = true,
+        },
+        label = "Slow 2H Sword / Mace / Polearm",
+    },
+
+    paladinTalentBuilds = {
+        defaultSpec = "Retribution",
+        Retribution = {
+            name = "Retribution",
+            purpose = "Fast solo leveling with strong sustained Holy/melee damage and low downtime",
+            source = "Mobalytics WoW Forever Paladin Leveling Guide, updated Oct 7 2026",
+            final30 = "0/0/21",
+            talentsByLevel = {
+                [10] = { talent = "Benediction", rank = 1, maxRank = 5 },
+                [11] = { talent = "Benediction", rank = 2, maxRank = 5 },
+                [12] = { talent = "Benediction", rank = 3, maxRank = 5 },
+                [13] = { talent = "Benediction", rank = 4, maxRank = 5 },
+                [14] = { talent = "Benediction", rank = 5, maxRank = 5 },
+                [15] = { talent = "Conviction", rank = 1, maxRank = 5 },
+                [16] = { talent = "Conviction", rank = 2, maxRank = 5 },
+                [17] = { talent = "Conviction", rank = 3, maxRank = 5 },
+                [18] = { talent = "Conviction", rank = 4, maxRank = 5 },
+                [19] = { talent = "Conviction", rank = 5, maxRank = 5 },
+                [20] = { talent = "Pursuit of Justice", rank = 1, maxRank = 2 },
+                [21] = { talent = "Pursuit of Justice", rank = 2, maxRank = 2 },
+                [22] = { talent = "Seal of Command", rank = 1, maxRank = 1 },
+                [23] = { talent = "Sanctified Judgement", rank = 1, maxRank = 3 },
+                [24] = { talent = "Sanctified Judgement", rank = 2, maxRank = 3 },
+                [25] = { talent = "Sacred Arbiter", rank = 1, maxRank = 1 },
+                [26] = { talent = "Sanctified Judgement", rank = 3, maxRank = 3 },
+                [27] = { talent = "Vindication", rank = 1, maxRank = 3 },
+                [28] = { talent = "Vindication", rank = 2, maxRank = 3 },
+                [29] = { talent = "Vindication", rank = 3, maxRank = 3 },
+                [30] = { talent = "Vengeance", rank = 1, maxRank = 3 },
+            },
+        },
+    },
+
+    paladinGearProfile = {
+        armorPreferred = "Mail",
+        armorAllowed = {
+            ["Cloth"] = true,
+            ["Leather"] = true,
+            ["Mail"] = true,
+            ["Shields"] = true,
+        },
+        meleeWeapons = {
+            ["One-Handed Maces"] = true,
+            ["One-Handed Swords"] = true,
+            ["Two-Handed Maces"] = true,
+            ["Two-Handed Swords"] = true,
+            ["Polearms"] = true,
+        },
+    },
+
+    paladinTrainers = {
+        names = {
+            ["Master Pyreanor"] = true,
+            ["Champion Cyssa Dawnrose"] = true,
+        },
+        locations = {
+            {
+                city = "Undercity",
+                name = "Champion Cyssa Dawnrose",
+                zone = "Royal Quarter, Undercity",
+                coords = "58.0, 89.8",
+                mapID = 1458,
+                x = 0.580,
+                y = 0.898,
+                aliases = { "Undercity", "Tirisfal Glades", "Silverpine Forest", "Silverpine" },
+            },
+            {
+                city = "Orgrimmar",
+                name = "Master Pyreanor",
+                zone = "Grommash Hold, Valley of Wisdom, Orgrimmar",
+                coords = "32.4, 35.7",
+                mapID = 1454,
+                x = 0.324,
+                y = 0.357,
+                aliases = { "Orgrimmar", "Durotar", "The Barrens", "Barrens", "Ashenvale" },
+            },
+        },
     },
 
     priestTalentBuilds = {
