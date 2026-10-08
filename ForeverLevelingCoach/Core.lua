@@ -680,6 +680,7 @@ local function getNearbyClusterQuestNames(step, byID)
                     title = routeStep.title or active.title or ("Quest " .. tostring(routeStep.questID)),
                     priority = routeStep.clusterPriority or 999,
                     complete = active.isComplete and true or false,
+                    background = routeStep.backgroundQuest and true or false,
                     step = routeStep,
                     active = active,
                 }
@@ -689,6 +690,7 @@ local function getNearbyClusterQuestNames(step, byID)
 
     table.sort(names, function(a, b)
         if a.complete ~= b.complete then return a.complete end
+        if a.background ~= b.background then return a.background end
         if a.priority ~= b.priority then return a.priority < b.priority end
         return tostring(a.title) < tostring(b.title)
     end)
@@ -722,6 +724,7 @@ local function chooseRouteStep(byID)
             local _, playerClass = UnitClass("player")
             if step.dungeon and step.cluster == insideDungeonCluster and active
                 and routeStepEligible(step, level, playerClass)
+                and not step.backgroundQuest
                 and not active.isComplete and not isQuestCompleted(step.questID) then
                 local score, reasons = scoreRouteStep(step, active, clusterCounts)
                 score = score + 1000
@@ -738,6 +741,7 @@ local function chooseRouteStep(byID)
         local active = byID[step.questID]
         local _, playerClass = UnitClass("player")
         if active and routeStepEligible(step, level, playerClass)
+            and not step.backgroundQuest
             and not isQuestCompleted(step.questID) then
             local score, reasons = scoreRouteStep(step, active, clusterCounts)
             if score > bestScore then
