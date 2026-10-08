@@ -2545,8 +2545,11 @@ local function flcBestUpgradeTarget(slot, currentScore)
             -- Source practicality breaks near-ties, but never makes a worse
             -- item into an "upgrade". Route-friendly quest rewards are favored
             -- over optional farms when their actual gear value is comparable.
-            if pct >= 1 then
-                local practicalBonus = target.routeFriendly and 12 or 0
+            if pct >= 1 and not (target.questID and isQuestCompleted(target.questID)) then
+                local practicalBonus = 0
+                if target.routeFriendly then
+                    practicalBonus = (target.questID and currentByID and currentByID[target.questID]) and 20 or 15
+                end
                 local sourceBonus = (tonumber(target.sourcePriority) or 0) * 0.05
                 local value = pct + practicalBonus + sourceBonus
                 if value > bestValue then
@@ -3283,6 +3286,7 @@ FLC:RegisterEvent("QUEST_ACCEPTED")
 FLC:RegisterEvent("QUEST_REMOVED")
 FLC:RegisterEvent("QUEST_TURNED_IN")
 FLC:RegisterEvent("PLAYER_LEVEL_UP")
+FLC:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
 FLC:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 FLC:RegisterEvent("ZONE_CHANGED")
 FLC:RegisterEvent("ZONE_CHANGED_INDOORS")
