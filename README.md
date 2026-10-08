@@ -149,3 +149,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Cluster quests now render as normal quest blocks in the scrollable Lazy window; no NEARBY label or 3-quest cap
 
 - Step-by-step Lazy guide with STEP 1 owning the arrow and later clustered quests queued below it
+
+- Improved same-cave ordering for Deathknell Rogue route and exact Night Web kill counts
