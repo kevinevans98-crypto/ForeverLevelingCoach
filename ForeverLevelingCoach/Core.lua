@@ -582,6 +582,27 @@ local function scoreRouteStep(step, active, clusterCounts)
         reasons[#reasons + 1] = waypointReason
     end
 
+    -- Speed-first tuning. Data.speedXP is a curated XP/min value (0..120),
+    -- used only to break ties between otherwise valid routed quests.
+    if step.speedXP and tonumber(step.speedXP) and tonumber(step.speedXP) > 0 then
+        local bonus = math.min(weights.speedXPMax or 120, tonumber(step.speedXP))
+        score = score + bonus
+        reasons[#reasons + 1] = string.format("fast XP/min (+%d)", bonus)
+    end
+
+    -- Quests far below the player's level lose value quickly. Keep a small
+    -- grace band so efficient green quests in the same cluster still finish.
+    if step.questLevel then
+        local playerLevel = UnitLevel("player") or 1
+        local freeLevels = weights.staleQuestFreeLevels or 4
+        local over = playerLevel - (tonumber(step.questLevel) or playerLevel) - freeLevels
+        if over > 0 then
+            local penalty = over * (weights.staleQuestPenaltyPerLevel or 35)
+            score = score - penalty
+            reasons[#reasons + 1] = string.format("low XP for level (-%d)", penalty)
+        end
+    end
+
     return score, reasons
 end
 
@@ -1665,7 +1686,8 @@ local function render()
                 qAction = (q.step and q.step.turnInTarget and q.step.turnInTarget.action)
                     or ("TURN IN " .. string.upper(q.title or "QUEST"))
             elseif q.active then
-                qAction = objectiveSummary(q.active)
+                local qTarget = getBestObjectiveTarget(q.step, q.active)
+                qAction = (qTarget and qTarget.action) or objectiveSummary(q.active)
             end
 
             detailLines[#detailLines + 1] = ""
