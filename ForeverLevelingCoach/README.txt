@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.18.0
+Forever Leveling Coach v0.18.1
 
 Current scope
 -------------
@@ -400,3 +400,9 @@ Roadmap
 - Talent export now supports WoW Forever 1.60.1's C_ClassTalents/C_Traits API as a fallback when legacy GetTalentTabInfo/GetTalentInfo are unavailable
 - /flc export now reports TalentAPI=classic or TalentAPI=traits
 - Trait-based exports include learned talent name, rank, node ID, and spell ID so Forever builds can be checked directly
+
+- Added speed-first Shaman 23-30 routing: curated XP/min bonuses now break ties between valid quests, while significantly under-level quests receive a stale-XP penalty
+- Added The Lost Pages [6504] as a high-value 3650 XP quest and explicitly stack it with Troll Charm / Thistlefur work instead of a standalone farm
+- Added an Ashenvale Outrunners [6503] target waypoint around 70,76 so STEP 1 has usable local navigation
+- Call of Water steps are now Shaman-only and carry maximum speed priority because the Water Totem unlock is worth the travel
+- Secondary checklist steps now use curated action text when available, not only raw quest-log counters
