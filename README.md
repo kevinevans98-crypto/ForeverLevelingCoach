@@ -265,3 +265,9 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Full equipped-slot diagnostics remain in `/flc export`, while `/flc gearscan` prints only a compact upgrade summary.
 
 - v0.24.2: Hotfix gear scanner compatibility on Forever clients where the legacy global item-info API is unavailable; item info/stat reads now use safe legacy/new-API fallbacks.
+
+- v0.25.0: Added an in-addon Settings panel so common features no longer require memorizing slash commands.
+
+- Settings includes clickable ON/OFF controls for Lazy Mode, auto accept, auto turn-in, gear advice, navigation arrow, flight assist, Beginner Mode, and Relic Advisor.
+
+- Settings also includes Lock/Unlock UI, Gear Summary, and Mark Class Training Done actions.
