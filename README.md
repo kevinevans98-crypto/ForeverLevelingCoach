@@ -141,3 +141,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Ultra-clean Lazy window: quest/task + one immediate action; arrow handles location
 
 - Undead Rogue fastest-route foundation, expanded verified Tirisfal quest data, and Rogue-specific gear validation
+
+- Nearby quest cluster line in Lazy Mode shows other active quests in the same local area
