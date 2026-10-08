@@ -299,3 +299,9 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Removed the compact-mode footer and softened the scroll bar chrome to reduce visual clutter.
 
 - Replaced the stock scrollbar-style navigation arrow with a larger GPS-style minimap arrow, gold tint, shadow, and separate target/distance panel.
+
+- v0.26.3: Fixed malformed queued-quest color markup that could print raw color codes in the guide.
+
+- Navigation arrow now uses WorldMapArrow with a safe scrollbar-arrow fallback for Forever clients where the previous minimap texture does not render.
+
+- Tightened the arrow target/distance panel so it takes less screen space.
