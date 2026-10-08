@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.56.0",
+    version = "0.57.0",
     supported = {
         faction = "Horde",
         classes = {
@@ -3947,9 +3947,9 @@ ForeverLevelingCoach_Data = {
         },
     },
 
-    shamanRaceFallback = {
+    raceFallback = {
         DUROTAR = {
-            [1] = { tag = "DO", title = "Valley of Trials", note = "Orc/Troll Shaman: stack Valley of Trials starter quests around the Den." },
+            [1] = { tag = "DO", title = "Valley of Trials", note = "Orc/Troll: stack Valley of Trials starter quests around the Den." },
             [2] = { tag = "DO", title = "Valley of Trials", note = "Stay local: starter kills, gathering, and Vile Familiars should overlap." },
             [3] = { tag = "DO", title = "Valley of Trials", note = "Finish dense Valley quests before taking long Durotar travel steps." },
             [4] = { tag = "DO", title = "Valley of Trials", note = "Finish Lazy Peons, cave/medallion work, and remaining nearby objectives." },
@@ -3961,7 +3961,7 @@ ForeverLevelingCoach_Data = {
             [10] = { tag = "DO", title = "Durotar → Barrens", note = "Wrap up efficient Durotar quests and transition toward Crossroads." },
         },
         MULGORE = {
-            [1] = { tag = "DO", title = "Camp Narache", note = "Tauren Shaman: stack Camp Narache starter quests tightly." },
+            [1] = { tag = "DO", title = "Camp Narache", note = "Tauren: stack Camp Narache starter quests tightly." },
             [2] = { tag = "DO", title = "Camp Narache", note = "Combine The Hunt Begins and A Humble Task with nearby starter objectives." },
             [3] = { tag = "DO", title = "Camp Narache", note = "Continue the hunt/Earthmother chains without leaving the local cluster early." },
             [4] = { tag = "DO", title = "Camp Narache", note = "Finish Bristleback and Rite objectives before moving north." },
@@ -3973,7 +3973,7 @@ ForeverLevelingCoach_Data = {
             [10] = { tag = "DO", title = "Mulgore → Thunder Bluff", note = "Finish Mulgore's best quests and prepare the Barrens transition." },
         },
         ZEPHRAS = {
-            [1] = { tag = "DO", title = "Zephras Isle", note = "Skyborne Shaman: stay on the Zephras Isle main quest path. FLC will not invent unverified quest IDs." },
+            [1] = { tag = "DO", title = "Zephras Isle", note = "Skyborne: stay on the Zephras Isle main quest path. FLC will not invent unverified quest IDs." },
             [2] = { tag = "DO", title = "Zephras Isle", note = "Continue the island's main quest chain and nearby side quests." },
             [3] = { tag = "DO", title = "Zephras Isle", note = "Keep questing on Zephras Isle; the zone is designed as a 1-12 starter experience." },
             [4] = { tag = "DO", title = "Zephras Isle", note = "Continue the island route; prioritize clustered objectives." },
