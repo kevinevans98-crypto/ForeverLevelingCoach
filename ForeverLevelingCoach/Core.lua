@@ -1754,6 +1754,8 @@ local function updateArrow()
     local targetAngle = atan2Safe(-dx, -dy)
     local facing = GetPlayerFacing and GetPlayerFacing() or 0
     local relativeAngle = targetAngle - facing
+    while relativeAngle > math.pi do relativeAngle = relativeAngle - (2 * math.pi) end
+    while relativeAngle < -math.pi do relativeAngle = relativeAngle + (2 * math.pi) end
 
     arrowFrame:Show()
     currentArrowState = "active-same-map"
@@ -1994,6 +1996,12 @@ local function getLazyTravelTarget(step, flightTarget)
     flightTarget = flightTarget or (step and step.flightTarget)
     if not DB or DB.lazyMode == false or not step or not flightTarget then return nil end
 
+    -- If the flight destination already matches the player's current zone/subzone,
+    -- there is nothing to fly to. Continue with the local quest objective instead.
+    if zoneMatchesAliases({ tostring(flightTarget) }) then
+        return nil
+    end
+
     -- Lazy Mode never points an arrow blindly across maps. Instead it converts
     -- cross-zone travel into the next local action the player can actually do.
     if zoneMatchesAliases({ "Splintertree Post" }) then
@@ -2162,6 +2170,11 @@ local function render()
         and C_Map.GetBestMapForUnit("player") == currentObjectiveTarget.waypoint.mapID then
         currentAutoFlightTarget = nil
         currentAutoFlightStatus = "local-objective"
+        currentTravelTarget = nil
+        currentNavigationWaypoint = currentObjectiveTarget.waypoint
+        if currentObjectiveTarget.instruction then
+            currentTravelInstruction = currentObjectiveTarget.instruction
+        end
     elseif active and active.isComplete and step and step.turnInTarget and step.turnInTarget.waypoint
         and C_Map and C_Map.GetBestMapForUnit
         and C_Map.GetBestMapForUnit("player") == step.turnInTarget.waypoint.mapID then
