@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.29.7",
+    version = "0.30.0",
     supported = {
         faction = "Horde",
         classes = {
@@ -305,6 +305,9 @@ ForeverLevelingCoach_Data = {
         routeSwitchMargin = 20,
         eventUrgencyMax = 85,
         eventUrgencyDistance = 0.08,
+        smartTurnInDeferPenalty = 400,
+        turnInDeferNearbyDistance = 0.08,
+        turnInDeferMargin = 0.03,
     },
 
     -- Quest clusters let the router keep you in one area and stack nearby
