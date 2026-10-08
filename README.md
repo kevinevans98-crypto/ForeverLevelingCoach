@@ -355,3 +355,7 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Local same-map objective navigation now explicitly overrides any stale lazy travel target, so Ashenvale Outrunners at Splintertree points to the Outrunners instead of the Splintertree flight master.
 
 - Navigation rotation is normalized to -180..180 degrees for cleaner arrow behavior and export diagnostics.
+
+- v0.28.8: Added localAliases support for route clusters so the large current-area bonus can distinguish separate hubs inside the same parent zone.
+
+- Ashenvale Zoram Strand, Thistlefur, and Splintertree now score as distinct local areas instead of every Ashenvale quest receiving the full +170 local bonus.
