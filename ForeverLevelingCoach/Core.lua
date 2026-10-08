@@ -225,6 +225,7 @@ local currentAutoFlightStatus = "idle"
 local taxiOpenSerial = 0
 local exportSnapshot
 local syncQuests
+local getBestObjectiveTarget
 
 local function isKnownQuest(questID)
     if Data.knownQuestIDs and Data.knownQuestIDs[questID] then return true end
@@ -544,6 +545,14 @@ local function getWaypointProximityBonus(step, active)
     if step and active and active.isComplete and step.turnInTarget and step.turnInTarget.waypoint then
         waypoint = step.turnInTarget.waypoint
         targetLabel = "turn-in nearby"
+    elseif step and active and not active.isComplete and getBestObjectiveTarget then
+        local objectiveTarget = getBestObjectiveTarget(step, active)
+        if objectiveTarget and objectiveTarget.waypoint then
+            waypoint = objectiveTarget.waypoint
+            targetLabel = "next objective nearby"
+        else
+            waypoint = step.waypoint
+        end
     elseif step then
         waypoint = step.waypoint
     end
@@ -705,11 +714,17 @@ local function getNearbyClusterQuestNames(step, byID)
             local active = byID[routeStep.questID]
             if active and routeStepEligible(routeStep, UnitLevel("player") or 1, playerClass)
                 and not isQuestCompleted(routeStep.questID) then
+                local queueScore = nil
+                if not routeStep.backgroundQuest then
+                    local clusterCounts = getActiveClusterCounts(byID)
+                    queueScore = select(1, scoreRouteStep(routeStep, active, clusterCounts))
+                end
                 names[#names + 1] = {
                     title = routeStep.title or active.title or ("Quest " .. tostring(routeStep.questID)),
                     priority = routeStep.clusterPriority or 999,
                     complete = active.isComplete and true or false,
                     background = routeStep.backgroundQuest and true or false,
+                    score = queueScore,
                     step = routeStep,
                     active = active,
                 }
@@ -726,6 +741,15 @@ local function getNearbyClusterQuestNames(step, byID)
 
         local rankA, rankB = queueRank(a), queueRank(b)
         if rankA ~= rankB then return rankA < rankB end
+
+        -- Background quests stay directly behind STEP 1. Real unfinished
+        -- quests are then ordered by live route score so proximity/progress
+        -- can reshape the queue as the player moves.
+        if rankA == 2 then
+            local scoreA, scoreB = a.score or -999999, b.score or -999999
+            if scoreA ~= scoreB then return scoreA > scoreB end
+        end
+
         if a.priority ~= b.priority then return a.priority < b.priority end
         return tostring(a.title) < tostring(b.title)
     end)
@@ -787,6 +811,27 @@ local function chooseRouteStep(byID)
             end
         end
     end
+    end
+
+    -- GPS-style anti-flip-flop: keep the current primary quest when it is
+    -- still valid and the new candidate is only marginally better. A meaningful
+    -- proximity/progress advantage will still switch the route automatically.
+    if bestStep and currentRouteStep and currentRouteStep.questID
+        and currentRouteStep.questID ~= bestStep.questID
+        and not currentRouteStep.backgroundQuest then
+        local previousActive = byID[currentRouteStep.questID]
+        local _, playerClass = UnitClass("player")
+        if previousActive
+            and routeStepEligible(currentRouteStep, level, playerClass)
+            and not isQuestCompleted(currentRouteStep.questID) then
+            local previousScore, previousReasons = scoreRouteStep(currentRouteStep, previousActive, clusterCounts)
+            local margin = (Data.scoring and Data.scoring.routeSwitchMargin) or 20
+            if bestScore - previousScore < margin then
+                bestStep, bestActive, bestScore, bestReasons =
+                    currentRouteStep, previousActive, previousScore, previousReasons
+                bestReasons[#bestReasons + 1] = string.format("route stability: challenger under %d-point switch margin", margin)
+            end
+        end
     end
 
     if bestStep then
@@ -1376,7 +1421,7 @@ local function scanTaxiMapAndAutoFly()
     end
 end
 
-local function getBestObjectiveTarget(step, active)
+getBestObjectiveTarget = function(step, active)
     if not step or not active or not step.objectiveTargets or not active.objectives then return nil end
 
     local playerMapID = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player")
@@ -2024,6 +2069,7 @@ exportSnapshot = function()
         "RecommendedScore=" .. tostring(currentRouteScore or 0),
         "RecommendedReasons=" .. table.concat(currentRouteReasons or {}, " | "),
         "QueuePolicy=STEP 1 primary navigation | STEP 2 background while-questing when available | then next primary objectives | deferred turn-ins last",
+        "DynamicLocalOrdering=enabled | objective waypoint proximity + progress + route switch margin",
         "CurrentZone=" .. tostring((GetZoneText and GetZoneText()) or "?"),
         "CurrentSubZone=" .. tostring((GetSubZoneText and GetSubZoneText()) or "?"),
         "CurrentTravelStep=" .. tostring(currentTravelInstruction or "none"),
