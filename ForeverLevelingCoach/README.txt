@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.17.1
+Forever Leveling Coach v0.17.2
 
 Current scope
 -------------
@@ -358,3 +358,9 @@ Roadmap
 - Added The Scarlet Crusade [381] route to Deathknell
 - Objective arrow points to the local Scarlet camp around 37,68 and turn-in points to Executor Arren at 32.2,66.0
 - Because the route now has a verified objective waypoint, proximity scoring can correctly prefer this nearby quest before farther Deathknell work such as Marla's Last Wish
+
+- Added per-spec Rogue talent guides for Combat, Assassination, and Subtlety
+- Builds track current popular/community-recommended WoW Forever guide setups rather than a single hard-coded leveling tree
+- Combat remains the default for fastest leveling and dungeon quest runs
+- /flc spec combat, /flc spec assassination, /flc spec subtlety switch the displayed level-by-level talent path
+- Combat updated to the current recommended order: Precision before Deflection
