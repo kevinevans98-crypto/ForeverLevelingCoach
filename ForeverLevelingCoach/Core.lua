@@ -1019,21 +1019,21 @@ local function flcStyleFlatButton(button, accent)
 end
 
 local exportButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-exportButton:SetSize(62, 24)
+exportButton:SetSize(58, 24)
 exportButton:SetPoint("TOPRIGHT", -12, -42)
 exportButton:SetText("Export")
 flcStyleFlatButton(exportButton, false)
 
 local goButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-goButton:SetSize(42, 24)
-goButton:SetPoint("RIGHT", exportButton, "LEFT", -4, 0)
+goButton:SetSize(40, 24)
+goButton:SetPoint("RIGHT", exportButton, "LEFT", -5, 0)
 goButton:SetText("Go")
 flcStyleFlatButton(goButton, true)
 goButton:SetScript("OnClick", focusCurrentQuest)
 
 local settingsButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-settingsButton:SetSize(64, 24)
-settingsButton:SetPoint("RIGHT", goButton, "LEFT", -4, 0)
+settingsButton:SetSize(62, 24)
+settingsButton:SetPoint("RIGHT", goButton, "LEFT", -5, 0)
 settingsButton:SetText("Settings")
 flcStyleFlatButton(settingsButton, false)
 
@@ -1103,7 +1103,7 @@ local questCards = {}
 
 local function createQuestCard(index)
     local card = CreateFrame("Frame", nil, mainScrollChild, "BackdropTemplate")
-    card:SetHeight(index == 1 and 58 or 48)
+    card:SetHeight(index == 1 and 62 or 48)
     card:SetBackdrop({
         bgFile = "Interface/Buttons/WHITE8x8",
         edgeFile = "Interface/Buttons/WHITE8x8",
@@ -1111,7 +1111,7 @@ local function createQuestCard(index)
         edgeSize = 1,
         insets = { left = 1, right = 1, top = 1, bottom = 1 },
     })
-    card:SetBackdropColor(index == 1 and 0.050 or 0.043, index == 1 and 0.070 or 0.055, index == 1 and 0.080 or 0.064, 0.98)
+    card:SetBackdropColor(index == 1 and 0.055 or 0.043, index == 1 and 0.078 or 0.055, index == 1 and 0.090 or 0.064, 0.98)
     card:SetBackdropBorderColor(0.10, 0.13, 0.15, 0.92)
 
     card.accent = card:CreateTexture(nil, "ARTWORK")
@@ -1127,14 +1127,14 @@ local function createQuestCard(index)
     card.status:SetPoint("LEFT", card.step, "RIGHT", 8, 0)
 
     card.title = card:CreateFontString(nil, "OVERLAY", index == 1 and "GameFontNormal" or "GameFontHighlightSmall")
-    card.title:SetPoint("TOPLEFT", 10, index == 1 and -21 or -20)
-    card.title:SetPoint("TOPRIGHT", -8, index == 1 and -21 or -20)
+    card.title:SetPoint("TOPLEFT", 10, index == 1 and -23 or -20)
+    card.title:SetPoint("TOPRIGHT", -8, index == 1 and -23 or -20)
     card.title:SetJustifyH("LEFT")
     card.title:SetWordWrap(false)
 
     card.action = card:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    card.action:SetPoint("TOPLEFT", 10, index == 1 and -39 or -34)
-    card.action:SetPoint("TOPRIGHT", -8, index == 1 and -39 or -34)
+    card.action:SetPoint("TOPLEFT", 10, index == 1 and -43 or -34)
+    card.action:SetPoint("TOPRIGHT", -8, index == 1 and -43 or -34)
     card.action:SetJustifyH("LEFT")
     card.action:SetWordWrap(false)
 
@@ -1157,7 +1157,7 @@ local function renderQuestCards(cards)
         if info then
             shown = shown + 1
             local primary = i == 1
-            card:SetHeight(primary and 58 or 48)
+            card:SetHeight(primary and 62 or 48)
             if previous then
                 card:SetPoint("TOPLEFT", previous, "BOTTOMLEFT", 0, -6)
                 card:SetPoint("TOPRIGHT", previous, "BOTTOMRIGHT", 0, -6)
@@ -1202,7 +1202,7 @@ local function renderQuestCards(cards)
     if shown == 0 then
         cardListHeight = 0
     else
-        cardListHeight = 58 + math.max(0, shown - 1) * 54
+        cardListHeight = 62 + math.max(0, shown - 1) * 54
     end
 end
 
@@ -1239,6 +1239,17 @@ local function refreshMainScroll()
     local detailHeight = detailText:IsShown() and (detailText:GetStringHeight() or 0) or 0
     local contentHeight = cardListHeight + (detailHeight > 0 and (detailHeight + 12) or 0)
     mainScrollChild:SetHeight(math.max(mainScroll:GetHeight(), contentHeight))
+
+    local needsScroll = contentHeight > (mainScroll:GetHeight() + 1)
+    if mainScroll.ScrollBar then
+        mainScroll.ScrollBar:SetShown(needsScroll)
+    end
+    if legacyScrollBar then
+        legacyScrollBar:SetShown(needsScroll)
+    end
+    if not needsScroll then
+        mainScroll:SetVerticalScroll(0)
+    end
 end
 
 mainScroll:SetScript("OnSizeChanged", refreshMainScroll)
@@ -1267,12 +1278,13 @@ arrowFrame:SetFrameStrata("HIGH")
 
 -- Single-piece FLC navigation arrow. One texture, one rotation, no geometry drift.
 local arrowTexture = arrowFrame:CreateTexture(nil, "ARTWORK")
-arrowTexture:SetSize(52, 52)
+arrowTexture:SetSize(46, 46)
 arrowTexture:SetPoint("TOP", 0, 0)
 arrowTexture:SetTexture("Interface\\AddOns\\ForeverLevelingCoach\\Media\\FLCArrow.tga")
+arrowTexture:SetAlpha(0.92)
 
 local arrowLabel = arrowFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-arrowLabel:SetPoint("TOP", arrowTexture, "BOTTOM", 0, -2)
+arrowLabel:SetPoint("TOP", arrowTexture, "BOTTOM", 0, -6)
 arrowLabel:SetWidth(178)
 arrowLabel:SetJustifyH("CENTER")
 arrowLabel:SetTextColor(0.88, 0.94, 0.95)
@@ -1280,7 +1292,7 @@ arrowLabel:SetShadowOffset(1, -1)
 arrowLabel:SetText("")
 
 local arrowDistance = arrowFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-arrowDistance:SetPoint("TOP", arrowLabel, "BOTTOM", 0, 0)
+arrowDistance:SetPoint("TOP", arrowLabel, "BOTTOM", 0, -1)
 arrowDistance:SetWidth(178)
 arrowDistance:SetJustifyH("CENTER")
 arrowDistance:SetTextColor(0.38, 0.82, 0.76)
