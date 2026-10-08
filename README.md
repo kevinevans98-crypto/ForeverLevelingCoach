@@ -431,3 +431,9 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Active pruned quests are surfaced under QuestCleanup as SAFE TO IGNORE / ABANDON instead of silently remaining in route scoring.
 
 - Cleanup warnings are informational only; FLC does not automatically abandon quests from the player's quest log.
+
+- v0.36.0: Cleanup cards now include a clickable DROP button for quests currently marked SAFE TO DROP.
+
+- DROP validates that the quest is still in the live QuestCleanup set, asks for confirmation, selects that exact quest ID, and uses the available client abandon API before refreshing the route.
+
+- Cleanup buttons never appear on normal DO/IMPORTANT quests or other route cards.
