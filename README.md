@@ -249,3 +249,11 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Head, neck, and low-level trinket empties are now OPTIONAL EMPTY instead of top-priority failures before their expected levels.
 
 - Weak wrist/hands/weapon pieces now rank ahead of opportunistic accessory slots, producing more practical leveling upgrade priorities.
+
+- v0.24.0: Connected the Gear Scanner to a conservative verified upgrade-source catalog.
+
+- Gear priorities now show an estimated upgrade percentage, source, and ROUTE-FRIENDLY vs OPTIONAL FARM/AH guidance when a verified target actually beats the equipped item.
+
+- Added verified Shaman wrist targets including Witherbite Bracers from Witherfang in Ruins of Lordaeron and Wolfmane Wristguards from Earthen Arise.
+
+- Added verified hand candidates including The Lost Pages rewards and Brawler Gloves; weak-looking gear becomes HOLD when no verified candidate actually beats its leveling score.
