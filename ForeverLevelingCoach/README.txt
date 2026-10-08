@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.16.1
+Forever Leveling Coach v0.16.2
 
 Current scope
 -------------
@@ -329,3 +329,8 @@ Roadmap
 - Shows up to 3 other active quests from the same local cluster under the current DO action
 - Completed nearby quests are marked with a check mark; extra quests collapse into +N more
 - Keeps the window compact while making it obvious which nearby quests should be stacked together
+
+- Added Forever-specific A Light in the Darkness [98389] to the Deathknell cluster
+- Added Marla's Last Wish [6395] with item-aware two-stage routing: kill Samuel first, then automatically switch the arrow to Marla's Grave after Samuel's Remains are in the bags
+- Added Night Web's Hollow [380] proactively because it stacks with A Light in the Darkness in the same spider cave
+- Generic objective item gates added so future quest steps can change automatically based on quest items in the player's bags
