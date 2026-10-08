@@ -155,3 +155,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Rogue talent/spec advisor with a level-by-level Combat 10-30 leveling path ending in Blade Flurry
 
 - Added The Scarlet Crusade [381] route so local proximity can beat farther Deathknell objectives
+
+- Added per-spec Rogue talent guides with switchable Combat, Assassination, and Subtlety community-recommended builds
