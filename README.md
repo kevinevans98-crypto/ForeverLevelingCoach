@@ -407,3 +407,9 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Batched turn-ins sort verified NPCs by current same-map distance, navigate to the nearest turn-in first, and automatically recalculate after each quest leaves the log.
 
 - The compact HUD now shows the hub and turn-in count instead of duplicating individual completed quests, and export includes TurnInBatch details.
+
+- v0.32.0: Added post-turn-in hub chaining. QUEST_TURNED_IN now preserves a verified follow-up pickup briefly after the source quest disappears from the quest log.
+
+- Verified same-hub follow-ups can temporarily own navigation as PICK UP NEXT, then automatically clear when the follow-up is accepted or becomes active/completed.
+
+- Added verified follow-up quest IDs to existing route chains for Vital Intelligence, Fields of Grief, The Great Outdoors, Rattling the Rattlecages, and In Nightmares.
