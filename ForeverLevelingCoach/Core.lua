@@ -1265,45 +1265,14 @@ arrowFrame:EnableMouse(true)
 arrowFrame:SetClampedToScreen(true)
 arrowFrame:SetFrameStrata("HIGH")
 
--- FLC custom chevron: built from flat textures so it does not depend on WoW arrow art.
-local arrowShadowLeft = arrowFrame:CreateTexture(nil, "BACKGROUND")
-arrowShadowLeft:SetSize(28, 6)
-arrowShadowLeft:SetPoint("CENTER", arrowFrame, "TOP", -7, -19)
-arrowShadowLeft:SetTexture("Interface/Buttons/WHITE8x8")
-arrowShadowLeft:SetVertexColor(0, 0, 0, 0.75)
-
-local arrowShadowRight = arrowFrame:CreateTexture(nil, "BACKGROUND")
-arrowShadowRight:SetSize(28, 6)
-arrowShadowRight:SetPoint("CENTER", arrowFrame, "TOP", 7, -19)
-arrowShadowRight:SetTexture("Interface/Buttons/WHITE8x8")
-arrowShadowRight:SetVertexColor(0, 0, 0, 0.75)
-
-local arrowLeft = arrowFrame:CreateTexture(nil, "ARTWORK")
-arrowLeft:SetSize(26, 4)
-arrowLeft:SetPoint("CENTER", arrowFrame, "TOP", -7, -18)
-arrowLeft:SetTexture("Interface/Buttons/WHITE8x8")
-arrowLeft:SetVertexColor(0.25, 1.0, 0.88, 1.0)
-
-local arrowRight = arrowFrame:CreateTexture(nil, "ARTWORK")
-arrowRight:SetSize(26, 4)
-arrowRight:SetPoint("CENTER", arrowFrame, "TOP", 7, -18)
-arrowRight:SetTexture("Interface/Buttons/WHITE8x8")
-arrowRight:SetVertexColor(0.25, 1.0, 0.88, 1.0)
-
-local arrowShaftShadow = arrowFrame:CreateTexture(nil, "BACKGROUND")
-arrowShaftShadow:SetSize(32, 7)
-arrowShaftShadow:SetPoint("CENTER", arrowFrame, "TOP", 1, -31)
-arrowShaftShadow:SetTexture("Interface/Buttons/WHITE8x8")
-arrowShaftShadow:SetVertexColor(0, 0, 0, 0.75)
-
-local arrowShaft = arrowFrame:CreateTexture(nil, "ARTWORK")
-arrowShaft:SetSize(30, 4)
-arrowShaft:SetPoint("CENTER", arrowFrame, "TOP", 0, -30)
-arrowShaft:SetTexture("Interface/Buttons/WHITE8x8")
-arrowShaft:SetVertexColor(0.25, 1.0, 0.88, 1.0)
+-- Single-piece FLC navigation arrow. One texture, one rotation, no geometry drift.
+local arrowTexture = arrowFrame:CreateTexture(nil, "ARTWORK")
+arrowTexture:SetSize(52, 52)
+arrowTexture:SetPoint("TOP", 0, 0)
+arrowTexture:SetTexture("Interface\\AddOns\\ForeverLevelingCoach\\Media\\FLCArrow.tga")
 
 local arrowLabel = arrowFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-arrowLabel:SetPoint("TOP", arrowFrame, "TOP", 0, -50)
+arrowLabel:SetPoint("TOP", arrowTexture, "BOTTOM", 0, -2)
 arrowLabel:SetWidth(178)
 arrowLabel:SetJustifyH("CENTER")
 arrowLabel:SetTextColor(0.88, 0.94, 0.95)
@@ -1777,41 +1746,7 @@ local function updateArrow()
     arrowFrame:Show()
     currentArrowState = "active-same-map"
     updateTravelHint(nil, currentArrowState)
-    -- Rotate the chevron as one rigid shape. The wing textures need both their
-    -- angle AND their center points rotated around the same pivot; otherwise the
-    -- two halves separate/cross as the player turns.
-    local wing = 0.55
-    local cosA = math.cos(relativeAngle)
-    local sinA = math.sin(relativeAngle)
-
-    local function rotateChevronPoint(x, y)
-        return (x * cosA) - (y * sinA), (x * sinA) + (y * cosA)
-    end
-
-    local leftX, leftY = rotateChevronPoint(-7, -18)
-    local rightX, rightY = rotateChevronPoint(7, -18)
-    local shaftX, shaftY = rotateChevronPoint(0, -31)
-
-    arrowLeft:ClearAllPoints()
-    arrowRight:ClearAllPoints()
-    arrowShadowLeft:ClearAllPoints()
-    arrowShadowRight:ClearAllPoints()
-    arrowShaft:ClearAllPoints()
-    arrowShaftShadow:ClearAllPoints()
-
-    arrowLeft:SetPoint("CENTER", arrowFrame, "TOP", leftX, leftY)
-    arrowRight:SetPoint("CENTER", arrowFrame, "TOP", rightX, rightY)
-    arrowShadowLeft:SetPoint("CENTER", arrowFrame, "TOP", leftX + 1, leftY - 1)
-    arrowShadowRight:SetPoint("CENTER", arrowFrame, "TOP", rightX + 1, rightY - 1)
-    arrowShaft:SetPoint("CENTER", arrowFrame, "TOP", shaftX, shaftY)
-    arrowShaftShadow:SetPoint("CENTER", arrowFrame, "TOP", shaftX + 1, shaftY - 1)
-
-    arrowLeft:SetRotation(relativeAngle - wing)
-    arrowRight:SetRotation(relativeAngle + wing)
-    arrowShadowLeft:SetRotation(relativeAngle - wing)
-    arrowShadowRight:SetRotation(relativeAngle + wing)
-    arrowShaft:SetRotation(relativeAngle + (math.pi / 2))
-    arrowShaftShadow:SetRotation(relativeAngle + (math.pi / 2))
+    arrowTexture:SetRotation(relativeAngle)
 
     currentArrowDebug = {
         playerMapID = playerMapID,
