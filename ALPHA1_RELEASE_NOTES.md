@@ -1,6 +1,6 @@
 # Forever Leveling Coach — Alpha 1 Release Notes
 
-## Alpha 1 — v0.45.0
+## Alpha 1 — v0.46.0
 
 Forever Leveling Coach Alpha 1 is an early tester build focused on validating the core leveling experience before wider class and route expansion.
 
@@ -27,7 +27,14 @@ Forever Leveling Coach Alpha 1 is an early tester build focused on validating th
 - Talent guidance
 - Full `/flc export` diagnostics
 
-### New in v0.45.0
+### New in v0.46.0
+- Refactored class training into a reusable generic class service.
+- Removed Shaman-only trainer calls from the core render path.
+- Class profiles now declare whether trainer guidance exists and when training reminders should trigger.
+- Classes without verified trainer data safely skip trainer routing instead of failing.
+- Shaman keeps its verified trainer locations and current level-24+ reminder behavior.
+
+### Retained from v0.45.0
 - Added universal Horde class support foundation.
 - Warrior, Hunter, Rogue, Priest, Shaman, Mage, Warlock, and Druid now pass the core support gate.
 - Added generic class profiles so unsupported class-specific systems fail safely instead of blocking the entire addon.
