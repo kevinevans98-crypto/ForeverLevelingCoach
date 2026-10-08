@@ -226,6 +226,7 @@ local currentFastTravelMode = nil
 local currentNextQuestPickup = nil
 local currentPickupSuggestions = {}
 local currentQuickPickupSuggestion = nil
+local currentArrivalState = nil
 local currentPersonTarget = nil
 local currentObjectiveTarget = nil
 local currentTravelTarget = nil
@@ -1910,11 +1911,6 @@ local function updateArrow()
     while relativeAngle > math.pi do relativeAngle = relativeAngle - (2 * math.pi) end
     while relativeAngle < -math.pi do relativeAngle = relativeAngle + (2 * math.pi) end
 
-    arrowFrame:Show()
-    currentArrowState = "active-same-map"
-    updateTravelHint(nil, currentArrowState)
-    arrowTexture:SetRotation(relativeAngle)
-
     currentArrowDebug = {
         playerMapID = playerMapID,
         playerX = px,
@@ -1928,6 +1924,53 @@ local function updateArrow()
     }
 
     local meters = getWaypointDistanceMeters(playerMapID, px, py, waypoint.x, waypoint.y)
+
+    -- Arrival handling for Quick Pickup: once the player is close enough to
+    -- interact, the arrow becomes visual noise. Hide it and turn the live HUD
+    -- into a direct interaction prompt. If the player backs away, restore the
+    -- normal Quick Pickup presentation automatically.
+    local quickPickupArrival = currentQuickPickupSuggestion
+        and currentPersonTarget
+        and currentPersonTarget.waypoint == waypoint
+        and meters
+        and meters <= 8
+
+    if quickPickupArrival then
+        currentArrivalState = "quick-pickup-interact"
+        currentArrowState = "arrived-quick-pickup"
+        arrowFrame:Hide()
+        updateTravelHint(nil, currentArrowState)
+
+        routeText:SetText("Interact now")
+        local topCard = questCards and questCards[1]
+        if topCard and topCard:IsShown() then
+            topCard.status:SetText("INTERACT NOW")
+            local npc = currentQuickPickupSuggestion.pickup and currentQuickPickupSuggestion.pickup.npc
+            topCard.action:SetText(npc and ("TALK TO " .. string.upper(tostring(npc))) or "INTERACT WITH QUEST GIVER")
+            topCard.action:Show()
+        end
+        return
+    end
+
+    if currentArrivalState == "quick-pickup-interact" then
+        currentArrivalState = nil
+        if currentQuickPickupSuggestion then
+            routeText:SetText("Quick pickup")
+            local topCard = questCards and questCards[1]
+            if topCard and topCard:IsShown() then
+                topCard.status:SetText("PICK UP NOW")
+                local npc = currentQuickPickupSuggestion.pickup and currentQuickPickupSuggestion.pickup.npc
+                topCard.action:SetText(npc and ("TALK TO " .. string.upper(tostring(npc))) or "PICK UP QUEST")
+                topCard.action:Show()
+            end
+        end
+    end
+
+    arrowFrame:Show()
+    currentArrowState = "active-same-map"
+    updateTravelHint(nil, currentArrowState)
+    arrowTexture:SetRotation(relativeAngle)
+
     local label = waypoint.label or currentRouteStep.title or "Route target"
     arrowLabel:SetText(label)
     if meters then
@@ -2278,6 +2321,7 @@ local function render()
     currentRouteStep = step
     currentPickupSuggestions = getPickupSuggestions(currentByID, step)
     currentQuickPickupSuggestion = nil
+    currentArrivalState = nil
     for _, suggestion in ipairs(currentPickupSuggestions or {}) do
         if suggestion.classification == "PICK UP NOW"
             and suggestion.pickup
@@ -2904,6 +2948,7 @@ exportSnapshot = function()
         "PickupSuggestionCount=" .. tostring(#(currentPickupSuggestions or {})),
         "QuickPickup=" .. tostring(currentQuickPickupSuggestion and currentQuickPickupSuggestion.title or "none"),
         "QuickPickupQuestID=" .. tostring(currentQuickPickupSuggestion and currentQuickPickupSuggestion.questID or "none"),
+        "ArrivalState=" .. tostring(currentArrivalState or "none"),
         "MarkedPersonRole=" .. tostring(currentPersonTarget and currentPersonTarget.role or "none"),
         "MarkedPersonName=" .. tostring(currentPersonTarget and currentPersonTarget.name or "none"),
         "MarkedPersonZone=" .. tostring(currentPersonTarget and currentPersonTarget.zone or "none"),
