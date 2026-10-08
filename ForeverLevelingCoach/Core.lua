@@ -2487,8 +2487,8 @@ end
 
 
 local FLC_GEAR_SCAN_SLOTS = {
-    { slot = 1,  name = "Head",      expectedLevel = 20 },
-    { slot = 2,  name = "Neck",      expectedLevel = 16 },
+    { slot = 1,  name = "Head",      expectedLevel = 28, optionalEmpty = true },
+    { slot = 2,  name = "Neck",      expectedLevel = 30, optionalEmpty = true },
     { slot = 3,  name = "Shoulders", expectedLevel = 18 },
     { slot = 5,  name = "Chest",     expectedLevel = 1 },
     { slot = 6,  name = "Waist",     expectedLevel = 8 },
@@ -2498,8 +2498,8 @@ local FLC_GEAR_SCAN_SLOTS = {
     { slot = 10, name = "Hands",     expectedLevel = 1 },
     { slot = 11, name = "Ring 1",    expectedLevel = 18 },
     { slot = 12, name = "Ring 2",    expectedLevel = 22 },
-    { slot = 13, name = "Trinket 1", expectedLevel = 20 },
-    { slot = 14, name = "Trinket 2", expectedLevel = 28 },
+    { slot = 13, name = "Trinket 1", expectedLevel = 28, optionalEmpty = true },
+    { slot = 14, name = "Trinket 2", expectedLevel = 35, optionalEmpty = true },
     { slot = 15, name = "Back",      expectedLevel = 8 },
     { slot = 16, name = "Weapon",    expectedLevel = 1, weapon = true },
     { slot = 17, name = "Off Hand",  expectedLevel = 1, optionalFor2H = true },
@@ -2541,18 +2541,39 @@ local function flcGearSlotStatus(slotDef, playerLevel)
 
     if not link then
         local expected = playerLevel >= (slotDef.expectedLevel or 1)
-        if expected then
-            local priority = slotDef.weapon and 140 or (slotDef.relic and 90 or 100)
+
+        if slotDef.optionalEmpty and not expected then
             return {
                 slot = slot,
                 slotName = slotDef.name,
-                status = "EMPTY",
-                reason = "Expected leveling slot is empty",
+                status = "OPTIONAL EMPTY",
+                reason = "Nice to fill when a worthwhile upgrade appears",
+                score = 0,
+                priority = 10,
+                expected = false,
+                optionalEmpty = true,
+            }
+        end
+
+        if expected then
+            local priority = slotDef.weapon and 140 or (slotDef.relic and 90 or 85)
+            if slotDef.optionalEmpty then
+                priority = 35
+            end
+            return {
+                slot = slot,
+                slotName = slotDef.name,
+                status = slotDef.optionalEmpty and "OPTIONAL EMPTY" or "EMPTY",
+                reason = slotDef.optionalEmpty
+                    and "Useful upgrade slot, but do not detour for a mediocre item"
+                    or "Expected leveling slot is empty",
                 score = 0,
                 priority = priority,
                 expected = true,
+                optionalEmpty = slotDef.optionalEmpty and true or false,
             }
         end
+
         return {
             slot = slot, slotName = slotDef.name, status = "NOT EXPECTED YET",
             reason = "Empty slot is normal at this level",
@@ -2628,6 +2649,11 @@ flcGearScanSnapshot = function()
             snapshot.emptyExpected = snapshot.emptyExpected + 1
             snapshot.weakCount = snapshot.weakCount + 1
             snapshot.priorities[#snapshot.priorities + 1] = item
+        elseif item.status == "OPTIONAL EMPTY" then
+            if item.expected then
+                snapshot.emptyExpected = snapshot.emptyExpected + 1
+            end
+            snapshot.priorities[#snapshot.priorities + 1] = item
         elseif item.status == "CRITICAL" or item.status == "WEAK" or item.status == "WATCH" then
             snapshot.weakCount = snapshot.weakCount + 1
             snapshot.priorities[#snapshot.priorities + 1] = item
@@ -2672,6 +2698,8 @@ flcRenderGearScannerView = function()
                 statusColor = "|cffff5555"
             elseif item.status == "WEAK" then
                 statusColor = "|cffff9933"
+            elseif item.status == "OPTIONAL EMPTY" then
+                statusColor = "|cffaaaaaa"
             end
             lines[#lines + 1] = string.format(
                 "%d. %s — %s%s|r",
@@ -2699,6 +2727,8 @@ flcRenderGearScannerView = function()
         local color = "|cffaaaaaa"
         if status == "OK" or status == "N/A" or status == "NOT EXPECTED YET" then
             color = "|cff33ff99"
+        elseif status == "OPTIONAL EMPTY" then
+            color = "|cffaaaaaa"
         elseif status == "CRITICAL" or status == "EMPTY" then
             color = "|cffff5555"
         elseif status == "WEAK" then
