@@ -339,3 +339,7 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - v0.28.3: Fixed the custom navigation chevron geometry so both wings rotate around one shared pivot instead of separating/crossing while the player turns; increased arrow refresh smoothness.
 
 - v0.28.4: Converted the custom navigation chevron into a true arrow by adding a rotating shaft and matching shadow, while preserving the modern FLC visual style.
+
+- v0.28.5: Replaced the multi-piece navigation marker with a custom single-piece FLC arrow texture stored in the addon.
+
+- The navigation arrow now rotates as one texture, eliminating the Y-shape, wing separation, and geometry glitches from the previous construction.
