@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.21.0",
+    version = "0.21.1",
     supported = {
         faction = "Horde",
         classes = {
@@ -2380,6 +2380,7 @@ ForeverLevelingCoach_Data = {
             speedXP = 120,
             title = "The Lost Pages",
             tag = "DO",
+            backgroundQuest = true,
             minLevel = 20,
             maxLevel = 27,
             note = "High-value Ashenvale quest (3650 XP in Forever). Farm the pages while doing Troll Charm / Thistlefur objectives so there is no dedicated detour.",
