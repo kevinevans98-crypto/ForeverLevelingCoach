@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.16.0
+Forever Leveling Coach v0.16.1
 
 Current scope
 -------------
@@ -324,3 +324,8 @@ Roadmap
 - Rogue melee whitelist: daggers, 1H swords, 1H maces, fist weapons
 - Rogue ranged whitelist: thrown, bows, crossbows, guns
 - Rogue stat scoring now prioritizes Agility and ignores Intellect/Spirit for leveling
+
+- Nearby quest cluster line added to the compact Lazy window
+- Shows up to 3 other active quests from the same local cluster under the current DO action
+- Completed nearby quests are marked with a check mark; extra quests collapse into +N more
+- Keeps the window compact while making it obvious which nearby quests should be stacked together
