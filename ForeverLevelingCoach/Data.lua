@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.47.0",
+    version = "0.48.0",
     supported = {
         faction = "Horde",
         classes = {
@@ -21,7 +21,7 @@ ForeverLevelingCoach_Data = {
     -- extra class-specific intelligence such as talent, trainer, relic, or
     -- weapon rules; it is not required for core routing support.
     classProfiles = {
-        WARRIOR = { name = "Warrior", optimized = false },
+        WARRIOR = { name = "Warrior", optimized = true, gearProfile = "warriorGearProfile", talentData = "warriorTalentBuilds", talentSetting = "warriorTalentSpec", trainerData = "warriorTrainers", trainingStart = 2, trainingInterval = 2 },
         HUNTER = { name = "Hunter", optimized = false },
         ROGUE = { name = "Rogue", optimized = true, gearProfile = "rogueGearProfile", talentData = "rogueTalentBuilds", talentSetting = "rogueTalentSpec" },
         PRIEST = { name = "Priest", optimized = false },
@@ -139,6 +139,96 @@ ForeverLevelingCoach_Data = {
             ["Two-Handed Maces"] = true,
         },
         label = "2H Axe / 2H Mace",
+    },
+
+    warriorTalentBuilds = {
+        defaultSpec = "Protection",
+        Protection = {
+            name = "Protection",
+            purpose = "Fast, durable WoW Forever leveling with strong dungeon tanking",
+            source = "Mobalytics WoW Forever Warrior Leveling Guide, updated Sep 29 2026",
+            final30 = "Protection leveling path through Master of Defense",
+            talentsByLevel = {
+                [10] = { talent = "Improved Rend", rank = 1, maxRank = 3 },
+                [11] = { talent = "Improved Rend", rank = 2, maxRank = 3 },
+                [12] = { talent = "Improved Rend", rank = 3, maxRank = 3 },
+                [13] = { talent = "Cruelty", rank = 1, maxRank = 5 },
+                [14] = { talent = "Cruelty", rank = 2, maxRank = 5 },
+                [15] = { talent = "Cruelty", rank = 3, maxRank = 5 },
+                [16] = { talent = "Shield Specialization", rank = 1, maxRank = 5, note = "Respec to Protection for 1 Silver, then start Shield Specialization" },
+                [17] = { talent = "Shield Specialization", rank = 2, maxRank = 5 },
+                [18] = { talent = "Shield Specialization", rank = 3, maxRank = 5 },
+                [19] = { talent = "Shield Specialization", rank = 4, maxRank = 5 },
+                [20] = { talent = "Shield Specialization", rank = 5, maxRank = 5 },
+                [21] = { talent = "Improved Thunder Clap", rank = 1, maxRank = 3 },
+                [22] = { talent = "Improved Thunder Clap", rank = 2, maxRank = 3 },
+                [23] = { talent = "Improved Thunder Clap", rank = 3, maxRank = 3 },
+                [24] = { talent = "Improved Bloodrage", rank = 1, maxRank = 2 },
+                [25] = { talent = "Improved Bloodrage", rank = 2, maxRank = 2 },
+                [26] = { talent = "Improved Revenge", rank = 1, maxRank = 3 },
+                [27] = { talent = "Improved Revenge", rank = 2, maxRank = 3 },
+                [28] = { talent = "Improved Revenge", rank = 3, maxRank = 3 },
+                [29] = { talent = "Master of Defense", rank = 1, maxRank = 2 },
+                [30] = { talent = "Master of Defense", rank = 2, maxRank = 2 },
+            },
+        },
+    },
+
+    warriorGearProfile = {
+        armorPreferred = "Mail",
+        armorAllowed = {
+            ["Cloth"] = true,
+            ["Leather"] = true,
+            ["Mail"] = true,
+            ["Shields"] = true,
+        },
+        meleeWeapons = {
+            ["Daggers"] = true,
+            ["Fist Weapons"] = true,
+            ["One-Handed Axes"] = true,
+            ["One-Handed Maces"] = true,
+            ["One-Handed Swords"] = true,
+            ["Two-Handed Axes"] = true,
+            ["Two-Handed Maces"] = true,
+            ["Two-Handed Swords"] = true,
+            ["Polearms"] = true,
+            ["Staves"] = true,
+        },
+        rangedWeapons = {
+            ["Bows"] = true,
+            ["Crossbows"] = true,
+            ["Guns"] = true,
+            ["Thrown"] = true,
+        },
+    },
+
+    warriorTrainers = {
+        names = {
+            ["Grezz Ragefist"] = true,
+            ["Sorek"] = true,
+            ["Zel'mak"] = true,
+            ["Ker Ragetotem"] = true,
+            ["Sark Ragetotem"] = true,
+            ["Torm Ragetotem"] = true,
+        },
+        orgrimmar = {
+            city = "Orgrimmar",
+            name = "Grezz / Sorek / Zel'mak",
+            zone = "Hall of the Brave, Valley of Honor, Orgrimmar",
+            coords = "80.0, 31.0",
+            mapID = 1454,
+            x = 0.800,
+            y = 0.310,
+        },
+        thunderBluff = {
+            city = "Thunder Bluff",
+            name = "Ker / Sark / Torm Ragetotem",
+            zone = "Hunter's Rise, Thunder Bluff",
+            coords = "57.6, 87.6",
+            mapID = 1456,
+            x = 0.576,
+            y = 0.876,
+        },
     },
 
     rogueTalentBuilds = {
