@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.49.0",
+    version = "0.50.0",
     supported = {
         faction = "Horde",
         classes = {
@@ -26,7 +26,7 @@ ForeverLevelingCoach_Data = {
         ROGUE = { name = "Rogue", optimized = true, gearProfile = "rogueGearProfile", talentData = "rogueTalentBuilds", talentSetting = "rogueTalentSpec" },
         PRIEST = { name = "Priest", optimized = false },
         SHAMAN = { name = "Shaman", optimized = true, usesRelics = true, weaponPreference = "shamanWeaponPreference", trainerData = "shamanTrainers", trainingStart = 24, trainingInterval = 2 },
-        MAGE = { name = "Mage", optimized = false },
+        MAGE = { name = "Mage", optimized = true, gearProfile = "mageGearProfile", talentData = "mageTalentBuilds", talentSetting = "mageTalentSpec", trainerData = "mageTrainers", trainingStart = 2, trainingInterval = 2 },
         WARLOCK = { name = "Warlock", optimized = false },
         DRUID = { name = "Druid", optimized = false },
     },
@@ -139,6 +139,84 @@ ForeverLevelingCoach_Data = {
             ["Two-Handed Maces"] = true,
         },
         label = "2H Axe / 2H Mace",
+    },
+
+    mageTalentBuilds = {
+        defaultSpec = "Frost",
+        Frost = {
+            name = "Frost",
+            purpose = "Safe solo leveling with strong kiting, control, and efficient AoE",
+            source = "Mobalytics WoW Forever Mage Leveling Guide, updated Sep 28 2026",
+            final30 = "0/0/21",
+            talentsByLevel = {
+                [10] = { talent = "Improved Frostbolt", rank = 1, maxRank = 5 },
+                [11] = { talent = "Improved Frostbolt", rank = 2, maxRank = 5 },
+                [12] = { talent = "Improved Frostbolt", rank = 3, maxRank = 5 },
+                [13] = { talent = "Improved Frostbolt", rank = 4, maxRank = 5 },
+                [14] = { talent = "Improved Frostbolt", rank = 5, maxRank = 5 },
+                [15] = { talent = "Frostbite", rank = 1, maxRank = 3 },
+                [16] = { talent = "Frostbite", rank = 2, maxRank = 3 },
+                [17] = { talent = "Ice Shards", rank = 1, maxRank = 5 },
+                [18] = { talent = "Ice Shards", rank = 2, maxRank = 5 },
+                [19] = { talent = "Ice Shards", rank = 3, maxRank = 5 },
+                [20] = { talent = "Piercing Ice", rank = 1, maxRank = 3 },
+                [21] = { talent = "Piercing Ice", rank = 2, maxRank = 3 },
+                [22] = { talent = "Piercing Ice", rank = 3, maxRank = 3 },
+                [23] = { talent = "Ice Lance", rank = 1, maxRank = 1 },
+                [24] = { talent = "Improved Blizzard", rank = 1, maxRank = 3 },
+                [25] = { talent = "Ice Shards", rank = 4, maxRank = 5 },
+                [26] = { talent = "Ice Shards", rank = 5, maxRank = 5 },
+                [27] = { talent = "Shatter", rank = 1, maxRank = 3 },
+                [28] = { talent = "Shatter", rank = 2, maxRank = 3 },
+                [29] = { talent = "Shatter", rank = 3, maxRank = 3 },
+                [30] = { talent = "Fingers of Frost", rank = 1, maxRank = 2 },
+            },
+        },
+    },
+
+    mageGearProfile = {
+        armorPreferred = "Cloth",
+        armorAllowed = {
+            ["Cloth"] = true,
+        },
+        meleeWeapons = {
+            ["Daggers"] = true,
+            ["One-Handed Swords"] = true,
+            ["Staves"] = true,
+        },
+        rangedWeapons = {
+            ["Wands"] = true,
+        },
+    },
+
+    mageTrainers = {
+        names = {
+            ["Deino"] = true,
+            ["Enyo"] = true,
+            ["Pephredo"] = true,
+            ["Uthel'nay"] = true,
+            ["Archmage Shymm"] = true,
+            ["Thurston Xane"] = true,
+            ["Ursyn Ghull"] = true,
+        },
+        orgrimmar = {
+            city = "Orgrimmar",
+            name = "Deino / Enyo / Pephredo / Uthel'nay",
+            zone = "Darkbriar Lodge, Valley of Spirits, Orgrimmar",
+            coords = "38.7, 85.9",
+            mapID = 1454,
+            x = 0.387,
+            y = 0.859,
+        },
+        thunderBluff = {
+            city = "Thunder Bluff",
+            name = "Archmage Shymm / Thurston Xane / Ursyn Ghull",
+            zone = "Pools of Vision, below Spirit Rise, Thunder Bluff",
+            coords = "24.5, 16.5",
+            mapID = 1456,
+            x = 0.245,
+            y = 0.165,
+        },
     },
 
     hunterTalentBuilds = {
