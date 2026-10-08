@@ -36,6 +36,7 @@ local defaults = {
     autoAccept = true,
     autoTurnIn = true,
     rogueTalentSpec = "Combat",
+    warriorTalentSpec = "Protection",
     lastClassTrainerLevel = 0,
     lastUIVersion = "0.16.1",
     lastCluster = nil,
@@ -83,7 +84,9 @@ local function flcTalentRecommendation()
 
     local pick = build.talentsByLevel and build.talentsByLevel[level]
     if pick then
-        return build.name, string.format("%s %d/%d", pick.talent, pick.rank or 1, pick.maxRank or 1)
+        local text = string.format("%s %d/%d", pick.talent, pick.rank or 1, pick.maxRank or 1)
+        if pick.note then text = tostring(pick.note) .. " — " .. text end
+        return build.name, text
     end
 
     if level >= 30 then
@@ -93,7 +96,9 @@ local function flcTalentRecommendation()
     for l = level, 10, -1 do
         pick = build.talentsByLevel and build.talentsByLevel[l]
         if pick then
-            return build.name, string.format("%s %d/%d", pick.talent, pick.rank or 1, pick.maxRank or 1)
+            local text = string.format("%s %d/%d", pick.talent, pick.rank or 1, pick.maxRank or 1)
+            if pick.note then text = tostring(pick.note) .. " — " .. text end
+            return build.name, text
         end
     end
 
@@ -4114,6 +4119,20 @@ local FLC_GEAR_WEIGHTS = {
         ITEM_MOD_SPELL_POWER_SHORT = 0.4,
         ITEM_MOD_DAMAGE_PER_SECOND_SHORT = 5.0,
     },
+    WARRIOR = {
+        ITEM_MOD_STRENGTH_SHORT = 2.0,
+        ITEM_MOD_AGILITY_SHORT = 0.7,
+        ITEM_MOD_STAMINA_SHORT = 0.9,
+        ITEM_MOD_INTELLECT_SHORT = 0,
+        ITEM_MOD_SPIRIT_SHORT = 0.1,
+        ITEM_MOD_ATTACK_POWER_SHORT = 0.5,
+        ITEM_MOD_CRIT_RATING_SHORT = 0.6,
+        ITEM_MOD_HIT_RATING_SHORT = 0.8,
+        ITEM_MOD_HASTE_RATING_SHORT = 0.4,
+        ITEM_MOD_ARMOR_PENETRATION_RATING_SHORT = 0.4,
+        ITEM_MOD_SPELL_POWER_SHORT = 0,
+        ITEM_MOD_DAMAGE_PER_SECOND_SHORT = 10.0,
+    },
     SHAMAN = {
         ITEM_MOD_STRENGTH_SHORT = 2.0,
         ITEM_MOD_AGILITY_SHORT = 1.4,
@@ -4591,6 +4610,7 @@ local function flcClassGearReason(itemType, itemSubType, equipLoc)
         if profile.armorAllowed and not profile.armorAllowed[itemSubType] then
             return "UNUSABLE", tostring(classProfile.className) .. " cannot use this armor type"
         end
+        if equipLoc == "INVTYPE_SHIELD" or itemSubType == "Shields" then return nil end
         if profile.armorPreferred and itemSubType ~= profile.armorPreferred then
             return "PREFERENCE", tostring(profile.armorPreferred) .. " is preferred for "
                 .. tostring(classProfile.className) .. " leveling"
