@@ -359,3 +359,11 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - v0.28.8: Added localAliases support for route clusters so the large current-area bonus can distinguish separate hubs inside the same parent zone.
 
 - Ashenvale Zoram Strand, Thistlefur, and Splintertree now score as distinct local areas instead of every Ashenvale quest receiving the full +170 local bonus.
+
+- v0.29.0: Added a verified Pickup Suggestions system. Unaccepted route quests with known quest-giver data can now be classified as PICK UP NOW, PICK UP IF NEARBY, or SKIP based on level, class/race, current hub, route cluster, and proximity.
+
+- Pickup suggestion cards now appear in the main guide without replacing the active STEP 1 objective; export includes a dedicated PickupSuggestions section for testing.
+
+- Added verified pickup data for key Ashenvale Horde quests including Naga at the Zoram Strand, Between a Rock and a Thistlefur, Troll Charm, The Lost Pages, Warsong Supplies, Ashenvale Outrunners, and Satyr Horns.
+
+- Promoted Stonetalon Standstill (25) and King of the Foulweald (6621) from unknown scanner entries into verified route data, including quest givers, objectives, turn-ins, and safe waypoints.
