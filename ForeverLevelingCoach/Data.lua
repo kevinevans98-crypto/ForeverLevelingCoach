@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.15.0",
+    version = "0.15.1",
     supported = {
         faction = "Horde",
         classes = {
@@ -11,6 +11,7 @@ ForeverLevelingCoach_Data = {
     },
 
     knownQuestIDs = {
+        [364] = true, -- The Mindless Ones (Undead starter, live-verified on Ms)
         [1527] = true,  -- Call of Fire: Horde Shaman Fire Totem / Totem of Charged Flames
         [2986] = true,
         [1534] = true,
@@ -118,6 +119,11 @@ ForeverLevelingCoach_Data = {
     -- Quest clusters let the router keep you in one area and stack nearby
     -- objectives instead of bouncing between zones after every quest.
     clusters = {
+        TIRISFAL_DEATHKNELL = {
+            name = "Tirisfal / Deathknell",
+            zoneAliases = { "Tirisfal Glades", "Deathknell", "Shadow Grave" },
+            note = "Undead starter cluster. Keep early Deathknell quests stacked together.",
+        },
         ASHENVALE_ZORAM = {
             name = "Ashenvale / Zoram Strand",
             zoneAliases = { "Ashenvale", "Zoram'gar Outpost", "Zoram Strand" },
@@ -179,6 +185,80 @@ ForeverLevelingCoach_Data = {
     -- Optional waypoint format for VERIFIED coordinates only:
     -- waypoint = { mapID = 123, x = 0.50, y = 0.50, label = "NPC / objective" }
     route = {
+        {
+            questID = 364,
+            class = "ROGUE",
+            cluster = "TIRISFAL_DEATHKNELL",
+            clusterPriority = 1,
+            title = "The Mindless Ones",
+            tag = "DO",
+            minLevel = 1,
+            maxLevel = 4,
+            note = "Fast Undead starter kill quest. Finish it before leaving Deathknell.",
+            personTarget = {
+                role = "Quest turn-in",
+                name = "Shadow Priest Sarvis",
+                zone = "Deathknell, Tirisfal Glades",
+                coords = "30.8, 66.2",
+                locationType = "QUEST GIVER / TURN-IN",
+                locationNote = "Sarvis gives and receives The Mindless Ones.",
+                approach = "Return to Shadow Priest Sarvis in Deathknell after killing the zombies.",
+                useArrow = true,
+                waypoint = { mapID = 1420, x = 0.308, y = 0.662, label = "Shadow Priest Sarvis" },
+            },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Shadow Priest Sarvis",
+                zone = "Deathknell, Tirisfal Glades",
+                coords = "30.8, 66.2",
+                locationType = "QUEST TURN-IN",
+                locationNote = "Return to Sarvis when both zombie objectives are complete.",
+                approach = "Go back to Shadow Priest Sarvis in Deathknell.",
+                instruction = "Return to Shadow Priest Sarvis at 30.8, 66.2.",
+                action = "TURN IN THE MINDLESS ONES",
+                useArrow = true,
+                waypoint = { mapID = 1420, x = 0.308, y = 0.662, label = "Shadow Priest Sarvis" },
+            },
+            objectiveTargets = {
+                {
+                    objectiveContains = "Mindless Zombie",
+                    role = "Kill",
+                    name = "Mindless / Wretched Zombies",
+                    zone = "Deathknell, Tirisfal Glades",
+                    coords = "around 33, 63",
+                    locationType = "MOBS — outside Deathknell",
+                    locationNote = "Both zombie types are clustered just outside the starter village.",
+                    approach = "Move out of Deathknell toward the nearby zombie field.",
+                    instruction = "Kill Mindless and Wretched Zombies around 33, 63.",
+                    action = "KILL 8 MINDLESS + 8 WRETCHED ZOMBIES",
+                    useArrow = true,
+                    waypoint = { mapID = 1420, x = 0.33, y = 0.63, label = "Mindless Ones" },
+                },
+                {
+                    objectiveContains = "Wretched Zombie",
+                    role = "Kill",
+                    name = "Mindless / Wretched Zombies",
+                    zone = "Deathknell, Tirisfal Glades",
+                    coords = "around 33, 63",
+                    locationType = "MOBS — outside Deathknell",
+                    locationNote = "Both zombie types are clustered just outside the starter village.",
+                    approach = "Move out of Deathknell toward the nearby zombie field.",
+                    instruction = "Kill Mindless and Wretched Zombies around 33, 63.",
+                    action = "KILL 8 MINDLESS + 8 WRETCHED ZOMBIES",
+                    useArrow = true,
+                    waypoint = { mapID = 1420, x = 0.33, y = 0.63, label = "Mindless Ones" },
+                },
+            },
+            nextPickup = {
+                title = "Rattling the Rattlecages",
+                npc = "Shadow Priest Sarvis",
+                role = "Quest giver",
+                zone = "Deathknell, Tirisfal Glades",
+                coords = "30.8, 66.2",
+                showWhileActive = false,
+                waypoint = { mapID = 1420, x = 0.308, y = 0.662, label = "Shadow Priest Sarvis" },
+            },
+        },
         -- Verified Horde Shaman Call of Water anchor IDs.
         -- These entries intentionally avoid invented coordinates.
         {
