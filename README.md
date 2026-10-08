@@ -213,3 +213,11 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Thistlefur routing now finishes incomplete real local objectives before sending the player away for completed quest turn-ins.
 
 - Queue ordering is now: STEP 1 primary navigation, STEP 2 while-questing background objective, remaining primary objectives, then deferred completed turn-ins.
+
+- v0.22.0: Added GPS-style dynamic local quest ordering.
+
+- Route proximity scoring now uses the closest verified unfinished objective waypoint, not only a quest's top-level waypoint.
+
+- Remaining primary quests in the Lazy Mode queue are sorted by live score, so movement and objective progress can reorder the route.
+
+- Added a small route-switch margin to prevent the recommended quest from flickering between near-equal candidates.
