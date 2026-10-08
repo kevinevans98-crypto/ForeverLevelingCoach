@@ -227,6 +227,8 @@ local currentNextQuestPickup = nil
 local currentPickupSuggestions = {}
 local currentQuickPickupSuggestion = nil
 local currentArrivalState = nil
+local currentTurnInDecision = nil
+local currentTurnInDecisionReason = nil
 local currentPersonTarget = nil
 local currentObjectiveTarget = nil
 local currentTravelTarget = nil
@@ -739,6 +741,76 @@ local function hasIncompletePrimaryInCluster(step)
     return false
 end
 
+local function getNearestUnfinishedClusterObjective(step)
+    if not step or not step.cluster or not currentByID then return nil, nil end
+
+    local level = UnitLevel("player") or 1
+    local _, playerClass = UnitClass("player")
+    local bestStep, bestDistance = nil, nil
+
+    for _, otherStep in ipairs(Data.route or {}) do
+        if otherStep.questID ~= step.questID
+            and otherStep.cluster == step.cluster
+            and not otherStep.backgroundQuest
+            and routeStepEligible(otherStep, level, playerClass)
+            and not isQuestCompleted(otherStep.questID) then
+
+            local otherActive = currentByID[otherStep.questID]
+            if otherActive and not otherActive.isComplete then
+                local target = getBestObjectiveTarget and getBestObjectiveTarget(otherStep, otherActive) or nil
+                local waypoint = target and target.waypoint or otherStep.waypoint
+                local distance = waypoint and waypointDistanceNormalized(waypoint) or nil
+                if distance and (not bestDistance or distance < bestDistance) then
+                    bestStep, bestDistance = otherStep, distance
+                end
+            end
+        end
+    end
+
+    return bestStep, bestDistance
+end
+
+local function getCompletedTurnInDecision(step, active, quickPickup)
+    if not step or not active or not active.isComplete then return nil, nil end
+
+    if quickPickup
+        and quickPickup.classification == "PICK UP NOW"
+        and quickPickup.distance
+        and quickPickup.distance <= 0.05 then
+        return "QUICK PICKUP FIRST", "verified worthwhile pickup is right beside you"
+    end
+
+    if step.deferTurnInForQuestIDs then
+        for _, deferQuestID in ipairs(step.deferTurnInForQuestIDs) do
+            local deferActive = currentByID and currentByID[deferQuestID]
+            if deferActive and not deferActive.isComplete and not isQuestCompleted(deferQuestID) then
+                return "DEFER TURN-IN", "finish specified nearby route objective first"
+            end
+        end
+    end
+
+    local cluster = step.cluster and Data.clusters and Data.clusters[step.cluster] or nil
+    if cluster and cluster.finishBeforeTurnIn and hasIncompletePrimaryInCluster(step) then
+        return "DEFER TURN-IN", "finish this local quest cluster before leaving"
+    end
+
+    local turnDistance = step.turnInTarget
+        and step.turnInTarget.waypoint
+        and waypointDistanceNormalized(step.turnInTarget.waypoint)
+        or nil
+    local nearbyStep, nearbyDistance = getNearestUnfinishedClusterObjective(step)
+
+    local weights = Data.scoring or {}
+    local nearbyLimit = tonumber(weights.turnInDeferNearbyDistance) or 0.08
+    local detourMargin = tonumber(weights.turnInDeferMargin) or 0.03
+    if nearbyStep and nearbyDistance and nearbyDistance <= nearbyLimit
+        and turnDistance and (nearbyDistance + detourMargin) < turnDistance then
+        return "DEFER TURN-IN", "nearby " .. tostring(nearbyStep.title or "route objective") .. " is better before backtracking"
+    end
+
+    return "TURN IN NOW", "turn-in is the best immediate completed-quest action"
+end
+
 local function getEventUrgencyBonus(step, active)
     if not step or not active or active.isComplete or not step.eventUrgency then
         return 0, nil
@@ -786,21 +858,11 @@ local function scoreRouteStep(step, active, clusterCounts)
         score = score + bonus
         reasons[#reasons + 1] = string.format("ready to turn in (+%d)", bonus)
 
-        if step.deferTurnInForQuestIDs then
-            for _, deferQuestID in ipairs(step.deferTurnInForQuestIDs) do
-                local deferActive = currentByID and currentByID[deferQuestID]
-                if deferActive and not deferActive.isComplete and not isQuestCompleted(deferQuestID) then
-                    score = score - 400
-                    reasons[#reasons + 1] = "finish nearby objective before leaving (-400)"
-                    break
-                end
-            end
-        end
-
-        if hasIncompletePrimaryInCluster(step) then
-            local penalty = weights.finishClusterBeforeTurnInPenalty or 400
+        local decision, decisionReason = getCompletedTurnInDecision(step, active, nil)
+        if decision == "DEFER TURN-IN" then
+            local penalty = weights.smartTurnInDeferPenalty or weights.finishClusterBeforeTurnInPenalty or 400
             score = score - penalty
-            reasons[#reasons + 1] = string.format("finish local cluster before turn-in (-%d)", penalty)
+            reasons[#reasons + 1] = string.format("defer turn-in: %s (-%d)", tostring(decisionReason or "finish nearby work first"), penalty)
         end
     else
         local progress = getObjectiveProgress(active)
@@ -2332,6 +2394,13 @@ local function render()
             break
         end
     end
+    currentTurnInDecision = nil
+    currentTurnInDecisionReason = nil
+    if active and active.isComplete then
+        currentTurnInDecision, currentTurnInDecisionReason =
+            getCompletedTurnInDecision(step, active, currentQuickPickupSuggestion)
+    end
+
     local routeFlightTarget = step and step.flightTarget or nil
     if active and active.isComplete and step and step.turnInFlightTarget then
         routeFlightTarget = step.turnInFlightTarget
@@ -2490,6 +2559,8 @@ local function render()
     -- Location is communicated by the safe same-zone arrow/local travel handoff.
     if currentQuickPickupSuggestion then
         routeText:SetText("Quick pickup")
+    elseif currentTurnInDecision == "DEFER TURN-IN" then
+        routeText:SetText("Finish nearby first")
     elseif currentTravelTarget and DB and DB.lazyMode ~= false then
         routeText:SetText("Travel")
     elseif active and active.isComplete then
@@ -2524,7 +2595,12 @@ local function render()
         action = "FOLLOW THE ARROW"
     end
 
-    local primaryState = active and active.isComplete and "TURN IN" or "DO NOW"
+    local primaryState
+    if active and active.isComplete then
+        primaryState = currentTurnInDecision or "TURN IN NOW"
+    else
+        primaryState = "DO NOW"
+    end
     local cardData = {}
     local stepNumber = 1
 
@@ -2949,6 +3025,8 @@ exportSnapshot = function()
         "QuickPickup=" .. tostring(currentQuickPickupSuggestion and currentQuickPickupSuggestion.title or "none"),
         "QuickPickupQuestID=" .. tostring(currentQuickPickupSuggestion and currentQuickPickupSuggestion.questID or "none"),
         "ArrivalState=" .. tostring(currentArrivalState or "none"),
+        "TurnInDecision=" .. tostring(currentTurnInDecision or "none"),
+        "TurnInDecisionReason=" .. tostring(currentTurnInDecisionReason or "none"),
         "MarkedPersonRole=" .. tostring(currentPersonTarget and currentPersonTarget.role or "none"),
         "MarkedPersonName=" .. tostring(currentPersonTarget and currentPersonTarget.name or "none"),
         "MarkedPersonZone=" .. tostring(currentPersonTarget and currentPersonTarget.zone or "none"),
