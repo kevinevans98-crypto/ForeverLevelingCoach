@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.16.2
+Forever Leveling Coach v0.16.3
 
 Current scope
 -------------
@@ -334,3 +334,8 @@ Roadmap
 - Added Marla's Last Wish [6395] with item-aware two-stage routing: kill Samuel first, then automatically switch the arrow to Marla's Grave after Samuel's Remains are in the bags
 - Added Night Web's Hollow [380] proactively because it stacks with A Light in the Darkness in the same spider cave
 - Generic objective item gates added so future quest steps can change automatically based on quest items in the player's bags
+
+- Cluster quests now render as normal quest blocks in the scrollable main window
+- Removed the NEARBY label and the 3-quest cap
+- Every active quest in the selected local cluster can appear below the current quest with its own DO/objective line
+- The existing scroll area handles long quest clusters instead of compressing them
