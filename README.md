@@ -377,3 +377,7 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - v0.29.3: Added situational escort/event urgency scoring for verified active quests. The bonus only applies while the event start/objective is genuinely nearby and fades to zero outside the configured radius.
 
 - Torek's Assault now uses the event-urgency rule after pickup, helping FLC recommend doing the nearby assault before leaving the area without globally overvaluing escort quests.
+
+- v0.29.4: Compact HUD pass. Reduced default main-window height from 190 to 170, tightened the header/objective strip, shrank top controls, and reduced card height/padding.
+
+- Existing default-sized windows migrate to the new compact height while intentionally taller resized windows are preserved.
