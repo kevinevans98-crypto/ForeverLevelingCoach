@@ -1065,6 +1065,7 @@ routeText:SetPoint("TOPLEFT", 16, -64)
 routeText:SetPoint("TOPRIGHT", -16, -64)
 routeText:SetJustifyH("LEFT")
 routeText:SetText("Loading route...")
+routeText:SetTextColor(0.38, 0.82, 0.76)
 
 local routeClickButton = CreateFrame("Button", nil, frame)
 routeClickButton:SetPoint("TOPLEFT", routeText, "TOPLEFT", -2, 4)
@@ -1111,7 +1112,7 @@ local function createQuestCard(index)
         insets = { left = 1, right = 1, top = 1, bottom = 1 },
     })
     card:SetBackdropColor(index == 1 and 0.050 or 0.043, index == 1 and 0.070 or 0.055, index == 1 and 0.080 or 0.064, 0.98)
-    card:SetBackdropBorderColor(0.12, 0.16, 0.18, 1.0)
+    card:SetBackdropBorderColor(0.10, 0.13, 0.15, 0.92)
 
     card.accent = card:CreateTexture(nil, "ARTWORK")
     card.accent:SetPoint("TOPLEFT", 0, 0)
@@ -1258,31 +1259,39 @@ resizeGrip:SetHighlightTexture("Interface/ChatFrame/UI-ChatIM-SizeGrabber-Highli
 resizeGrip:SetPushedTexture("Interface/ChatFrame/UI-ChatIM-SizeGrabber-Down")
 
 local arrowFrame = CreateFrame("Frame", "ForeverLevelingCoachArrowFrame", UIParent)
-arrowFrame:SetSize(180, 88)
+arrowFrame:SetSize(180, 82)
 arrowFrame:SetMovable(true)
 arrowFrame:EnableMouse(true)
 arrowFrame:SetClampedToScreen(true)
 arrowFrame:SetFrameStrata("HIGH")
 
--- Minimal FLC navigation marker: clean pointer, no backing plate.
-local arrowShadow = arrowFrame:CreateTexture(nil, "BACKGROUND")
-arrowShadow:SetSize(54, 54)
-arrowShadow:SetPoint("TOP", 1, -1)
-arrowShadow:SetTexture("Interface\\WorldMap\\WorldMapArrow")
-arrowShadow:SetVertexColor(0, 0, 0, 0.70)
+-- FLC custom chevron: built from flat textures so it does not depend on WoW arrow art.
+local arrowShadowLeft = arrowFrame:CreateTexture(nil, "BACKGROUND")
+arrowShadowLeft:SetSize(28, 6)
+arrowShadowLeft:SetPoint("CENTER", arrowFrame, "TOP", -7, -19)
+arrowShadowLeft:SetTexture("Interface/Buttons/WHITE8x8")
+arrowShadowLeft:SetVertexColor(0, 0, 0, 0.75)
 
-local arrowTexture = arrowFrame:CreateTexture(nil, "ARTWORK")
-arrowTexture:SetSize(48, 48)
-arrowTexture:SetPoint("TOP", 0, 0)
-local arrowTextureOK = arrowTexture:SetTexture("Interface\\WorldMap\\WorldMapArrow")
-if arrowTextureOK == false then
-    arrowTexture:SetTexture("Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Up")
-    arrowShadow:SetTexture("Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Up")
-end
-arrowTexture:SetVertexColor(0.25, 1.0, 0.88, 1.0)
+local arrowShadowRight = arrowFrame:CreateTexture(nil, "BACKGROUND")
+arrowShadowRight:SetSize(28, 6)
+arrowShadowRight:SetPoint("CENTER", arrowFrame, "TOP", 7, -19)
+arrowShadowRight:SetTexture("Interface/Buttons/WHITE8x8")
+arrowShadowRight:SetVertexColor(0, 0, 0, 0.75)
+
+local arrowLeft = arrowFrame:CreateTexture(nil, "ARTWORK")
+arrowLeft:SetSize(26, 4)
+arrowLeft:SetPoint("CENTER", arrowFrame, "TOP", -7, -18)
+arrowLeft:SetTexture("Interface/Buttons/WHITE8x8")
+arrowLeft:SetVertexColor(0.25, 1.0, 0.88, 1.0)
+
+local arrowRight = arrowFrame:CreateTexture(nil, "ARTWORK")
+arrowRight:SetSize(26, 4)
+arrowRight:SetPoint("CENTER", arrowFrame, "TOP", 7, -18)
+arrowRight:SetTexture("Interface/Buttons/WHITE8x8")
+arrowRight:SetVertexColor(0.25, 1.0, 0.88, 1.0)
 
 local arrowLabel = arrowFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-arrowLabel:SetPoint("TOP", arrowTexture, "BOTTOM", 0, -2)
+arrowLabel:SetPoint("TOP", arrowFrame, "TOP", 0, -38)
 arrowLabel:SetWidth(178)
 arrowLabel:SetJustifyH("CENTER")
 arrowLabel:SetTextColor(0.88, 0.94, 0.95)
@@ -1756,8 +1765,11 @@ local function updateArrow()
     arrowFrame:Show()
     currentArrowState = "active-same-map"
     updateTravelHint(nil, currentArrowState)
-    arrowTexture:SetRotation(relativeAngle)
-    arrowShadow:SetRotation(relativeAngle)
+    local wing = 0.55
+    arrowLeft:SetRotation(relativeAngle - wing)
+    arrowRight:SetRotation(relativeAngle + wing)
+    arrowShadowLeft:SetRotation(relativeAngle - wing)
+    arrowShadowRight:SetRotation(relativeAngle + wing)
 
     currentArrowDebug = {
         playerMapID = playerMapID,
