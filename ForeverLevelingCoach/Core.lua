@@ -234,6 +234,7 @@ local currentTurnInBatch = nil
 local currentBatchTurnInTarget = nil
 local currentHubChainPickup = nil
 local currentRouteDataGaps = {}
+local currentRouteReadiness = {}
 local currentQuestCleanup = {}
 local currentPersonTarget = nil
 local currentObjectiveTarget = nil
@@ -343,6 +344,123 @@ local function scanCompletedRouteDataGaps()
 
     currentRouteDataGaps = gaps
     return gaps
+end
+
+local function hasVerifiedWaypoint(target)
+    return target and target.waypoint
+        and target.waypoint.mapID
+        and target.waypoint.x
+        and target.waypoint.y
+        and true or false
+end
+
+local function addRouteReadinessIssue(list, q, step, severity, code, detail)
+    list[#list + 1] = {
+        questID = q and q.questID or (step and step.questID),
+        title = (q and q.title) or (step and step.title) or "Unknown Quest",
+        severity = severity or "INFO",
+        code = code or "UNKNOWN",
+        detail = detail or "Route data needs review",
+    }
+end
+
+local function scanRouteReadiness()
+    local issues = {}
+    local playerMapID = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player") or nil
+
+    for _, q in ipairs(currentQuests or {}) do
+        if isKnownQuest(q.questID) and not isQuestCompleted(q.questID) then
+            local step = getStepByQuestID(q.questID)
+
+            if not step then
+                addRouteReadinessIssue(issues, q, nil, "BLOCKER", "NO_ROUTE_ENTRY",
+                    "Known active quest has no route entry")
+            else
+                -- Pickup metadata is useful for future route reconstruction and
+                -- hub chaining, but it is non-blocking after the quest is active.
+                if not step.pickupTarget then
+                    addRouteReadinessIssue(issues, q, step, "INFO", "PICKUP_DATA_MISSING",
+                        "Active quest has no pickupTarget metadata")
+                end
+
+                -- Every routed quest should know how to finish cleanly. A text-only
+                -- turn-in is better than nothing, but a verified waypoint is preferred.
+                if not step.turnInTarget then
+                    addRouteReadinessIssue(issues, q, step, "WARN", "TURNIN_TARGET_MISSING",
+                        "Route entry has no turn-in target")
+                elseif not hasVerifiedWaypoint(step.turnInTarget) then
+                    addRouteReadinessIssue(issues, q, step, "WARN", "TURNIN_WAYPOINT_MISSING",
+                        "Turn-in target has no verified waypoint")
+                end
+
+                if not q.isComplete then
+                    local unfinishedCount = 0
+                    for _, obj in ipairs(q.objectives or {}) do
+                        if not obj.finished then unfinishedCount = unfinishedCount + 1 end
+                    end
+
+                    if unfinishedCount > 0 then
+                        local hasObjectiveGuidance =
+                            (step.objectiveTargets and #step.objectiveTargets > 0)
+                            or hasVerifiedWaypoint(step)
+                            or step.personTarget
+                            or step.travelGuide
+
+                        if not hasObjectiveGuidance then
+                            addRouteReadinessIssue(issues, q, step, "BLOCKER", "OBJECTIVE_GUIDANCE_MISSING",
+                                "Unfinished quest has no objective target, waypoint, person target, or travel guide")
+                        end
+                    end
+
+                    if step.dungeon then
+                        local hasDungeonGuidance =
+                            (step.objectiveTargets and #step.objectiveTargets > 0)
+                            or step.personTarget
+                            or step.travelGuide
+                        if not hasDungeonGuidance then
+                            addRouteReadinessIssue(issues, q, step, "WARN", "DUNGEON_GUIDANCE_MISSING",
+                                "Dungeon quest has no entrance/objective instructions")
+                        end
+                    end
+
+                    -- Detect known cross-map objectives that lack a route bridge.
+                    -- A flight target, travel guide, or explicit person/entrance
+                    -- target counts as cross-zone support.
+                    if playerMapID and step.objectiveTargets then
+                        local foundRemote = false
+                        for _, target in ipairs(step.objectiveTargets) do
+                            if hasVerifiedWaypoint(target)
+                                and target.waypoint.mapID ~= playerMapID then
+                                foundRemote = true
+                                break
+                            end
+                        end
+                        if foundRemote
+                            and not step.travelGuide
+                            and not step.flightTarget
+                            and not step.personTarget then
+                            addRouteReadinessIssue(issues, q, step, "WARN", "CROSS_ZONE_TRAVEL_MISSING",
+                                "Remote objective has no travelGuide, flightTarget, or entrance/person target")
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    local severityRank = { BLOCKER = 1, WARN = 2, INFO = 3 }
+    table.sort(issues, function(a, b)
+        local ar = severityRank[a.severity] or 9
+        local br = severityRank[b.severity] or 9
+        if ar ~= br then return ar < br end
+        if (a.questID or 0) ~= (b.questID or 0) then
+            return (a.questID or 0) < (b.questID or 0)
+        end
+        return tostring(a.code or "") < tostring(b.code or "")
+    end)
+
+    currentRouteReadiness = issues
+    return issues
 end
 
 local function getPlayerRaceKeys()
@@ -3238,6 +3356,26 @@ local function render()
         end
     end
 
+    if currentRouteReadiness and #currentRouteReadiness > 0 then
+        local readinessShown = 0
+        for _, issue in ipairs(currentRouteReadiness) do
+            if #cardData >= #questCards or readinessShown >= 2 then break end
+            if issue.severity == "BLOCKER" or issue.severity == "WARN" then
+                cardData[#cardData + 1] = {
+                    label = "READY",
+                    step = stepNumber,
+                    status = issue.severity == "BLOCKER" and "ROUTE BLOCKER" or "ROUTE WARNING",
+                    title = tostring(issue.title or ("Quest " .. tostring(issue.questID or "?"))),
+                    action = tostring(issue.code or "ROUTE DATA NEEDS REVIEW"),
+                    dataGap = true,
+                    background = false,
+                }
+                stepNumber = stepNumber + 1
+                readinessShown = readinessShown + 1
+            end
+        end
+    end
+
     if currentQuestCleanup and #currentQuestCleanup > 0 then
         for _, item in ipairs(currentQuestCleanup) do
             if #cardData >= #questCards then break end
@@ -3318,6 +3456,7 @@ syncQuests = function()
     currentQuests, currentByID = getQuestLogSnapshot()
     scanUnknownQuests()
     scanCompletedRouteDataGaps()
+    scanRouteReadiness()
     scanQuestCleanup()
     render()
 end
@@ -3594,6 +3733,22 @@ exportSnapshot = function()
         "HubChainSourceQuestID=" .. tostring(DB and DB.pendingHubChain and DB.pendingHubChain.sourceQuestID or "none"),
         "RouteDataGapCount=" .. tostring(#(currentRouteDataGaps or {})),
         "RouteDataGapTop=" .. tostring(currentRouteDataGaps and currentRouteDataGaps[1] and currentRouteDataGaps[1].title or "none"),
+        "RouteReadinessIssueCount=" .. tostring(#(currentRouteReadiness or {})),
+        "RouteReadinessBlockerCount=" .. tostring((function()
+            local count = 0
+            for _, issue in ipairs(currentRouteReadiness or {}) do
+                if issue.severity == "BLOCKER" then count = count + 1 end
+            end
+            return count
+        end)()),
+        "RouteReadinessWarningCount=" .. tostring((function()
+            local count = 0
+            for _, issue in ipairs(currentRouteReadiness or {}) do
+                if issue.severity == "WARN" then count = count + 1 end
+            end
+            return count
+        end)()),
+        "RouteReadinessTop=" .. tostring(currentRouteReadiness and currentRouteReadiness[1] and currentRouteReadiness[1].title or "none"),
         "QuestCleanupCount=" .. tostring(#(currentQuestCleanup or {})),
         "QuestCleanupTop=" .. tostring(currentQuestCleanup and currentQuestCleanup[1] and currentQuestCleanup[1].title or "none"),
         "MarkedPersonRole=" .. tostring(currentPersonTarget and currentPersonTarget.role or "none"),
@@ -3773,6 +3928,20 @@ exportSnapshot = function()
                 tostring(item.title or "?"),
                 tostring(item.recommendation or "IGNORE"),
                 tostring(item.reason or "low route value"))
+        end
+    end
+
+    lines[#lines + 1] = "RouteReadiness:"
+    if not currentRouteReadiness or #currentRouteReadiness == 0 then
+        lines[#lines + 1] = "- READY | all active known quests passed readiness checks"
+    else
+        for _, issue in ipairs(currentRouteReadiness) do
+            lines[#lines + 1] = string.format("- %s | %d | %s | %s | %s",
+                tostring(issue.severity or "INFO"),
+                tonumber(issue.questID) or 0,
+                tostring(issue.title or "?"),
+                tostring(issue.code or "UNKNOWN"),
+                tostring(issue.detail or ""))
         end
     end
 
