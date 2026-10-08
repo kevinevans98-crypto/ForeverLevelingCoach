@@ -243,3 +243,9 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Gear view shows the top five upgrade priorities followed by the full equipped-slot scan, while route/arrow state continues updating underneath.
 
 - `/flc gearscan` now opens the Gear Scanner directly in the main window.
+
+- v0.23.2: Rebalanced gear-scan slot expectations so real weak equipped gear outranks optional empty accessories.
+
+- Head, neck, and low-level trinket empties are now OPTIONAL EMPTY instead of top-priority failures before their expected levels.
+
+- Weak wrist/hands/weapon pieces now rank ahead of opportunistic accessory slots, producing more practical leveling upgrade priorities.
