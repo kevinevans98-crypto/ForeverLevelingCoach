@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.37.0",
+    version = "0.38.0",
     supported = {
         faction = "Horde",
         classes = {
@@ -2862,7 +2862,6 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 6441,
-            flightTarget = "Splintertree Post",
             cluster = "ASHENVALE_SPLINTERTREE",
             questLevel = 26,
             speedXP = 35,
@@ -2871,12 +2870,38 @@ ForeverLevelingCoach_Data = {
             tag = "DO",
             minLevel = 21,
             maxLevel = 29,
-            note = "Worth doing while questing around Splintertree and the nearby satyr camps. Avoid a long standalone detour just for this quest.",
+            note = "Verified Forever quest. Collect 16 Satyr Horns from the nearby Ashenvale satyr camps, then return to Pixel at Splintertree Post.",
             pickupTarget = {
                 npc = "Pixel",
                 role = "Quest giver",
                 zone = "Splintertree Post, Ashenvale",
                 coords = "73.1, 61.5",
+                waypoint = { mapID = 1440, x = 0.731, y = 0.615, label = "Pixel" },
+            },
+            objectiveTargets = {
+                {
+                    objectiveContains = "Satyr Horn",
+                    role = "Kill / loot",
+                    name = "Ashenvale Satyrs",
+                    zone = "Ashenvale",
+                    coords = "around 75, 50",
+                    locationType = "SATYR CAMPS",
+                    locationNote = "Night Run, Satyrnaar, and Xavian satyrs can drop the horns.",
+                    instruction = "Kill Ashenvale satyrs around 75, 50 and collect 16 Satyr Horns.",
+                    action = "COLLECT 16 SATYR HORNS",
+                    useArrow = true,
+                    waypoint = { mapID = 1440, x = 0.750, y = 0.500, label = "Ashenvale Satyrs" },
+                },
+            },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Pixel",
+                zone = "Splintertree Post, Ashenvale",
+                coords = "73.1, 61.5",
+                locationType = "QUEST TURN-IN",
+                instruction = "Return the 16 Satyr Horns to Pixel at Splintertree Post around 73.1, 61.5.",
+                action = "TURN IN SATYR HORNS",
+                useArrow = true,
                 waypoint = { mapID = 1440, x = 0.731, y = 0.615, label = "Pixel" },
             },
         },
