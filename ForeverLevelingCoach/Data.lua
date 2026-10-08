@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.36.0",
+    version = "0.37.0",
     supported = {
         faction = "Horde",
         classes = {
@@ -307,6 +307,7 @@ ForeverLevelingCoach_Data = {
         eventUrgencyMax = 85,
         eventUrgencyDistance = 0.08,
         smartTurnInDeferPenalty = 400,
+        crossZoneTurnInDeferPenalty = 400,
         turnInDeferNearbyDistance = 0.08,
         turnInDeferMargin = 0.03,
     },
