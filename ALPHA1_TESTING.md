@@ -1,10 +1,10 @@
 # Forever Leveling Coach — Alpha 1 Testing Guide
 
-**Build:** v0.44.0  
+**Build:** v0.45.0  
 **Status:** Early Alpha  
-**Primary supported test profile:** Horde Shaman, levels 1–30  
-**Experimental support:** Horde Rogue  
-**Other classes:** The addon may load, but they are not part of Alpha 1 validation yet.
+**Core support:** All standard Horde classes, levels 1–30  
+**Class-optimized support:** Shaman and Rogue  
+**Other Horde classes:** Core routing/navigation is enabled, while class-specific talents, trainers, and gear rules are still being expanded.
 
 ## What Alpha 1 is testing
 
@@ -126,9 +126,13 @@ Optional screenshot/error:
 - Dungeon repeat-XP efficiency and broader class routing are still being refined.
 - Gear recommendations are leveling guidance, not an endgame simulator.
 
-## v0.44.0 focus
+## v0.45.0 focus
 
-Alpha 1 includes chain-aware completed-quest scoring.
+Alpha 1 now includes a universal Horde class foundation.
+
+Every standard Horde class can pass the support gate and use the shared routing, navigation, travel, quest-chain, auto quest, export, and generic gear systems. Shaman and Rogue keep their additional optimized class-specific logic.
+
+The build also retains chain-aware completed-quest scoring.
 
 When a completed quest immediately unlocks a useful follow-up, FLC can give that turn-in additional value. A same-NPC follow-up can receive up to **+80 chain value**.
 
