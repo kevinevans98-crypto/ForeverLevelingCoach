@@ -387,3 +387,7 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Quick pickup suggestions now render directly under STEP 1 and disappear automatically once accepted; ordinary queued quests remain below them.
 
 - Added the verified Ashenvale Outrunners turn-in target: Kuray'bin at 71.1, 68.1.
+
+- v0.29.6: Fixed Quick Pickup visual ownership so the top card now always matches the arrow/navigation target.
+
+- While Quick Pickup is active, the pickup becomes the emphasized first card and the saved route moves directly underneath as ROUTE. Once the quest is accepted, normal STEP 1 presentation returns automatically.
