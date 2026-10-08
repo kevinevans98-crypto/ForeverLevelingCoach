@@ -1259,7 +1259,7 @@ resizeGrip:SetHighlightTexture("Interface/ChatFrame/UI-ChatIM-SizeGrabber-Highli
 resizeGrip:SetPushedTexture("Interface/ChatFrame/UI-ChatIM-SizeGrabber-Down")
 
 local arrowFrame = CreateFrame("Frame", "ForeverLevelingCoachArrowFrame", UIParent)
-arrowFrame:SetSize(180, 82)
+arrowFrame:SetSize(180, 96)
 arrowFrame:SetMovable(true)
 arrowFrame:EnableMouse(true)
 arrowFrame:SetClampedToScreen(true)
@@ -1290,8 +1290,20 @@ arrowRight:SetPoint("CENTER", arrowFrame, "TOP", 7, -18)
 arrowRight:SetTexture("Interface/Buttons/WHITE8x8")
 arrowRight:SetVertexColor(0.25, 1.0, 0.88, 1.0)
 
+local arrowShaftShadow = arrowFrame:CreateTexture(nil, "BACKGROUND")
+arrowShaftShadow:SetSize(32, 7)
+arrowShaftShadow:SetPoint("CENTER", arrowFrame, "TOP", 1, -31)
+arrowShaftShadow:SetTexture("Interface/Buttons/WHITE8x8")
+arrowShaftShadow:SetVertexColor(0, 0, 0, 0.75)
+
+local arrowShaft = arrowFrame:CreateTexture(nil, "ARTWORK")
+arrowShaft:SetSize(30, 4)
+arrowShaft:SetPoint("CENTER", arrowFrame, "TOP", 0, -30)
+arrowShaft:SetTexture("Interface/Buttons/WHITE8x8")
+arrowShaft:SetVertexColor(0.25, 1.0, 0.88, 1.0)
+
 local arrowLabel = arrowFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-arrowLabel:SetPoint("TOP", arrowFrame, "TOP", 0, -38)
+arrowLabel:SetPoint("TOP", arrowFrame, "TOP", 0, -50)
 arrowLabel:SetWidth(178)
 arrowLabel:SetJustifyH("CENTER")
 arrowLabel:SetTextColor(0.88, 0.94, 0.95)
@@ -1778,21 +1790,28 @@ local function updateArrow()
 
     local leftX, leftY = rotateChevronPoint(-7, -18)
     local rightX, rightY = rotateChevronPoint(7, -18)
+    local shaftX, shaftY = rotateChevronPoint(0, -31)
 
     arrowLeft:ClearAllPoints()
     arrowRight:ClearAllPoints()
     arrowShadowLeft:ClearAllPoints()
     arrowShadowRight:ClearAllPoints()
+    arrowShaft:ClearAllPoints()
+    arrowShaftShadow:ClearAllPoints()
 
     arrowLeft:SetPoint("CENTER", arrowFrame, "TOP", leftX, leftY)
     arrowRight:SetPoint("CENTER", arrowFrame, "TOP", rightX, rightY)
     arrowShadowLeft:SetPoint("CENTER", arrowFrame, "TOP", leftX + 1, leftY - 1)
     arrowShadowRight:SetPoint("CENTER", arrowFrame, "TOP", rightX + 1, rightY - 1)
+    arrowShaft:SetPoint("CENTER", arrowFrame, "TOP", shaftX, shaftY)
+    arrowShaftShadow:SetPoint("CENTER", arrowFrame, "TOP", shaftX + 1, shaftY - 1)
 
     arrowLeft:SetRotation(relativeAngle - wing)
     arrowRight:SetRotation(relativeAngle + wing)
     arrowShadowLeft:SetRotation(relativeAngle - wing)
     arrowShadowRight:SetRotation(relativeAngle + wing)
+    arrowShaft:SetRotation(relativeAngle + (math.pi / 2))
+    arrowShaftShadow:SetRotation(relativeAngle + (math.pi / 2))
 
     currentArrowDebug = {
         playerMapID = playerMapID,
