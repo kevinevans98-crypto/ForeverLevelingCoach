@@ -235,3 +235,11 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - `/flc export` now includes GearTopPriority, GearScan priorities, and a complete equipped-slot status snapshot.
 
 - Gear scan is intentionally conservative: it identifies upgrade needs from the player's actual equipment and level without inventing unverified Forever item sources.
+
+- v0.23.1: Added an in-window Gear Scanner view.
+
+- The main FLC window now has a Gear/Guide toggle beside Go and Export.
+
+- Gear view shows the top five upgrade priorities followed by the full equipped-slot scan, while route/arrow state continues updating underneath.
+
+- `/flc gearscan` now opens the Gear Scanner directly in the main window.
