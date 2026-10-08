@@ -10,7 +10,7 @@ local defaults = {
     x = 0,
     y = 0,
     width = 430,
-    height = 185,
+    height = 120,
     scale = 1,
     alpha = 0.95,
     locked = false,
@@ -35,7 +35,7 @@ local defaults = {
     autoAccept = true,
     autoTurnIn = true,
     lastClassTrainerLevel = 0,
-    lastUIVersion = "0.4.2",
+    lastUIVersion = "0.15.2",
     lastCluster = nil,
 }
 
@@ -96,11 +96,11 @@ local function copyDefaults()
     charDB.knownFlightPaths = charDB.knownFlightPaths or {}
     charDB.navigationProgress = charDB.navigationProgress or {}
 
-    if charDB.lastUIVersion ~= "0.4.2" then
+    if charDB.lastUIVersion ~= "0.15.2" then
         charDB.width = 410
-        charDB.height = 185
+        charDB.height = 120
         charDB.alpha = 1
-        charDB.lastUIVersion = "0.4.2"
+        charDB.lastUIVersion = "0.15.2"
     end
 
     DB = charDB
@@ -623,7 +623,7 @@ frame:SetMovable(true)
 frame:SetResizable(true)
 frame:EnableMouse(true)
 frame:SetClampedToScreen(true)
-frame:SetResizeBounds(340, 150, 700, 420)
+frame:SetResizeBounds(340, 105, 700, 300)
 frame:SetBackdrop({
     bgFile = "Interface/DialogFrame/UI-DialogBox-Background-Dark",
     edgeFile = "Interface/DialogFrame/UI-DialogBox-Border",
@@ -1518,94 +1518,39 @@ local function render()
     end
     local tag = TAG_LABELS[step.tag] or step.tag or "DO"
 
+    -- Lazy play UI: show only the quest/task name plus ONE immediate action.
+    -- Location is communicated by the safe same-zone arrow/local travel handoff.
     if DB and DB.lazyMode ~= false then
-        routeText:SetText("NEXT: " .. (step.title or "Next step"))
+        routeText:SetText(step.title or "Next step")
     else
         routeText:SetText(tag .. ": " .. (step.title or "Next step"))
     end
 
-    local details = {}
     local obj = objectiveSummary(active)
-    local person = currentPersonTarget
-    local where = nil
-    if person then
-        where = person.zone or person.locationType
-        if person.coords then
-            where = (where and (where .. " — ") or "") .. person.coords
-        end
-    elseif currentNextQuestPickup then
-        where = currentNextQuestPickup.zone
-        if currentNextQuestPickup.coords then
-            where = (where and (where .. " — ") or "") .. currentNextQuestPickup.coords
-        end
-    end
-
-    if insideDungeonRoute then
-        local nextObj = nextUnfinishedObjective(active)
-        if nextObj then
-            details[#details + 1] = "GO TO: " .. nextObj:gsub("^0/1%s*", "")
-        else
-            details[#details + 1] = "GO TO: Dungeon exit / turn-in"
-        end
-    elseif person and person.name then
-        details[#details + 1] = "GO TO: " .. person.name
-    elseif currentNextQuestPickup and currentNextQuestPickup.npc then
-        details[#details + 1] = "GO TO: " .. currentNextQuestPickup.npc
-    end
-
-    if where and (not DB or DB.lazyMode == false) then
-        details[#details + 1] = "WHERE: " .. where
-    end
+    local action = nil
 
     if currentTravelTarget and DB and DB.lazyMode ~= false then
-        -- Keep Lazy Mode to one immediate travel action; no paragraph to read.
-    elseif currentFastTravelSuggestion then
-        local fast = currentFastTravelSuggestion
-        fast = fast:gsub("^FASTEST:%s*", "")
-        fast = fast:gsub("^FAST TRAVEL:%s*", "")
-        fast = fast:gsub("^LOCAL ROUTE:%s*", "")
-        fast = fast:gsub("^HEARTH READY:%s*", "")
-        details[#details + 1] = "FASTEST: " .. fast
-    elseif currentTravelInstruction then
-        details[#details + 1] = "TRAVEL: " .. currentTravelInstruction
-    end
-
-    if currentTravelTarget and DB and DB.lazyMode ~= false then
-        details[#details + 1] = "DO: " .. (currentTravelTarget.action or currentTravelTarget.instruction or "Travel")
+        action = currentTravelTarget.action or currentTravelTarget.instruction or "Follow the arrow"
     elseif step and step.training then
-        details[#details + 1] = "DO: BUY NEW SHAMAN SPELLS"
+        local _, classFile = UnitClass("player")
+        action = "TRAIN " .. tostring(classFile or "CLASS")
     elseif active and active.isComplete then
-        details[#details + 1] = "DO: Turn in " .. (step.title or "this quest")
+        action = (step.turnInTarget and step.turnInTarget.action)
+            or ("TURN IN " .. string.upper(step.title or "QUEST"))
     elseif step and step.dungeon then
         local nextObj = nextUnfinishedObjective(active)
-        if nextObj then
-            details[#details + 1] = "DO: " .. nextObj
-        else
-            details[#details + 1] = "DO: Complete remaining dungeon objectives"
-        end
+        action = nextObj or "COMPLETE REMAINING DUNGEON OBJECTIVES"
     elseif currentObjectiveTarget and currentObjectiveTarget.action then
-        details[#details + 1] = "DO: " .. currentObjectiveTarget.action
+        action = currentObjectiveTarget.action
     elseif obj then
-        details[#details + 1] = "DO: " .. obj
+        action = obj
     elseif currentNextQuestPickup and currentNextQuestPickup.title then
-        details[#details + 1] = "DO: Pick up " .. currentNextQuestPickup.title
+        action = "PICK UP " .. string.upper(currentNextQuestPickup.title)
     else
-        details[#details + 1] = "DO: Follow the arrow / travel hint"
+        action = "FOLLOW THE ARROW"
     end
 
-    if currentTrainingDue and not (step and step.training) and currentTrainingTarget then
-        details[#details + 1] = "SOON: Train Shaman — " .. tostring(currentTrainingTarget.city or currentTrainingTarget.zone or "nearest trainer")
-    end
-
-    local classProfile = getClassProfile()
-    if DB and DB.relicAdvisor ~= false and classProfile and classProfile.usesRelics then
-        local _, relicName, relicState = flcRelicStatus()
-        if relicState == "known-relic-in-bags" and relicName then
-            details[#details + 1] = "SOON: Equip " .. tostring(relicName)
-        end
-    end
-
-    detailText:SetText(table.concat(details, "\n"))
+    detailText:SetText("DO: " .. tostring(action))
     refreshMainScroll()
 
     -- Keep the visible guide uncluttered: only the current recommended step
