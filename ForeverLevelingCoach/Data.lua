@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.43.0",
+    version = "0.44.0",
     supported = {
         faction = "Horde",
         classes = {
@@ -293,6 +293,8 @@ ForeverLevelingCoach_Data = {
             SKIP = -500,
         },
         completedTurnIn = 180,
+        chainFollowupTurnIn = 45,
+        sameNpcFollowupTurnIn = 35,
         currentZoneCluster = 170,
         rememberedCluster = 60,
         clusterQuest = 22,
