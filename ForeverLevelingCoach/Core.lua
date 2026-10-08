@@ -1102,19 +1102,23 @@ arrowFrame:SetFrameStrata("HIGH")
 -- Clean GPS-style navigation indicator. The map/facing math below is unchanged;
 -- only the presentation is different from the old scrollbar-button texture.
 local arrowShadow = arrowFrame:CreateTexture(nil, "BACKGROUND")
-arrowShadow:SetSize(68, 68)
+arrowShadow:SetSize(72, 72)
 arrowShadow:SetPoint("TOP", 2, -2)
-arrowShadow:SetTexture("Interface/Minimap/MinimapArrow")
-arrowShadow:SetVertexColor(0, 0, 0, 0.55)
+arrowShadow:SetTexture("Interface\\WorldMap\\WorldMapArrow")
+arrowShadow:SetVertexColor(0, 0, 0, 0.60)
 
 local arrowTexture = arrowFrame:CreateTexture(nil, "ARTWORK")
-arrowTexture:SetSize(62, 62)
+arrowTexture:SetSize(66, 66)
 arrowTexture:SetPoint("TOP", 0, 0)
-arrowTexture:SetTexture("Interface/Minimap/MinimapArrow")
+local arrowTextureOK = arrowTexture:SetTexture("Interface\\WorldMap\\WorldMapArrow")
+if arrowTextureOK == false then
+    arrowTexture:SetTexture("Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Up")
+    arrowShadow:SetTexture("Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Up")
+end
 arrowTexture:SetVertexColor(1.0, 0.78, 0.12, 1.0)
 
 local arrowInfo = CreateFrame("Frame", nil, arrowFrame, "BackdropTemplate")
-arrowInfo:SetSize(210, 40)
+arrowInfo:SetSize(190, 38)
 arrowInfo:SetPoint("TOP", arrowTexture, "BOTTOM", 0, -3)
 arrowInfo:SetBackdrop({
     bgFile = "Interface/Tooltips/UI-Tooltip-Background",
@@ -1135,7 +1139,7 @@ arrowLabel:SetText("")
 
 local arrowDistance = arrowInfo:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 arrowDistance:SetPoint("TOP", arrowLabel, "BOTTOM", 0, -2)
-arrowDistance:SetWidth(196)
+arrowDistance:SetWidth(176)
 arrowDistance:SetJustifyH("CENTER")
 arrowDistance:SetText("")
 
@@ -2131,7 +2135,7 @@ local function render()
             detailLines[#detailLines + 1] = ""
             local queueLabel = q.background and "  |cff707070WHILE QUESTING|r" or ""
             local statusLabel = q.active and q.active.isComplete and "|cff6edb8fTURN IN|r" or "|cffbda66bNEXT|r"
-            local titleColor = q.background and "|cff8a8a8a" or "|ffc9c0aa"
+            local titleColor = q.background and "|cff8a8a8a" or "|cffc9c0aa"
             detailLines[#detailLines + 1] = string.format(
                 "|cff8f7a50STEP %d|r  %s%s|r%s",
                 stepNumber,
