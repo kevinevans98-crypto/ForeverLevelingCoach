@@ -437,3 +437,9 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - DROP validates that the quest is still in the live QuestCleanup set, asks for confirmation, selects that exact quest ID, and uses the available client abandon API before refreshing the route.
 
 - Cleanup buttons never appear on normal DO/IMPORTANT quests or other route cards.
+
+- v0.37.0: Added cross-zone completed-turn-in deferral. Normal completed quests on another map are deferred while eligible unfinished DO/IMPORTANT objectives remain on the player's current map.
+
+- IMPORTANT completed quests are exempt from cross-zone deferral so class/progression-critical turn-ins can still take priority.
+
+- Cross-zone deferral uses a dedicated 400-point penalty and explains the local quest that should be finished first in scoring/export reasons.
