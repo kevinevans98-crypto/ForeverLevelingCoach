@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.29.0",
+    version = "0.29.1",
     supported = {
         faction = "Horde",
         classes = {
@@ -85,6 +85,7 @@ ForeverLevelingCoach_Data = {
         [745] = true, -- Sharing the Land
         [25] = true, -- Stonetalon Standstill (verified Forever/classic route data)
         [6621] = true, -- King of the Foulweald (verified follow-up)
+        [6544] = true, -- Torek's Assault (live-discovered + Forever DB verified)
         [6503] = true, -- Ashenvale Outrunners
         [6504] = true, -- The Lost Pages (Classic quest live-verified on Shamm; 3650 XP in Forever)
         [6441] = true, -- Satyr Horns
@@ -2416,6 +2417,52 @@ ForeverLevelingCoach_Data = {
                     useArrow = true,
                     waypoint = { mapID = 1440, x = 0.35, y = 0.39, label = "Thistlefur Village" },
                 },
+            },
+        },
+        {
+            questID = 6544,
+            questLevel = 24,
+            speedXP = 70,
+            title = "Torek's Assault",
+            tag = "DO",
+            minLevel = 20,
+            maxLevel = 28,
+            cluster = "ASHENVALE_SPLINTERTREE",
+            clusterPriority = 1,
+            note = "Verified Horde escort/assault quest. Help Torek take Silverwing Outpost, then report back to Ertog Ragetusk at Splintertree.",
+            pickupTarget = {
+                npc = "Torek",
+                role = "Quest giver",
+                zone = "Ashenvale",
+                coords = "68.3, 75.3",
+                waypoint = { mapID = 1440, x = 0.683, y = 0.753, label = "Torek" },
+            },
+            objectiveTargets = {
+                {
+                    objectiveContains = "Silverwing Outpost",
+                    role = "Escort / assault",
+                    name = "Torek",
+                    zone = "Ashenvale",
+                    coords = "around 68.3, 75.3",
+                    locationType = "ESCORT / ASSAULT",
+                    locationNote = "Start with Torek and stay with his raiders as they attack Silverwing Outpost.",
+                    approach = "Meet Torek around 68.3, 75.3 and follow the assault west into Silverwing Outpost.",
+                    instruction = "Escort Torek and help take Silverwing Outpost.",
+                    action = "ESCORT TOREK + TAKE SILVERWING OUTPOST",
+                    useArrow = true,
+                    waypoint = { mapID = 1440, x = 0.683, y = 0.753, label = "Torek — assault start" },
+                },
+            },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Ertog Ragetusk",
+                zone = "Splintertree Post, Ashenvale",
+                coords = "73.0, 62.5",
+                locationType = "QUEST TURN-IN",
+                instruction = "Report the successful assault to Ertog Ragetusk at Splintertree Post around 73.0, 62.5.",
+                action = "TURN IN TOREK'S ASSAULT",
+                useArrow = true,
+                waypoint = { mapID = 1440, x = 0.730, y = 0.625, label = "Ertog Ragetusk" },
             },
         },
         {
