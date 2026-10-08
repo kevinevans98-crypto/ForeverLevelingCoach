@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.29.5",
+    version = "0.29.6",
     supported = {
         faction = "Horde",
         classes = {
