@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.16.3
+Forever Leveling Coach v0.16.4
 
 Current scope
 -------------
@@ -339,3 +339,8 @@ Roadmap
 - Removed the NEARBY label and the 3-quest cap
 - Every active quest in the selected local cluster can appear below the current quest with its own DO/objective line
 - The existing scroll area handles long quest clusters instead of compressing them
+
+- Step-by-step Lazy guide: current routed quest is STEP 1 and owns the arrow
+- Other active quests in the same cluster are shown as STEP 2, STEP 3, and so on
+- Each step shows its own DO/objective line
+- The window remains scrollable so the full local quest plan can stay visible without cramming text
