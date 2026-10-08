@@ -1049,7 +1049,7 @@ routeLabel:SetText("|cff6f7f88CURRENT OBJECTIVE|r")
 local objectiveHighlight = frame:CreateTexture(nil, "BACKGROUND")
 objectiveHighlight:SetPoint("TOPLEFT", 11, -58)
 objectiveHighlight:SetPoint("TOPRIGHT", -11, -58)
-objectiveHighlight:SetHeight(38)
+objectiveHighlight:SetHeight(30)
 objectiveHighlight:SetTexture("Interface/Buttons/WHITE8x8")
 objectiveHighlight:SetVertexColor(0.060, 0.078, 0.090, 0.95)
 
@@ -1061,8 +1061,8 @@ objectiveAccent:SetTexture("Interface/Buttons/WHITE8x8")
 objectiveAccent:SetVertexColor(0.20, 0.82, 0.74, 1.0)
 
 local routeText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-routeText:SetPoint("TOPLEFT", 16, -66)
-routeText:SetPoint("TOPRIGHT", -16, -66)
+routeText:SetPoint("TOPLEFT", 16, -64)
+routeText:SetPoint("TOPRIGHT", -16, -64)
 routeText:SetJustifyH("LEFT")
 routeText:SetText("Loading route...")
 
@@ -1083,7 +1083,7 @@ routeClickButton:SetScript("OnLeave", function()
 end)
 
 local mainScroll = CreateFrame("ScrollFrame", "ForeverLevelingCoachMainScroll", frame, "UIPanelScrollFrameTemplate")
-mainScroll:SetPoint("TOPLEFT", routeText, "BOTTOMLEFT", 0, -14)
+mainScroll:SetPoint("TOPLEFT", routeText, "BOTTOMLEFT", 0, -10)
 mainScroll:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -28, 18)
 mainScroll:EnableMouseWheel(true)
 
@@ -1264,31 +1264,25 @@ arrowFrame:EnableMouse(true)
 arrowFrame:SetClampedToScreen(true)
 arrowFrame:SetFrameStrata("HIGH")
 
--- Minimal FLC navigation marker with a flat contrast plate.
-local arrowPlate = arrowFrame:CreateTexture(nil, "BACKGROUND")
-arrowPlate:SetSize(52, 52)
-arrowPlate:SetPoint("TOP", 0, 2)
-arrowPlate:SetTexture("Interface/Buttons/WHITE8x8")
-arrowPlate:SetVertexColor(0.015, 0.025, 0.030, 0.72)
-
+-- Minimal FLC navigation marker: clean pointer, no backing plate.
 local arrowShadow = arrowFrame:CreateTexture(nil, "BACKGROUND")
-arrowShadow:SetSize(48, 48)
+arrowShadow:SetSize(54, 54)
 arrowShadow:SetPoint("TOP", 1, -1)
 arrowShadow:SetTexture("Interface\\WorldMap\\WorldMapArrow")
-arrowShadow:SetVertexColor(0, 0, 0, 0.45)
+arrowShadow:SetVertexColor(0, 0, 0, 0.70)
 
 local arrowTexture = arrowFrame:CreateTexture(nil, "ARTWORK")
-arrowTexture:SetSize(40, 40)
+arrowTexture:SetSize(48, 48)
 arrowTexture:SetPoint("TOP", 0, 0)
 local arrowTextureOK = arrowTexture:SetTexture("Interface\\WorldMap\\WorldMapArrow")
 if arrowTextureOK == false then
     arrowTexture:SetTexture("Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Up")
     arrowShadow:SetTexture("Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Up")
 end
-arrowTexture:SetVertexColor(0.32, 0.95, 0.84, 1.0)
+arrowTexture:SetVertexColor(0.25, 1.0, 0.88, 1.0)
 
 local arrowLabel = arrowFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-arrowLabel:SetPoint("TOP", arrowTexture, "BOTTOM", 0, -4)
+arrowLabel:SetPoint("TOP", arrowTexture, "BOTTOM", 0, -2)
 arrowLabel:SetWidth(178)
 arrowLabel:SetJustifyH("CENTER")
 arrowLabel:SetTextColor(0.88, 0.94, 0.95)
@@ -1296,7 +1290,7 @@ arrowLabel:SetShadowOffset(1, -1)
 arrowLabel:SetText("")
 
 local arrowDistance = arrowFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-arrowDistance:SetPoint("TOP", arrowLabel, "BOTTOM", 0, -1)
+arrowDistance:SetPoint("TOP", arrowLabel, "BOTTOM", 0, 0)
 arrowDistance:SetWidth(178)
 arrowDistance:SetJustifyH("CENTER")
 arrowDistance:SetTextColor(0.38, 0.82, 0.76)
@@ -2244,10 +2238,14 @@ local function render()
 
     -- Lazy play UI: show only the quest/task name plus ONE immediate action.
     -- Location is communicated by the safe same-zone arrow/local travel handoff.
-    if DB and DB.lazyMode ~= false then
-        routeText:SetText(step.title or "Next step")
+    if currentTravelTarget and DB and DB.lazyMode ~= false then
+        routeText:SetText("Travel")
+    elseif active and active.isComplete then
+        routeText:SetText("Turn in quest")
+    elseif step and step.training then
+        routeText:SetText("Class training")
     else
-        routeText:SetText((tag or "DO") .. "  •  " .. (step.title or "Next step"))
+        routeText:SetText("Current route")
     end
 
     local obj = objectiveSummary(active)
