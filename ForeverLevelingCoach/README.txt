@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.17.2
+Forever Leveling Coach v0.17.3
 
 Current scope
 -------------
@@ -364,3 +364,8 @@ Roadmap
 - Combat remains the default for fastest leveling and dungeon quest runs
 - /flc spec combat, /flc spec assassination, /flc spec subtlety switch the displayed level-by-level talent path
 - Combat updated to the current recommended order: Precision before Deflection
+
+- Added The Red Messenger [382] as the immediate Deathknell follow-up to The Scarlet Crusade
+- Meven Korgal is routed at 36.6,68.5 in the same Scarlet camp; turn-in is Executor Arren at 32.2,66.0
+- Added Vital Intelligence [383] as the natural transition from Deathknell to Brill, turning in to Executor Zygand at 60.6,51.8
+- The route now stays in Deathknell for the Scarlet follow-up before using Brill as the next hub
