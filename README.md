@@ -277,3 +277,13 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Completed Thistlefur quests now provide a real navigation target and arrow instead of leaving STEP 1 with no waypoint.
 
 - Between a Rock and a Thistlefur now also exposes the verified King of the Foulweald follow-up pickup at Karang Amakkar.
+
+- v0.26.0: Major interface polish pass focused on readability during active leveling.
+
+- STEP 1 now has a stronger visual hierarchy with a dedicated Current Objective label and larger quest title; queued/background quests are visually quieter.
+
+- Settings is reorganized into Guide, Navigation, Advisors, Interface, and Actions sections.
+
+- Added Compact/Detailed display modes and a Reset UI button for restoring the main window, arrow, and travel-hint positions/sizes.
+
+- Compact mode hides secondary gear details and background-task instructions; Detailed mode keeps the fuller coaching view.
