@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.15.1
+Forever Leveling Coach v0.15.2
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.15.1 highlights
+v0.15.2 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -310,3 +310,9 @@ Roadmap
 - The Mindless Ones routes Ms to the zombie field around 33,63, then back to Shadow Priest Sarvis at 30.8,66.2
 - Next-chain pickup recorded as Rattling the Rattlecages from Sarvis
 - Route steps can now be class-specific so Rogue-only starter guidance cannot leak onto Shaman
+
+- Ultra-clean Lazy window: only the current quest/task name and one DO action are shown
+- Removed GO TO / WHERE / TRAVEL / FASTEST / SOON clutter from the main window
+- The navigation arrow is now the location layer: it points only to a safe target on the current map/zone, or to a verified local travel handoff for cross-zone travel
+- Main window default height reduced to 120px
+- Detailed route diagnostics remain in /flc export
