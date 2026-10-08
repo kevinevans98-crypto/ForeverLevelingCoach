@@ -443,3 +443,9 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - IMPORTANT completed quests are exempt from cross-zone deferral so class/progression-critical turn-ins can still take priority.
 
 - Cross-zone deferral uses a dedicated 400-point penalty and explains the local quest that should be finished first in scoring/export reasons.
+
+- v0.38.0: Completed Satyr Horns (6441) routing with a verified Ashenvale satyr objective waypoint around 75, 50 and Pixel turn-in at Splintertree Post around 73.1, 61.5.
+
+- Removed the redundant Splintertree flight target from Satyr Horns so being at Splintertree no longer produces a bogus flight-master instruction.
+
+- Satyr Horns can now own normal same-map arrow navigation for both collection and turn-in.
