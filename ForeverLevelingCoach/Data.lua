@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.21.1",
+    version = "0.21.2",
     supported = {
         faction = "Horde",
         classes = {
@@ -298,6 +298,7 @@ ForeverLevelingCoach_Data = {
         speedXPMax = 120,
         staleQuestPenaltyPerLevel = 35,
         staleQuestFreeLevels = 4,
+        finishClusterBeforeTurnInPenalty = 400,
     },
 
     -- Quest clusters let the router keep you in one area and stack nearby
@@ -341,7 +342,8 @@ ForeverLevelingCoach_Data = {
         ASHENVALE_THISTLEFUR = {
             name = "Ashenvale / Thistlefur",
             zoneAliases = { "Ashenvale", "Thistlefur Village", "Thistlefur Hold" },
-            note = "Bundle Thistlefur kills, Troll Charms, and Logging Rope when moving through central-west Ashenvale.",
+            finishBeforeTurnIn = true,
+            note = "Bundle Thistlefur kills, Troll Charms, and Logging Rope when moving through central-west Ashenvale. Finish real local objectives before leaving for turn-ins.",
         },
         ASHENVALE_SPLINTERTREE = {
             name = "Ashenvale / Splintertree",
