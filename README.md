@@ -367,3 +367,7 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Added verified pickup data for key Ashenvale Horde quests including Naga at the Zoram Strand, Between a Rock and a Thistlefur, Troll Charm, The Lost Pages, Warsong Supplies, Ashenvale Outrunners, and Satyr Horns.
 
 - Promoted Stonetalon Standstill (25) and King of the Foulweald (6621) from unknown scanner entries into verified route data, including quest givers, objectives, turn-ins, and safe waypoints.
+
+- v0.29.1: Added verified Torek's Assault (6544) route data after live discovery on Shamm.
+
+- Torek's Assault now includes the verified quest giver, assault start, Splintertree turn-in, and pickup metadata, so it no longer appears as NEW/UNVERIFIED.
