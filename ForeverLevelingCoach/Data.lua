@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.45.0",
+    version = "0.46.0",
     supported = {
         faction = "Horde",
         classes = {
@@ -25,7 +25,7 @@ ForeverLevelingCoach_Data = {
         HUNTER = { name = "Hunter", optimized = false },
         ROGUE = { name = "Rogue", optimized = true, gearProfile = "rogue" },
         PRIEST = { name = "Priest", optimized = false },
-        SHAMAN = { name = "Shaman", optimized = true, usesRelics = true, weaponPreference = "shaman" },
+        SHAMAN = { name = "Shaman", optimized = true, usesRelics = true, weaponPreference = "shaman", trainerData = "shamanTrainers", trainingStart = 24, trainingInterval = 2 },
         MAGE = { name = "Mage", optimized = false },
         WARLOCK = { name = "Warlock", optimized = false },
         DRUID = { name = "Druid", optimized = false },
