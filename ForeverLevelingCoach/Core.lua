@@ -52,37 +52,31 @@ local TAG_LABELS = {
 local function getClassProfile()
     local className, classFile = UnitClass("player")
     local configured = Data.classProfiles and Data.classProfiles[classFile] or nil
-    local profile = {
+    return {
         classFile = classFile,
         className = (configured and configured.name) or className or classFile or "Unknown",
         optimized = configured and configured.optimized == true or false,
-        weaponPreference = nil,
         usesRelics = configured and configured.usesRelics == true or false,
-        rogueGearProfile = nil,
+        weaponPreference = configured and configured.weaponPreference and Data[configured.weaponPreference] or nil,
+        gearProfile = configured and configured.gearProfile and Data[configured.gearProfile] or nil,
+        talentBuilds = configured and configured.talentData and Data[configured.talentData] or nil,
+        talentSetting = configured and configured.talentSetting or nil,
     }
-
-    if configured and configured.weaponPreference == "shaman" then
-        profile.weaponPreference = Data.shamanWeaponPreference
-    end
-    if configured and configured.gearProfile == "rogue" then
-        profile.rogueGearProfile = Data.rogueGearProfile
-    end
-
-    return profile
 end
 
 local function flcTalentRecommendation()
-    local level = UnitLevel("player") or 1
-    local _, classFile = UnitClass("player")
-    if classFile ~= "ROGUE" then return nil, nil end
-
-    local builds = Data.rogueTalentBuilds
+    local profile = getClassProfile()
+    local builds = profile and profile.talentBuilds
     if not builds then return nil, nil end
 
-    local spec = (DB and DB.rogueTalentSpec) or builds.defaultSpec or "Combat"
-    local build = builds[spec] or builds.Combat
+    local defaultSpec = builds.defaultSpec
+    local selectedSpec = profile.talentSetting and DB and DB[profile.talentSetting] or nil
+    local spec = selectedSpec or defaultSpec
+    local build = spec and builds[spec] or nil
+    if not build and defaultSpec then build = builds[defaultSpec] end
     if not build then return nil, nil end
 
+    local level = UnitLevel("player") or 1
     if level < 10 then
         return build.name, "Talents unlock at level 10"
     end
@@ -4584,34 +4578,32 @@ local function flcItemUsabilityReason(link, sourceTooltip)
     return nil
 end
 
-local function flcRogueGearReason(itemType, itemSubType, equipLoc)
-    local _, classFile = UnitClass("player")
-    if classFile ~= "ROGUE" then return nil end
-    local profile = Data.rogueGearProfile or {}
+local function flcClassGearReason(itemType, itemSubType, equipLoc)
+    local classProfile = getClassProfile()
+    local profile = classProfile and classProfile.gearProfile
+    if not profile then return nil end
 
     if itemType == "Armor" then
-        if itemSubType == "Leather" then
-            return nil
-        elseif itemSubType == "Cloth" then
-            return "ROGUE_CLOTH", "Leather is preferred for Rogue leveling"
-        elseif equipLoc ~= "INVTYPE_CLOAK" and equipLoc ~= "INVTYPE_NECK"
-            and equipLoc ~= "INVTYPE_FINGER" and equipLoc ~= "INVTYPE_TRINKET" then
-            return "UNUSABLE", "Rogues cannot use this armor type"
+        local accessory = equipLoc == "INVTYPE_CLOAK" or equipLoc == "INVTYPE_NECK"
+            or equipLoc == "INVTYPE_FINGER" or equipLoc == "INVTYPE_TRINKET"
+        if accessory then return nil end
+
+        if profile.armorAllowed and not profile.armorAllowed[itemSubType] then
+            return "UNUSABLE", tostring(classProfile.className) .. " cannot use this armor type"
+        end
+        if profile.armorPreferred and itemSubType ~= profile.armorPreferred then
+            return "PREFERENCE", tostring(profile.armorPreferred) .. " is preferred for "
+                .. tostring(classProfile.className) .. " leveling"
         end
     elseif itemType == "Weapon" then
-        local ranged = equipLoc == "INVTYPE_RANGED" or equipLoc == "INVTYPE_RANGEDRIGHT" or equipLoc == "INVTYPE_THROWN"
-        if ranged then
-            if profile.rangedWeapons and profile.rangedWeapons[itemSubType] then return nil end
-            return "UNUSABLE", "Rogue ranged weapons: thrown, bows, crossbows, guns"
+        local ranged = equipLoc == "INVTYPE_RANGED" or equipLoc == "INVTYPE_RANGEDRIGHT"
+            or equipLoc == "INVTYPE_THROWN"
+        local allowed = ranged and profile.rangedWeapons or profile.meleeWeapons
+        if allowed and not allowed[itemSubType] then
+            return "UNUSABLE", tostring(classProfile.className) .. " cannot use this weapon for this slot"
         end
-        if equipLoc == "INVTYPE_2HWEAPON" then
-            return "UNUSABLE", "Rogues cannot use two-handed weapons"
-        end
-        if profile.meleeWeapons and profile.meleeWeapons[itemSubType] then
-            return nil
-        end
-        return "UNUSABLE", "Rogue melee: daggers, 1H swords, 1H maces, fist weapons"
     end
+
     return nil
 end
 
@@ -4623,8 +4615,8 @@ local function flcGearEvaluateItem(link, sourceTooltip)
     local slots = FLC_EQUIP_SLOTS[equipLoc]
     if not slots then return nil end
 
-    local rogueGrade, rogueReason = flcRogueGearReason(itemType, itemSubType, equipLoc)
-    if rogueGrade then return rogueGrade, rogueReason end
+    local classGrade, classReason = flcClassGearReason(itemType, itemSubType, equipLoc)
+    if classGrade then return classGrade, classReason end
 
     local classProfile = getClassProfile()
     local weaponPreference = classProfile and classProfile.weaponPreference
