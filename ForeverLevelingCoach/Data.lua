@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.18.0",
+    version = "0.18.1",
     supported = {
         faction = "Horde",
         classes = {
@@ -47,6 +47,7 @@ ForeverLevelingCoach_Data = {
         [100] = true,  -- Call of Water: speak with Minor Manifestation of Water
         [1103] = true, -- Call of Water recovery: bring Water Sapta to Tiev Mordune
         [6503] = true, -- Ashenvale Outrunners
+        [6504] = true, -- The Lost Pages (Classic quest live-verified on Shamm; 3650 XP in Forever)
         [6441] = true, -- Satyr Horns
         [6548] = true, -- Avenge My Village
         [1062] = true, -- Goblin Invaders
@@ -257,6 +258,9 @@ ForeverLevelingCoach_Data = {
         partialProgressMax = 80,
         waypointNearMax = 90,
         clusterPriorityMax = 30,
+        speedXPMax = 120,
+        staleQuestPenaltyPerLevel = 35,
+        staleQuestFreeLevels = 4,
     },
 
     -- Quest clusters let the router keep you in one area and stack nearby
@@ -1281,6 +1285,8 @@ ForeverLevelingCoach_Data = {
         -- These entries intentionally avoid invented coordinates.
         {
             questID = 2986,
+            class = "SHAMAN",
+            speedXP = 120,
             title = "Call of Water",
             tag = "IMPORTANT",
             minLevel = 20,
@@ -1289,6 +1295,8 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 1534,
+            class = "SHAMAN",
+            speedXP = 120,
             title = "Call of Water",
             tag = "IMPORTANT",
             minLevel = 20,
@@ -1297,6 +1305,8 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 1536,
+            class = "SHAMAN",
+            speedXP = 120,
             title = "Call of Water",
             tag = "IMPORTANT",
             minLevel = 20,
@@ -1305,6 +1315,8 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 220,
+            class = "SHAMAN",
+            speedXP = 120,
             title = "Call of Water",
             tag = "IMPORTANT",
             minLevel = 20,
@@ -1316,6 +1328,8 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 63,
+            class = "SHAMAN",
+            speedXP = 120,
             cluster = "SILVERPINE_WATER",
             clusterPriority = 1,
             title = "Call of Water",
@@ -1397,6 +1411,8 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 100,
+            class = "SHAMAN",
+            speedXP = 120,
             cluster = "SILVERPINE_WATER",
             clusterPriority = 2,
             title = "Call of Water",
@@ -1593,6 +1609,8 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 216,
+            questLevel = 24,
+            speedXP = 105,
             title = "Between a Rock and a Thistlefur",
             tag = "DO",
             minLevel = 21,
@@ -1618,7 +1636,45 @@ ForeverLevelingCoach_Data = {
             },
         },
         {
+            questID = 6504,
+            cluster = "ASHENVALE_THISTLEFUR",
+            clusterPriority = 1,
+            questLevel = 23,
+            speedXP = 120,
+            title = "The Lost Pages",
+            tag = "DO",
+            minLevel = 20,
+            maxLevel = 27,
+            note = "High-value Ashenvale quest (3650 XP in Forever). Farm the pages while doing Troll Charm / Thistlefur objectives so there is no dedicated detour.",
+            objectiveTargets = {
+                {
+                    objectiveContains = "Shredder Operating Manual",
+                    role = "Loot",
+                    name = "Shredder Manual pages",
+                    zone = "Ashenvale",
+                    coords = "Thistlefur / central Ashenvale route",
+                    locationType = "WORLD DROPS — combine pages into Chapters 1-3",
+                    locationNote = "Do not make a separate farm loop. Loot the manual pages while killing/looting through the Thistlefur route.",
+                    instruction = "Loot Shredder Manual pages while doing the Thistlefur cluster; combine them until Chapters 1, 2, and 3 are complete.",
+                    action = "LOOT + COMBINE MANUAL PAGES WHILE QUESTING",
+                    useArrow = false,
+                },
+            },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Gurda Ragescar",
+                zone = "Near Splintertree Post, Ashenvale",
+                coords = "near Splintertree Post",
+                locationType = "QUEST TURN-IN",
+                instruction = "Return the completed Shredder Operating Manual chapters to Gurda Ragescar near Splintertree Post.",
+                action = "TURN IN THE LOST PAGES",
+                useArrow = false,
+            },
+        },
+        {
             questID = 6462,
+            questLevel = 23,
+            speedXP = 110,
             title = "Troll Charm",
             tag = "DO",
             minLevel = 19,
@@ -1784,17 +1840,35 @@ ForeverLevelingCoach_Data = {
             questID = 6503,
             flightTarget = "Splintertree Post",
             cluster = "ASHENVALE_SPLINTERTREE",
+            questLevel = 24,
+            speedXP = 90,
             clusterPriority = 2,
             title = "Ashenvale Outrunners",
             tag = "DO",
             minLevel = 19,
             maxLevel = 27,
             note = "Good Splintertree-area kill quest. Pair it with other nearby Ashenvale objectives instead of making a separate trip.",
+            objectiveTargets = {
+                {
+                    objectiveContains = "Ashenvale Outrunner",
+                    role = "Kill",
+                    name = "Ashenvale Outrunners",
+                    zone = "Ashenvale",
+                    coords = "around 70, 76",
+                    locationType = "STEALTH MOBS — south of Splintertree",
+                    instruction = "Kill 9 Ashenvale Outrunners around the trees south of Splintertree, roughly 70, 76.",
+                    action = "KILL 9 ASHENVALE OUTRUNNERS",
+                    useArrow = true,
+                    waypoint = { mapID = 1440, x = 0.700, y = 0.760, label = "Ashenvale Outrunners" },
+                },
+            },
         },
         {
             questID = 6441,
             flightTarget = "Splintertree Post",
             cluster = "ASHENVALE_SPLINTERTREE",
+            questLevel = 26,
+            speedXP = 35,
             clusterPriority = 3,
             title = "Satyr Horns",
             tag = "DO",
