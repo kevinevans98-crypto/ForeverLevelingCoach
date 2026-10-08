@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.39.0",
+    version = "0.40.0",
     supported = {
         faction = "Horde",
         classes = {
@@ -2294,6 +2294,17 @@ ForeverLevelingCoach_Data = {
                 useArrow = true,
                 waypoint = { mapID = 1413, x = 0.460, y = 0.360, label = "Wailing Caverns cave entrance" },
             },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Nara Wildmane",
+                zone = "Thunder Bluff",
+                coords = "75.6, 31.6",
+                locationType = "QUEST TURN-IN",
+                instruction = "Bring all four Fang leader gems to Nara Wildmane in Thunder Bluff around 75.6, 31.6.",
+                action = "TURN IN LEADERS OF THE FANG",
+                useArrow = true,
+                waypoint = { mapID = 1456, x = 0.756, y = 0.316, label = "Nara Wildmane" },
+            },
             travelGuide = {
                 {
                     zoneAliases = { "The Barrens", "Barrens" },
@@ -2344,6 +2355,17 @@ ForeverLevelingCoach_Data = {
                     waypoint = { mapID = 1440, x = 0.10, y = 0.21, label = "Wrathtail Naga" },
                 },
             },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Marukai",
+                zone = "Zoram'gar Outpost, Ashenvale",
+                coords = "11.7, 34.9",
+                locationType = "QUEST TURN-IN",
+                instruction = "Return the 20 Wrathtail Heads to Marukai at Zoram'gar Outpost around 11.7, 34.9.",
+                action = "TURN IN NAGA AT THE ZORAM STRAND",
+                useArrow = true,
+                waypoint = { mapID = 1440, x = 0.117, y = 0.349, label = "Marukai" },
+            },
         },
         {
             questID = 6641,
@@ -2354,6 +2376,13 @@ ForeverLevelingCoach_Data = {
             cluster = "ASHENVALE_ZORAM",
             clusterPriority = 2,
             note = "Elite escort/event. Good if you have help; skip if solo time is tight.",
+            pickupTarget = {
+                npc = "Muglash",
+                role = "Quest giver / escort start",
+                zone = "Zoram'gar Outpost, Ashenvale",
+                coords = "12.1, 34.6",
+                waypoint = { mapID = 1440, x = 0.121, y = 0.346, label = "Muglash" },
+            },
             objectiveTargets = {
                 {
                     objectiveContains = "Vorsha the Lasher",
@@ -2369,6 +2398,17 @@ ForeverLevelingCoach_Data = {
                     useArrow = true,
                     waypoint = { mapID = 1440, x = 0.121, y = 0.346, label = "Muglash — Vorsha event" },
                 },
+            },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Warsong Runner",
+                zone = "Zoram'gar Outpost, Ashenvale",
+                coords = "12.2, 34.2",
+                locationType = "QUEST TURN-IN",
+                instruction = "Return to the Warsong Runner at Zoram'gar Outpost around 12.2, 34.2 after Vorsha is defeated.",
+                action = "TURN IN VORSHA THE LASHER",
+                useArrow = true,
+                waypoint = { mapID = 1440, x = 0.122, y = 0.342, label = "Warsong Runner" },
             },
         },
         {
@@ -2616,11 +2656,12 @@ ForeverLevelingCoach_Data = {
                 role = "Quest turn-in",
                 name = "Gurda Ragescar",
                 zone = "Near Splintertree Post, Ashenvale",
-                coords = "near Splintertree Post",
+                coords = "70.0, 71.2",
                 locationType = "QUEST TURN-IN",
-                instruction = "Return the completed Shredder Operating Manual chapters to Gurda Ragescar near Splintertree Post.",
+                instruction = "Return the completed Shredder Operating Manual chapters to Gurda Ragescar around 70.0, 71.2.",
                 action = "TURN IN THE LOST PAGES",
-                useArrow = false,
+                useArrow = true,
+                waypoint = { mapID = 1440, x = 0.700, y = 0.712, label = "Gurda Ragescar" },
             },
         },
         {
@@ -2813,6 +2854,17 @@ ForeverLevelingCoach_Data = {
                     useArrow = true,
                     waypoint = { mapID = 1440, x = 0.73, y = 0.61, label = "Pixel — Saw Blades" },
                 },
+            },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Locke Okarr",
+                zone = "Splintertree Post, Ashenvale",
+                coords = "71.4, 67.6",
+                locationType = "QUEST TURN-IN",
+                instruction = "Return all Warsong Supplies to Locke Okarr at Splintertree Post around 71.4, 67.6.",
+                action = "TURN IN WARSONG SUPPLIES",
+                useArrow = true,
+                waypoint = { mapID = 1440, x = 0.714, y = 0.676, label = "Locke Okarr" },
             },
         },
         {
