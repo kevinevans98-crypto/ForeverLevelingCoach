@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.16.4
+Forever Leveling Coach v0.16.5
 
 Current scope
 -------------
@@ -344,3 +344,6 @@ Roadmap
 - Other active quests in the same cluster are shown as STEP 2, STEP 3, and so on
 - Each step shows its own DO/objective line
 - The window remains scrollable so the full local quest plan can stay visible without cramming text
+
+- Deathknell same-cave ordering improved: A Light in the Darkness -> Night Web's Hollow -> Marla's Last Wish
+- Night Web's Hollow action now shows the exact 10 Young + 8 Night Web Spider kill counts
