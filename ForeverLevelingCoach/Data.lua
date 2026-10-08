@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.15.3",
+    version = "0.16.0",
     supported = {
         faction = "Horde",
         classes = {
@@ -12,6 +12,17 @@ ForeverLevelingCoach_Data = {
 
     knownQuestIDs = {
         [364] = true, -- The Mindless Ones (Undead starter, live-verified on Ms)
+        [408] = true, -- The Family Crypt (verified in Forever DB)
+        [372] = true, -- At War With The Scarlet Crusade (verified in Forever DB)
+        [371] = true, -- At War With The Scarlet Crusade (verified in Forever DB)
+        [492] = true, -- A New Plague (verified in Forever DB)
+        [369] = true, -- A New Plague (verified in Forever DB)
+        [368] = true, -- A New Plague (verified in Forever DB)
+        [367] = true, -- A New Plague (verified in Forever DB)
+        [8] = true, -- A Rogue's Deal delivery (verified in Forever DB)
+        [590] = true, -- A Rogue's Deal (verified in Forever DB)
+        [381] = true, -- The Scarlet Crusade (verified in Forever DB)
+        [3902] = true, -- Scavenging Deathknell (verified in Forever DB)
         [3096] = true, -- Encrypted Scroll (live-verified on Ms)
         [3901] = true, -- Rattling the Rattlecages (live-verified on Ms)
         [376] = true, -- The Damned (live-verified on Ms)
@@ -54,6 +65,33 @@ ForeverLevelingCoach_Data = {
             ["Two-Handed Maces"] = true,
         },
         label = "2H Axe / 2H Mace",
+    },
+
+    rogueGearProfile = {
+        armorPreferred = "Leather",
+        armorAllowed = {
+            ["Cloth"] = true,
+            ["Leather"] = true,
+        },
+        meleeWeapons = {
+            ["Daggers"] = true,
+            ["One-Handed Swords"] = true,
+            ["One-Handed Maces"] = true,
+            ["Fist Weapons"] = true,
+        },
+        rangedWeapons = {
+            ["Thrown"] = true,
+            ["Bows"] = true,
+            ["Crossbows"] = true,
+            ["Guns"] = true,
+        },
+        levelingStats = {
+            agility = 2.2,
+            stamina = 0.8,
+            strength = 0.5,
+            intellect = 0.0,
+            spirit = 0.0,
+        },
     },
 
     shamanRelics = {
@@ -122,6 +160,16 @@ ForeverLevelingCoach_Data = {
     -- Quest clusters let the router keep you in one area and stack nearby
     -- objectives instead of bouncing between zones after every quest.
     clusters = {
+        TIRISFAL_BRILL = {
+            name = "Tirisfal / Brill",
+            zoneAliases = { "Tirisfal Glades", "Brill" },
+            note = "Fast Undead hub after Deathknell. Stack Brill, Scarlet, plague, and Agamand work.",
+        },
+        SILVERPINE_ROGUE = {
+            name = "Silverpine Forest",
+            zoneAliases = { "Silverpine Forest", "The Sepulcher" },
+            note = "Primary Undead follow-up zone after Tirisfal for fast 10-18 leveling.",
+        },
         TIRISFAL_DEATHKNELL = {
             name = "Tirisfal / Deathknell",
             zoneAliases = { "Tirisfal Glades", "Deathknell", "Shadow Grave" },
@@ -292,6 +340,269 @@ ForeverLevelingCoach_Data = {
                 action = "SPEAK TO DAVID TRIAS",
                 useArrow = true,
                 waypoint = { mapID = 1420, x = 0.325, y = 0.657, label = "David Trias" },
+            },
+        },
+        {
+            questID = 3902,
+            class = "ROGUE",
+            cluster = "TIRISFAL_DEATHKNELL",
+            clusterPriority = 3,
+            title = "Scavenging Deathknell",
+            tag = "DO",
+            minLevel = 2,
+            maxLevel = 5,
+            note = "Very efficient Deathknell box-loot quest; stack with nearby starter kills.",
+            objectiveTargets = {
+                {
+                    objectiveContains = "Scavenged Goods",
+                    role = "Loot",
+                    name = "Equipment Boxes",
+                    zone = "Deathknell, Tirisfal Glades",
+                    coords = "around 33, 64",
+                    locationType = "GROUND OBJECTS",
+                    instruction = "Loot equipment boxes around Deathknell.",
+                    action = "LOOT 6 SCAVENGED GOODS",
+                    useArrow = true,
+                    waypoint = { mapID = 1420, x = 0.33, y = 0.64, label = "Scavenged Goods" },
+                },
+            },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Deathguard Saltain",
+                zone = "Deathknell, Tirisfal Glades",
+                coords = "31.6, 65.6",
+                locationType = "QUEST TURN-IN",
+                instruction = "Return to Deathguard Saltain at 31.6, 65.6.",
+                action = "TURN IN SCAVENGING DEATHKNELL",
+                useArrow = true,
+                waypoint = { mapID = 1420, x = 0.316, y = 0.656, label = "Deathguard Saltain" },
+            },
+        },
+        {
+            questID = 590,
+            class = "ROGUE",
+            cluster = "TIRISFAL_DEATHKNELL",
+            clusterPriority = 4,
+            title = "A Rogue's Deal",
+            tag = "OPTIONAL",
+            minLevel = 1,
+            maxLevel = 7,
+            note = "Short local Rogue quest. Do it if Calvin is on your path.",
+            objectiveTargets = {
+                {
+                    objectiveContains = "Calvin Montague",
+                    role = "Duel",
+                    name = "Calvin Montague",
+                    zone = "Tirisfal Glades",
+                    coords = "38.2, 56.8",
+                    locationType = "NPC",
+                    instruction = "Defeat Calvin Montague.",
+                    action = "DEFEAT CALVIN MONTAGUE",
+                    useArrow = true,
+                    waypoint = { mapID = 1420, x = 0.382, y = 0.568, label = "Calvin Montague" },
+                },
+            },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Calvin Montague",
+                zone = "Tirisfal Glades",
+                coords = "38.2, 56.8",
+                locationType = "QUEST TURN-IN",
+                action = "TURN IN A ROGUE'S DEAL",
+                useArrow = true,
+                waypoint = { mapID = 1420, x = 0.382, y = 0.568, label = "Calvin Montague" },
+            },
+        },
+        {
+            questID = 367,
+            class = "ROGUE",
+            cluster = "TIRISFAL_BRILL",
+            clusterPriority = 1,
+            title = "A New Plague",
+            tag = "DO",
+            minLevel = 6,
+            maxLevel = 12,
+            note = "Strong Brill chain opener; stacks with local beast kills.",
+            objectiveTargets = {
+                {
+                    objectiveContains = "Darkhound Blood",
+                    role = "Kill / loot",
+                    name = "Darkhounds",
+                    zone = "Tirisfal Glades",
+                    coords = "around 56, 51",
+                    action = "LOOT 5 DARKHOUND BLOOD",
+                    useArrow = true,
+                    waypoint = { mapID = 1420, x = 0.56, y = 0.51, label = "Darkhounds" },
+                },
+            },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Apothecary Johaan",
+                zone = "Brill, Tirisfal Glades",
+                coords = "59.4, 52.4",
+                action = "TURN IN A NEW PLAGUE",
+                useArrow = true,
+                waypoint = { mapID = 1420, x = 0.594, y = 0.524, label = "Apothecary Johaan" },
+            },
+        },
+        {
+            questID = 368,
+            class = "ROGUE",
+            cluster = "TIRISFAL_BRILL",
+            clusterPriority = 2,
+            title = "A New Plague",
+            tag = "DO",
+            minLevel = 6,
+            maxLevel = 13,
+            note = "Good XP and convenient while working north/west of Brill.",
+            objectiveTargets = {
+                {
+                    objectiveContains = "Vile Fin Scale",
+                    role = "Kill / loot",
+                    name = "Vile Fin Murlocs",
+                    zone = "Tirisfal Glades",
+                    coords = "around 50, 35",
+                    action = "LOOT 5 VILE FIN SCALES",
+                    useArrow = true,
+                    waypoint = { mapID = 1420, x = 0.50, y = 0.35, label = "Vile Fin Murlocs" },
+                },
+            },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Apothecary Johaan",
+                zone = "Brill, Tirisfal Glades",
+                coords = "59.4, 52.4",
+                action = "TURN IN A NEW PLAGUE",
+                useArrow = true,
+                waypoint = { mapID = 1420, x = 0.594, y = 0.524, label = "Apothecary Johaan" },
+            },
+        },
+        {
+            questID = 369,
+            class = "ROGUE",
+            cluster = "TIRISFAL_BRILL",
+            clusterPriority = 3,
+            title = "A New Plague",
+            tag = "DO",
+            minLevel = 6,
+            maxLevel = 14,
+            note = "Good continuation of the Brill plague chain.",
+            objectiveTargets = {
+                {
+                    objectiveContains = "Vicious Night Web Spider Venom",
+                    role = "Kill / loot",
+                    name = "Vicious Night Web Spiders",
+                    zone = "Tirisfal Glades",
+                    coords = "around 87, 53",
+                    action = "LOOT 4 SPIDER VENOM",
+                    useArrow = true,
+                    waypoint = { mapID = 1420, x = 0.87, y = 0.53, label = "Vicious Night Web Spiders" },
+                },
+            },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Apothecary Johaan",
+                zone = "Brill, Tirisfal Glades",
+                coords = "59.4, 52.4",
+                action = "TURN IN A NEW PLAGUE",
+                useArrow = true,
+                waypoint = { mapID = 1420, x = 0.594, y = 0.524, label = "Apothecary Johaan" },
+            },
+        },
+        {
+            questID = 371,
+            class = "ROGUE",
+            cluster = "TIRISFAL_BRILL",
+            clusterPriority = 4,
+            title = "At War With The Scarlet Crusade",
+            tag = "DO",
+            minLevel = 8,
+            maxLevel = 15,
+            note = "High-XP Scarlet kill chain. Do while sweeping eastern Tirisfal.",
+            objectiveTargets = {
+                {
+                    objectiveContains = "Captain Vachon",
+                    role = "Kill",
+                    name = "Captain Vachon / Scarlet Friars",
+                    zone = "Tirisfal Glades",
+                    coords = "around 82, 41",
+                    action = "KILL CAPTAIN VACHON + 5 FRIARS",
+                    useArrow = true,
+                    waypoint = { mapID = 1420, x = 0.82, y = 0.41, label = "Captain Vachon" },
+                },
+            },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Executor Zygand",
+                zone = "Brill, Tirisfal Glades",
+                coords = "60.6, 51.8",
+                action = "TURN IN SCARLET CRUSADE",
+                useArrow = true,
+                waypoint = { mapID = 1420, x = 0.606, y = 0.518, label = "Executor Zygand" },
+            },
+        },
+        {
+            questID = 372,
+            class = "ROGUE",
+            cluster = "TIRISFAL_BRILL",
+            clusterPriority = 5,
+            title = "At War With The Scarlet Crusade",
+            tag = "DO",
+            minLevel = 8,
+            maxLevel = 16,
+            note = "Strong chain finale with a weapon reward choice.",
+            objectiveTargets = {
+                {
+                    objectiveContains = "Captain Melrache",
+                    role = "Kill",
+                    name = "Captain Melrache / Bodyguards",
+                    zone = "Tirisfal Glades",
+                    coords = "around 79, 25",
+                    action = "KILL MELRACHE + 2 BODYGUARDS",
+                    useArrow = true,
+                    waypoint = { mapID = 1420, x = 0.79, y = 0.25, label = "Captain Melrache" },
+                },
+            },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Executor Zygand",
+                zone = "Brill, Tirisfal Glades",
+                coords = "60.6, 51.8",
+                action = "TURN IN SCARLET CRUSADE",
+                useArrow = true,
+                waypoint = { mapID = 1420, x = 0.606, y = 0.518, label = "Executor Zygand" },
+            },
+        },
+        {
+            questID = 408,
+            class = "ROGUE",
+            cluster = "TIRISFAL_BRILL",
+            clusterPriority = 6,
+            title = "The Family Crypt",
+            tag = "DO",
+            minLevel = 10,
+            maxLevel = 16,
+            note = "Good Agamand Mills XP; efficient when bundled with nearby Tirisfal work.",
+            objectiveTargets = {
+                {
+                    objectiveContains = "Dargol",
+                    role = "Kill",
+                    name = "Agamand Family Crypt",
+                    zone = "Tirisfal Glades",
+                    coords = "around 52, 30",
+                    action = "KILL ANCESTORS + CAPTAIN DARGOL",
+                    useArrow = true,
+                    waypoint = { mapID = 1420, x = 0.52, y = 0.30, label = "Agamand Family Crypt" },
+                },
+            },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Magistrate Sevren",
+                zone = "Brill, Tirisfal Glades",
+                coords = "61.3, 50.8",
+                action = "TURN IN THE FAMILY CRYPT",
+                useArrow = true,
+                waypoint = { mapID = 1420, x = 0.613, y = 0.508, label = "Magistrate Sevren" },
             },
         },
         {
@@ -977,55 +1288,35 @@ ForeverLevelingCoach_Data = {
     },
 
     fallback = {
-        [21] = {
-            tag = "DO",
-            title = "Quest efficiently while we verify the 21-30 route",
-            note = "Prioritize nearby yellow/orange quests and class quests. Avoid long detours for weak rewards.",
-        },
-        [22] = {
-            tag = "DO",
-            title = "Continue efficient questing",
-            note = "Use the synced quest log while the verified route database grows.",
-        },
-        [23] = {
-            tag = "DO",
-            title = "Continue efficient questing",
-            note = "Keep class quests and strong dungeon quest clusters prioritized.",
-        },
-        [24] = {
-            tag = "DO",
-            title = "Continue efficient questing",
-            note = "Prefer concentrated quest hubs over long single-quest travel.",
-        },
-        [25] = {
-            tag = "DO",
-            title = "Continue efficient questing",
-            note = "Keep worthwhile dungeon quests, class unlocks, and major gear rewards.",
-        },
-        [26] = {
-            tag = "DO",
-            title = "Continue efficient questing",
-            note = "Skip clearly poor XP/time detours.",
-        },
-        [27] = {
-            tag = "DO",
-            title = "Continue efficient questing",
-            note = "Favor efficient chains and nearby objectives.",
-        },
-        [28] = {
-            tag = "DO",
-            title = "Continue efficient questing",
-            note = "Use dungeon quests when several objectives can be completed in one run.",
-        },
-        [29] = {
-            tag = "DO",
-            title = "Finish the strongest available quest chains",
-            note = "Avoid grinding unless your quest options are temporarily weak.",
-        },
-        [30] = {
-            tag = "IMPORTANT",
-            title = "Level 30 reached",
-            note = "Current Forever Leveling Coach beta route ends at the level cap.",
-        },
+        [1] = { tag = "DO", title = "Deathknell", note = "Finish starter quests tightly around Deathknell." },
+        [2] = { tag = "DO", title = "Deathknell", note = "Stack The Damned, Rattlecages, Scavenging Deathknell, and Rogue class intro." },
+        [3] = { tag = "DO", title = "Deathknell", note = "Finish Deathknell chains; avoid leaving with local quests incomplete." },
+        [4] = { tag = "DO", title = "Deathknell → Brill", note = "Finish spider/Scarlet follow-ups, then move toward Brill." },
+        [5] = { tag = "DO", title = "Brill", note = "Transition to Brill and start dense Tirisfal chains." },
+        [6] = { tag = "DO", title = "Brill / Tirisfal", note = "Stack A New Plague, Scarlet, beast, and local hub quests." },
+        [7] = { tag = "DO", title = "Brill / Tirisfal", note = "Stay on dense Brill loops; minimize long single-quest detours." },
+        [8] = { tag = "DO", title = "Brill / Tirisfal", note = "Push Scarlet chain and nearby objectives." },
+        [9] = { tag = "DO", title = "Brill / Tirisfal", note = "Finish plague/Scarlet loops and Agamand work." },
+        [10] = { tag = "DO", title = "Tirisfal → Silverpine", note = "Finish strong Tirisfal chains, then move toward The Sepulcher." },
+        [11] = { tag = "DO", title = "Silverpine Forest", note = "Use The Sepulcher as the main hub." },
+        [12] = { tag = "DO", title = "Silverpine Forest", note = "Stack village, coast, and Fenris-area quests." },
+        [13] = { tag = "DO", title = "Silverpine Forest", note = "Stay on dense Silverpine quest clusters." },
+        [14] = { tag = "DO", title = "Silverpine Forest", note = "Do efficient local chains; avoid isolated elite detours unless grouped." },
+        [15] = { tag = "DO", title = "Silverpine / RFC option", note = "Quest first; dungeon only when several quests/rewards justify it." },
+        [16] = { tag = "DO", title = "Silverpine Forest", note = "Finish major Sepulcher chains and prepare to move south/west." },
+        [17] = { tag = "DO", title = "Silverpine → Barrens", note = "Finish strong leftovers, then transition to Barrens." },
+        [18] = { tag = "DO", title = "The Barrens", note = "Crossroads/Ratchet quest density becomes the main route." },
+        [19] = { tag = "DO", title = "The Barrens", note = "Stack Crossroads, Ratchet, and nearby kill/loot quests." },
+        [20] = { tag = "DO", title = "The Barrens", note = "Quest clusters first; Wailing Caverns only with a good quest bundle." },
+        [21] = { tag = "DO", title = "Barrens / Stonetalon", note = "Clean Barrens hubs and begin efficient Stonetalon overlaps." },
+        [22] = { tag = "DO", title = "Barrens / Stonetalon / Ashenvale", note = "Choose the densest active cluster and stay in it." },
+        [23] = { tag = "DO", title = "Stonetalon / Ashenvale", note = "Favor stacked quests over travel-heavy singles." },
+        [24] = { tag = "DO", title = "Stonetalon / Ashenvale", note = "Continue dense Horde hubs and worthwhile dungeon bundles." },
+        [25] = { tag = "DO", title = "Ashenvale / Stonetalon", note = "Push efficient chains and strong weapon rewards." },
+        [26] = { tag = "DO", title = "Ashenvale / Barrens south", note = "Avoid weak detours; stay with clustered objectives." },
+        [27] = { tag = "DO", title = "Ashenvale / Thousand Needles prep", note = "Finish strong chains and move only when local density drops." },
+        [28] = { tag = "DO", title = "Thousand Needles / Ashenvale", note = "Use the highest-density Horde quest hub available." },
+        [29] = { tag = "DO", title = "Finish strongest chains", note = "Prioritize clustered yellow quests and dungeon bundles." },
+        [30] = { tag = "IMPORTANT", title = "Level 30 reached", note = "Current Forever cap reached." },
     },
 }
