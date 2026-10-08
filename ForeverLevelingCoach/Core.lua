@@ -234,6 +234,7 @@ local currentTurnInBatch = nil
 local currentBatchTurnInTarget = nil
 local currentHubChainPickup = nil
 local currentRouteDataGaps = {}
+local currentQuestCleanup = {}
 local currentPersonTarget = nil
 local currentObjectiveTarget = nil
 local currentTravelTarget = nil
@@ -376,6 +377,15 @@ local function routeStepEligible(step, level, playerClass)
         return false
     end
 
+    -- Optional quest cleanup: once the player reaches an OPTIONAL quest's
+    -- route cutoff level, stop spending route time on it. This prevents old
+    -- side quests from competing with current-level DO/IMPORTANT work.
+    if (step.tag or "DO") == "OPTIONAL"
+        and tonumber(step.maxLevel)
+        and level >= tonumber(step.maxLevel) then
+        return false
+    end
+
     if not playerClass then
         local _, classFile = UnitClass("player")
         playerClass = classFile
@@ -402,6 +412,34 @@ local function routeStepEligible(step, level, playerClass)
     return true
 end
 
+
+local function scanQuestCleanup()
+    local cleanup = {}
+    local level = UnitLevel("player") or 1
+
+    for _, q in ipairs(currentQuests or {}) do
+        if not q.isComplete then
+            local step = getStepByQuestID(q.questID)
+            if step and (step.tag or "DO") == "OPTIONAL"
+                and tonumber(step.maxLevel)
+                and level >= tonumber(step.maxLevel) then
+                cleanup[#cleanup + 1] = {
+                    questID = q.questID,
+                    title = q.title or step.title,
+                    reason = string.format("OPTIONAL quest reached route cutoff level %d", tonumber(step.maxLevel)),
+                    recommendation = "SAFE TO IGNORE / ABANDON",
+                }
+            end
+        end
+    end
+
+    table.sort(cleanup, function(a, b)
+        return (tonumber(a.questID) or 0) < (tonumber(b.questID) or 0)
+    end)
+
+    currentQuestCleanup = cleanup
+    return cleanup
+end
 
 local function zoneMatchesCluster(clusterID)
     local cluster = Data.clusters and Data.clusters[clusterID]
@@ -2984,6 +3022,21 @@ local function render()
         end
     end
 
+    if currentQuestCleanup and #currentQuestCleanup > 0 then
+        for _, item in ipairs(currentQuestCleanup) do
+            if #cardData >= #questCards then break end
+            cardData[#cardData + 1] = {
+                label = "CLEANUP",
+                step = stepNumber,
+                status = "IGNORE / DROP",
+                title = tostring(item.title or ("Quest " .. tostring(item.questID or "?"))),
+                action = "OPTIONAL QUEST IS NOW BELOW ROUTE VALUE",
+                background = true,
+            }
+            stepNumber = stepNumber + 1
+        end
+    end
+
     if DB and DB.gearAdvisor ~= false and DB.displayMode == "DETAILED" and flcGearScanSnapshot then
         local scan = flcGearScanSnapshot()
         local shown = 0
@@ -3048,6 +3101,7 @@ syncQuests = function()
     currentQuests, currentByID = getQuestLogSnapshot()
     scanUnknownQuests()
     scanCompletedRouteDataGaps()
+    scanQuestCleanup()
     render()
 end
 
@@ -3315,6 +3369,8 @@ exportSnapshot = function()
         "HubChainSourceQuestID=" .. tostring(DB and DB.pendingHubChain and DB.pendingHubChain.sourceQuestID or "none"),
         "RouteDataGapCount=" .. tostring(#(currentRouteDataGaps or {})),
         "RouteDataGapTop=" .. tostring(currentRouteDataGaps and currentRouteDataGaps[1] and currentRouteDataGaps[1].title or "none"),
+        "QuestCleanupCount=" .. tostring(#(currentQuestCleanup or {})),
+        "QuestCleanupTop=" .. tostring(currentQuestCleanup and currentQuestCleanup[1] and currentQuestCleanup[1].title or "none"),
         "MarkedPersonRole=" .. tostring(currentPersonTarget and currentPersonTarget.role or "none"),
         "MarkedPersonName=" .. tostring(currentPersonTarget and currentPersonTarget.name or "none"),
         "MarkedPersonZone=" .. tostring(currentPersonTarget and currentPersonTarget.zone or "none"),
@@ -3478,6 +3534,19 @@ exportSnapshot = function()
         lines[#lines + 1] = string.format("- %d | %s | %s | %s", q.questID, q.title, q.isComplete and "complete" or "active", routeStatus)
         for _, obj in ipairs(q.objectives or {}) do
             lines[#lines + 1] = string.format("  %s %s", obj.finished and "[done]" or "[ ]", obj.text or "")
+        end
+    end
+
+    lines[#lines + 1] = "QuestCleanup:"
+    if not currentQuestCleanup or #currentQuestCleanup == 0 then
+        lines[#lines + 1] = "- none"
+    else
+        for _, item in ipairs(currentQuestCleanup) do
+            lines[#lines + 1] = string.format("- %d | %s | %s | %s",
+                tonumber(item.questID) or 0,
+                tostring(item.title or "?"),
+                tostring(item.recommendation or "IGNORE"),
+                tostring(item.reason or "low route value"))
         end
     end
 
