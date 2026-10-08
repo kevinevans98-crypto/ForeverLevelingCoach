@@ -2411,9 +2411,9 @@ local function render()
         detailLines[#detailLines + 1] = "|cff6bb8d9Talent:|r " .. tostring(specName) .. " — " .. tostring(talentPick)
     end
 
+    local stepNumber = 2
     if DB and DB.lazyMode ~= false and step and step.cluster then
         local clusterQuests = getNearbyClusterQuestNames(step, currentByID)
-        local stepNumber = 2
         for _, q in ipairs(clusterQuests) do
             if #cardData >= #questCards then break end
 
