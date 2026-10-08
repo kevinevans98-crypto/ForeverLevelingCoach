@@ -287,3 +287,9 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Added Compact/Detailed display modes and a Reset UI button for restoring the main window, arrow, and travel-hint positions/sizes.
 
 - Compact mode hides secondary gear details and background-task instructions; Detailed mode keeps the fuller coaching view.
+
+- v0.26.1: Tuned the redesigned main window after in-game testing.
+
+- The current quest title now gets the full window width instead of competing with Settings/Go/Export, preventing unnecessary title wrapping.
+
+- Increased the redesigned default height and shortened the compact footer so the bottom of the guide no longer feels clipped.
