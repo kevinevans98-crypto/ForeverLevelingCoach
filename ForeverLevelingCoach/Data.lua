@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.54.0",
+    version = "0.55.0",
     supported = {
         faction = "Horde",
         classes = {
@@ -24,10 +24,10 @@ ForeverLevelingCoach_Data = {
     classProfiles = {
         WARRIOR = { name = "Warrior", optimized = true, gearProfile = "warriorGearProfile", talentData = "warriorTalentBuilds", talentSetting = "warriorTalentSpec", trainerData = "warriorTrainers", trainingStart = 2, trainingInterval = 2 },
         HUNTER = { name = "Hunter", optimized = true, gearProfile = "hunterGearProfile", talentData = "hunterTalentBuilds", talentSetting = "hunterTalentSpec", trainerData = "hunterTrainers", trainingStart = 2, trainingInterval = 2 },
-        ROGUE = { name = "Rogue", optimized = true, gearProfile = "rogueGearProfile", talentData = "rogueTalentBuilds", talentSetting = "rogueTalentSpec" },
+        ROGUE = { name = "Rogue", optimized = true, gearProfile = "rogueGearProfile", talentData = "rogueTalentBuilds", talentSetting = "rogueTalentSpec", trainerData = "rogueTrainers", trainingStart = 2, trainingInterval = 2 },
         PRIEST = { name = "Priest", optimized = true, gearProfile = "priestGearProfile", talentData = "priestTalentBuilds", talentSetting = "priestTalentSpec", trainerData = "priestTrainers", trainingStart = 2, trainingInterval = 2 },
         PALADIN = { name = "Paladin", optimized = true, gearProfile = "paladinGearProfile", talentData = "paladinTalentBuilds", talentSetting = "paladinTalentSpec", weaponPreference = "paladinWeaponPreference", trainerData = "paladinTrainers", trainingStart = 2, trainingInterval = 2 },
-        SHAMAN = { name = "Shaman", optimized = true, usesRelics = true, weaponPreference = "shamanWeaponPreference", trainerData = "shamanTrainers", trainingStart = 24, trainingInterval = 2 },
+        SHAMAN = { name = "Shaman", optimized = true, usesRelics = true, weaponPreference = "shamanWeaponPreference", gearProfile = "shamanGearProfile", talentData = "shamanTalentBuilds", talentSetting = "shamanTalentSpec", trainerData = "shamanTrainers", trainingStart = 24, trainingInterval = 2 },
         MAGE = { name = "Mage", optimized = true, gearProfile = "mageGearProfile", talentData = "mageTalentBuilds", talentSetting = "mageTalentSpec", trainerData = "mageTrainers", trainingStart = 2, trainingInterval = 2 },
         WARLOCK = { name = "Warlock", optimized = true, gearProfile = "warlockGearProfile", talentData = "warlockTalentBuilds", talentSetting = "warlockTalentSpec", trainerData = "warlockTrainers", trainingStart = 2, trainingInterval = 2 },
         DRUID = { name = "Druid", optimized = true, gearProfile = "druidGearProfile", talentData = "druidTalentBuilds", talentSetting = "druidTalentSpec", trainerData = "druidTrainers", trainingStart = 2, trainingInterval = 2 },
@@ -132,6 +132,81 @@ ForeverLevelingCoach_Data = {
         [1014] = true, -- Arugal Must Die (live-discovered in Forever)
         [914] = true,  -- Leaders of the Fang (live-discovered in Forever)
         [1490] = true, -- Nara Wildmane (live-discovered in Forever)
+    },
+
+    shamanTalentBuilds = {
+        defaultSpec = "Enhancement",
+        Enhancement = {
+            name = "Enhancement",
+            purpose = "Fast melee leveling with strong weapon damage, shocks, totems, and low downtime",
+            source = "Mobalytics WoW Forever Shaman Leveling / Enhancement guides, updated Oct 8 and Sep 28 2026",
+            final30 = "0/21/0",
+            talentsByLevel = {
+                [10] = { talent = "Thundering Strikes", rank = 1, maxRank = 5 },
+                [11] = { talent = "Thundering Strikes", rank = 2, maxRank = 5 },
+                [12] = { talent = "Thundering Strikes", rank = 3, maxRank = 5 },
+                [13] = { talent = "Thundering Strikes", rank = 4, maxRank = 5 },
+                [14] = { talent = "Thundering Strikes", rank = 5, maxRank = 5 },
+                [15] = { talent = "Improved Lightning Shield", rank = 1, maxRank = 3 },
+                [16] = { talent = "Improved Lightning Shield", rank = 2, maxRank = 3 },
+                [17] = { talent = "Improved Lightning Shield", rank = 3, maxRank = 3 },
+                [18] = { talent = "Mental Dexterity", rank = 1, maxRank = 3 },
+                [19] = { talent = "Mental Dexterity", rank = 2, maxRank = 3 },
+                [20] = { talent = "Elemental Weapons", rank = 1, maxRank = 3 },
+                [21] = { talent = "Elemental Weapons", rank = 2, maxRank = 3 },
+                [22] = { talent = "Elemental Weapons", rank = 3, maxRank = 3 },
+                [23] = { talent = "Shamanistic Focus", rank = 1, maxRank = 1 },
+                [24] = { talent = "Mental Dexterity", rank = 3, maxRank = 3 },
+                [25] = { talent = "Stormstrike", rank = 1, maxRank = 1 },
+                [26] = { talent = "Improved Stormstrike", rank = 1, maxRank = 2 },
+                [27] = { talent = "Flurry", rank = 1, maxRank = 5 },
+                [28] = { talent = "Flurry", rank = 2, maxRank = 5 },
+                [29] = { talent = "Flurry", rank = 3, maxRank = 5 },
+                [30] = { talent = "Flurry", rank = 4, maxRank = 5 },
+            },
+        },
+    },
+
+    shamanGearProfile = {
+        armorPreferred = "Leather",
+        armorAllowed = {
+            ["Cloth"] = true,
+            ["Leather"] = true,
+            ["Shields"] = true,
+        },
+    },
+
+    rogueTrainers = {
+        names = {
+            ["Gest"] = true,
+            ["Ormok"] = true,
+            ["Shenthul"] = true,
+            ["Carolyn Ward"] = true,
+            ["Gregory Charles"] = true,
+            ["Miles Dexter"] = true,
+        },
+        locations = {
+            {
+                city = "Undercity",
+                name = "Carolyn Ward / Gregory Charles / Miles Dexter",
+                zone = "Rogues' Quarter, Undercity",
+                coords = "84.7, 72.3",
+                mapID = 1458,
+                x = 0.847,
+                y = 0.723,
+                aliases = { "Undercity", "Tirisfal Glades", "Silverpine Forest", "Silverpine" },
+            },
+            {
+                city = "Orgrimmar",
+                name = "Gest / Ormok / Shenthul",
+                zone = "Cleft of Shadow, Orgrimmar",
+                coords = "43.2, 53.3",
+                mapID = 1454,
+                x = 0.432,
+                y = 0.533,
+                aliases = { "Orgrimmar", "Durotar", "The Barrens", "Barrens", "Ashenvale" },
+            },
+        },
     },
 
     shamanWeaponPreference = {
