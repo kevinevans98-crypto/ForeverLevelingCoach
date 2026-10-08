@@ -1,6 +1,6 @@
 # Forever Leveling Coach — Alpha 1 Release Notes
 
-## Alpha 1 — v0.52.0
+## Alpha 1 — v0.53.0
 
 Forever Leveling Coach Alpha 1 is an early tester build focused on validating the core leveling experience before wider class and route expansion.
 
@@ -27,7 +27,14 @@ Forever Leveling Coach Alpha 1 is an early tester build focused on validating th
 - Talent guidance
 - Full `/flc export` diagnostics
 
-### New in v0.52.0
+### New in v0.53.0
+- Added Paladin as an optimized class on the generic class framework.
+- Added the current Retribution 1–30 leveling talent path.
+- Added Paladin-specific melee/caster stat weights and mail/weapon rules.
+- Added a Retribution 2H weapon preference.
+- Added Paladin trainer routing for Undercity and Orgrimmar.
+
+### Retained from v0.52.0
 - Added Priest as an optimized class on the generic class framework.
 - Added the current Shadow 1–30 leveling talent path.
 - Added Priest-specific caster/wand stat weights and cloth/weapon rules.
