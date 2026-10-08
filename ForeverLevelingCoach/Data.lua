@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.33.0",
+    version = "0.34.0",
     supported = {
         faction = "Horde",
         classes = {
@@ -100,7 +100,8 @@ ForeverLevelingCoach_Data = {
         [6641] = true, -- Vorsha the Lasher (live-discovered in Forever)
         [6442] = true, -- Naga at the Zoram Strand (live-discovered in Forever)
         [1489] = true, -- Hamuul Runetotem
-        [1483] = true, -- Ziz Fizziks (live-discovered in Forever)
+        [1483] = true, -- Ziz Fizziks (Forever DB verified route)
+        [1093] = true, -- Super Reaper 6000 (verified follow-up from Ziz Fizziks)
         [6981] = true, -- The Glowing Shard
         [3369] = true, -- In Nightmares (live-discovered in Forever)
         [1098] = true, -- Deathstalkers in Shadowfang (live-discovered in Forever)
@@ -2913,6 +2914,94 @@ ForeverLevelingCoach_Data = {
                 useArrow = true,
                 note = "After Sputtervalve advances The Glowing Shard, go to Falla Sagewind on top of the Wailing Caverns mountain for the next quest.",
                 waypoint = { mapID = 1413, x = 0.4818, y = 0.3282, label = "Next quest giver: Falla Sagewind" },
+            },
+        },
+        {
+            questID = 1483,
+            cluster = "STONETALON_GRIMTOTEM",
+            clusterPriority = 0,
+            questLevel = 21,
+            speedXP = 65,
+            title = "Ziz Fizziks",
+            tag = "DO",
+            minLevel = 16,
+            maxLevel = 28,
+            note = "Verified Forever/classic delivery from Sputtervalve in Ratchet to Ziz Fizziks at Windshear Crag. Low standalone XP, but valuable because it immediately opens Super Reaper 6000.",
+            pickupTarget = {
+                npc = "Sputtervalve",
+                role = "Quest giver",
+                zone = "Ratchet, The Barrens",
+                coords = "63.0, 37.2",
+                locationType = "RATCHET QUEST GIVER",
+                waypoint = { mapID = 1413, x = 0.630, y = 0.372, label = "Sputtervalve" },
+            },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Ziz Fizziks",
+                zone = "Windshear Crag, Stonetalon Mountains",
+                coords = "59.0, 62.6",
+                locationType = "QUEST TURN-IN / VENTURE CO. CHAIN",
+                instruction = "Speak with Ziz Fizziks at Windshear Crag around 59.0, 62.6.",
+                action = "TURN IN ZIZ FIZZIKS",
+                useArrow = true,
+                waypoint = { mapID = 1442, x = 0.590, y = 0.626, label = "Ziz Fizziks" },
+            },
+            nextPickup = {
+                questID = 1093,
+                title = "Super Reaper 6000",
+                npc = "Ziz Fizziks",
+                role = "Quest giver",
+                zone = "Windshear Crag, Stonetalon Mountains",
+                coords = "59.0, 62.6",
+                locationType = "FOLLOW-UP QUEST",
+                locationNote = "Immediate follow-up after Ziz Fizziks.",
+                waypoint = { mapID = 1442, x = 0.590, y = 0.626, label = "Ziz Fizziks" },
+            },
+        },
+        {
+            questID = 1093,
+            cluster = "STONETALON_GRIMTOTEM",
+            clusterPriority = 1,
+            questLevel = 21,
+            speedXP = 95,
+            title = "Super Reaper 6000",
+            tag = "DO",
+            minLevel = 16,
+            maxLevel = 28,
+            pickupPrereqQuestIDs = { 1483 },
+            note = "Verified follow-up from Ziz Fizziks. Kill Venture Co. Operators around 69, 54 until the Super Reaper 6000 Blueprints drop, then return to Ziz.",
+            pickupTarget = {
+                npc = "Ziz Fizziks",
+                role = "Quest giver",
+                zone = "Windshear Crag, Stonetalon Mountains",
+                coords = "59.0, 62.6",
+                locationType = "FOLLOW-UP QUEST",
+                waypoint = { mapID = 1442, x = 0.590, y = 0.626, label = "Ziz Fizziks" },
+            },
+            objectiveTargets = {
+                {
+                    objectiveContains = "Super Reaper 6000 Blueprints",
+                    role = "Kill / loot",
+                    name = "Venture Co. Operators",
+                    zone = "Windshear Crag, Stonetalon Mountains",
+                    coords = "around 69, 54",
+                    locationType = "VENTURE CO. CAMP",
+                    instruction = "Kill Venture Co. Operators around 69, 54 until the Super Reaper 6000 Blueprints drop.",
+                    action = "KILL VENTURE CO. OPERATORS + LOOT BLUEPRINTS",
+                    useArrow = true,
+                    waypoint = { mapID = 1442, x = 0.690, y = 0.540, label = "Venture Co. Operators" },
+                },
+            },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Ziz Fizziks",
+                zone = "Windshear Crag, Stonetalon Mountains",
+                coords = "59.0, 62.6",
+                locationType = "QUEST TURN-IN",
+                instruction = "Return the Super Reaper 6000 Blueprints to Ziz Fizziks around 59.0, 62.6.",
+                action = "TURN IN SUPER REAPER 6000",
+                useArrow = true,
+                waypoint = { mapID = 1442, x = 0.590, y = 0.626, label = "Ziz Fizziks" },
             },
         },
         {
