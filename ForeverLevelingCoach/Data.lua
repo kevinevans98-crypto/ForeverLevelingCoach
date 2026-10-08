@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.53.0",
+    version = "0.54.0",
     supported = {
         faction = "Horde",
         classes = {
@@ -30,7 +30,7 @@ ForeverLevelingCoach_Data = {
         SHAMAN = { name = "Shaman", optimized = true, usesRelics = true, weaponPreference = "shamanWeaponPreference", trainerData = "shamanTrainers", trainingStart = 24, trainingInterval = 2 },
         MAGE = { name = "Mage", optimized = true, gearProfile = "mageGearProfile", talentData = "mageTalentBuilds", talentSetting = "mageTalentSpec", trainerData = "mageTrainers", trainingStart = 2, trainingInterval = 2 },
         WARLOCK = { name = "Warlock", optimized = true, gearProfile = "warlockGearProfile", talentData = "warlockTalentBuilds", talentSetting = "warlockTalentSpec", trainerData = "warlockTrainers", trainingStart = 2, trainingInterval = 2 },
-        DRUID = { name = "Druid", optimized = false },
+        DRUID = { name = "Druid", optimized = true, gearProfile = "druidGearProfile", talentData = "druidTalentBuilds", talentSetting = "druidTalentSpec", trainerData = "druidTrainers", trainingStart = 2, trainingInterval = 2 },
     },
 
     knownQuestIDs = {
@@ -141,6 +141,75 @@ ForeverLevelingCoach_Data = {
             ["Two-Handed Maces"] = true,
         },
         label = "2H Axe / 2H Mace",
+    },
+
+    druidTalentBuilds = {
+        defaultSpec = "Feral",
+        Feral = {
+            name = "Feral",
+            purpose = "Fast flexible leveling with Bear/Cat damage, mobility, and low downtime",
+            source = "Mobalytics WoW Forever Druid Leveling Guide, updated Sep 29 2026",
+            final30 = "0/21/0",
+            talentsByLevel = {
+                [10] = { talent = "Ferocity", rank = 1, maxRank = 5 },
+                [11] = { talent = "Ferocity", rank = 2, maxRank = 5 },
+                [12] = { talent = "Ferocity", rank = 3, maxRank = 5 },
+                [13] = { talent = "Ferocity", rank = 4, maxRank = 5 },
+                [14] = { talent = "Ferocity", rank = 5, maxRank = 5 },
+                [15] = { talent = "Heart of the Wild", rank = 1, maxRank = 5 },
+                [16] = { talent = "Heart of the Wild", rank = 2, maxRank = 5 },
+                [17] = { talent = "Heart of the Wild", rank = 3, maxRank = 5 },
+                [18] = { talent = "Feral Swiftness", rank = 1, maxRank = 2 },
+                [19] = { talent = "Feral Swiftness", rank = 2, maxRank = 2 },
+                [20] = { talent = "Feral Charge", rank = 1, maxRank = 1 },
+                [21] = { talent = "Sharpened Claws", rank = 1, maxRank = 2 },
+                [22] = { talent = "Sharpened Claws", rank = 2, maxRank = 2 },
+                [23] = { talent = "Savage Fury", rank = 1, maxRank = 2 },
+                [24] = { talent = "Savage Fury", rank = 2, maxRank = 2 },
+                [25] = { talent = "Predatory Strikes", rank = 1, maxRank = 3 },
+                [26] = { talent = "Predatory Strikes", rank = 2, maxRank = 3 },
+                [27] = { talent = "Predatory Strikes", rank = 3, maxRank = 3 },
+                [28] = { talent = "Blood Frenzy", rank = 1, maxRank = 2 },
+                [29] = { talent = "Blood Frenzy", rank = 2, maxRank = 2 },
+                [30] = { talent = "Leader of the Pack", rank = 1, maxRank = 1 },
+            },
+        },
+    },
+
+    druidGearProfile = {
+        armorPreferred = "Leather",
+        armorAllowed = {
+            ["Cloth"] = true,
+            ["Leather"] = true,
+        },
+        meleeWeapons = {
+            ["Daggers"] = true,
+            ["Fist Weapons"] = true,
+            ["One-Handed Maces"] = true,
+            ["Two-Handed Maces"] = true,
+            ["Polearms"] = true,
+            ["Staves"] = true,
+        },
+    },
+
+    druidTrainers = {
+        names = {
+            ["Kym Wildmane"] = true,
+            ["Sheal Runetotem"] = true,
+            ["Turak Runetotem"] = true,
+        },
+        locations = {
+            {
+                city = "Thunder Bluff",
+                name = "Kym Wildmane / Sheal Runetotem / Turak Runetotem",
+                zone = "Hall of Elders, Elder Rise, Thunder Bluff",
+                coords = "76.9, 28.1",
+                mapID = 1456,
+                x = 0.769,
+                y = 0.281,
+                aliases = { "Thunder Bluff", "Mulgore", "Stonetalon Mountains", "Stonetalon", "The Barrens", "Barrens" },
+            },
+        },
     },
 
     paladinWeaponPreference = {
