@@ -30,7 +30,6 @@ local defaults = {
     travelHintHeight = 90,
     autoFlight = false,
     gearAdvisor = true,
-    mainView = "GUIDE",
     relicAdvisor = true,
     lazyMode = true,
     autoAccept = true,
@@ -228,7 +227,6 @@ local exportSnapshot
 local syncQuests
 local getBestObjectiveTarget
 local flcGearScanSnapshot
-local flcRenderGearScannerView
 
 local function isKnownQuest(questID)
     if Data.knownQuestIDs and Data.knownQuestIDs[questID] then return true end
@@ -978,17 +976,6 @@ goButton:SetPoint("RIGHT", exportButton, "LEFT", -4, 0)
 goButton:SetText("Go")
 goButton:SetScript("OnClick", focusCurrentQuest)
 
-local gearViewButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-gearViewButton:SetSize(52, 22)
-gearViewButton:SetPoint("RIGHT", goButton, "LEFT", -4, 0)
-gearViewButton:SetText("Gear")
-gearViewButton:SetScript("OnClick", function()
-    if not DB then return end
-    DB.mainView = (DB.mainView == "GEAR") and "GUIDE" or "GEAR"
-    gearViewButton:SetText(DB.mainView == "GEAR" and "Guide" or "Gear")
-    if syncQuests then syncQuests() end
-end)
-
 exportButton:SetScript("OnClick", function()
     syncQuests()
     exportSnapshot()
@@ -996,7 +983,7 @@ end)
 
 local routeText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 routeText:SetPoint("TOPLEFT", 14, -45)
-routeText:SetPoint("TOPRIGHT", -202, -45)
+routeText:SetPoint("TOPRIGHT", -142, -45)
 routeText:SetJustifyH("LEFT")
 routeText:SetText("Loading route...")
 
@@ -1826,16 +1813,6 @@ local function render()
     end
     local tag = TAG_LABELS[step.tag] or step.tag or "DO"
 
-    if gearViewButton then
-        gearViewButton:SetText(DB and DB.mainView == "GEAR" and "Guide" or "Gear")
-    end
-
-    if DB and DB.mainView == "GEAR" and flcRenderGearScannerView then
-        routeClickButton:Hide()
-        flcRenderGearScannerView()
-        updateArrow()
-        return
-    end
     routeClickButton:Show()
 
     -- Lazy play UI: show only the quest/task name plus ONE immediate action.
@@ -1897,6 +1874,53 @@ local function render()
                 detailLines[#detailLines + 1] = "DO: " .. tostring(qAction)
             end
             stepNumber = stepNumber + 1
+        end
+    end
+
+    if DB and DB.gearAdvisor ~= false and flcGearScanSnapshot then
+        local scan = flcGearScanSnapshot()
+        local shown = 0
+        for _, item in ipairs((scan and scan.priorities) or {}) do
+            if shown >= 2 then break end
+            if item.status ~= "OPTIONAL EMPTY" and item.status ~= "NOT EXPECTED YET" then
+                if shown == 0 then
+                    detailLines[#detailLines + 1] = ""
+                    detailLines[#detailLines + 1] = "|cffffcc00GEAR UPGRADES|r"
+                end
+
+                detailLines[#detailLines + 1] = string.format(
+                    "%s — %s: %s",
+                    tostring(item.slotName or "?"),
+                    tostring(item.status or "?"),
+                    tostring(item.itemName or "EMPTY")
+                )
+
+                if item.upgrade and item.upgrade.target then
+                    local target = item.upgrade.target
+                    local sourceState = ""
+                    if target.questID then
+                        if currentByID and currentByID[target.questID] then
+                            sourceState = " | ACTIVE QUEST"
+                        elseif isQuestCompleted(target.questID) then
+                            sourceState = " | COMPLETED"
+                        else
+                            sourceState = " | QUEST SOURCE"
+                        end
+                    elseif target.routeFriendly then
+                        sourceState = " | ROUTE-FRIENDLY"
+                    end
+
+                    detailLines[#detailLines + 1] = string.format(
+                        "  -> %s (~+%d%%)",
+                        tostring(target.name or "?"),
+                        math.floor((item.upgrade.pct or 0) + 0.5)
+                    )
+                    detailLines[#detailLines + 1] = "  " .. tostring(target.source or "Unknown source") .. sourceState
+                else
+                    detailLines[#detailLines + 1] = "  No verified worthwhile replacement yet."
+                end
+                shown = shown + 1
+            end
         end
     end
 
@@ -2767,108 +2791,6 @@ flcGearScanSnapshot = function()
     return snapshot
 end
 
-flcRenderGearScannerView = function()
-    local scan = flcGearScanSnapshot and flcGearScanSnapshot() or nil
-    local _, playerClass = UnitClass("player")
-    local level = UnitLevel("player") or 1
-
-    routeText:SetText("GEAR SCANNER — Level " .. tostring(level) .. " " .. tostring(playerClass or ""))
-
-    if not scan then
-        detailText:SetText("Gear scan is unavailable on this client.")
-        questText:SetText("")
-        questText:Hide()
-        refreshMainScroll()
-        return
-    end
-
-    local lines = {}
-    if #scan.priorities == 0 then
-        lines[#lines + 1] = "|cff33ff99No obvious weak slots found.|r"
-        lines[#lines + 1] = "Your equipped gear looks reasonable for your current level."
-    else
-        lines[#lines + 1] = "|cffffcc00TOP UPGRADE PRIORITIES|r"
-        local limit = math.min(5, #scan.priorities)
-        for i = 1, limit do
-            local item = scan.priorities[i]
-            local statusColor = "|cffffcc00"
-            if item.status == "CRITICAL" or item.status == "EMPTY" then
-                statusColor = "|cffff5555"
-            elseif item.status == "WEAK" then
-                statusColor = "|cffff9933"
-            elseif item.status == "OPTIONAL EMPTY" then
-                statusColor = "|cffaaaaaa"
-            end
-            lines[#lines + 1] = string.format(
-                "%d. %s — %s%s|r",
-                i,
-                tostring(item.slotName or "?"),
-                statusColor,
-                tostring(item.status or "?")
-            )
-            lines[#lines + 1] = "   " .. tostring(item.itemName or "EMPTY")
-            lines[#lines + 1] = "   " .. tostring(item.reason or "")
-            if item.upgrade and item.upgrade.target then
-                local target = item.upgrade.target
-                lines[#lines + 1] = string.format(
-                    "   UPGRADE: %s  (~+%d%%)",
-                    tostring(target.name or "?"),
-                    math.floor((item.upgrade.pct or 0) + 0.5)
-                )
-                lines[#lines + 1] = "   SOURCE: " .. tostring(target.source or "unknown")
-                lines[#lines + 1] = "   " .. (target.routeFriendly and "|cff33ff99ROUTE-FRIENDLY|r" or "|cffffcc00OPTIONAL FARM/AH|r")
-                if target.sourceNote then
-                    lines[#lines + 1] = "   " .. tostring(target.sourceNote)
-                end
-            end
-        end
-    end
-
-    lines[#lines + 1] = ""
-    lines[#lines + 1] = "|cffffcc00EQUIPPED SLOTS|r"
-
-    for _, item in ipairs(scan.slots or {}) do
-        local status = tostring(item.status or "?")
-        local itemName = tostring(item.itemName or "EMPTY")
-        local suffix = ""
-        if item.itemLevel then
-            suffix = "  (iLvl " .. tostring(item.itemLevel) .. ")"
-        end
-
-        local color = "|cffaaaaaa"
-        if status == "OK" or status == "N/A" or status == "NOT EXPECTED YET" or status == "HOLD" then
-            color = "|cff33ff99"
-        elseif status == "OPTIONAL EMPTY" then
-            color = "|cffaaaaaa"
-        elseif status == "CRITICAL" or status == "EMPTY" then
-            color = "|cffff5555"
-        elseif status == "WEAK" then
-            color = "|cffff9933"
-        elseif status == "WATCH" then
-            color = "|cffffcc00"
-        end
-
-        lines[#lines + 1] = string.format(
-            "%s%s: %s — %s%s|r",
-            color,
-            tostring(item.slotName or "?"),
-            status,
-            itemName,
-            suffix
-        )
-    end
-
-    lines[#lines + 1] = ""
-    lines[#lines + 1] = "Gear Advisor: " .. ((DB and DB.gearAdvisor ~= false) and "ON" or "OFF")
-    lines[#lines + 1] = "Click Guide above to return to the leveling route."
-
-    detailText:SetText(table.concat(lines, "\n"))
-    questText:SetText("")
-    questText:Hide()
-    mainScroll:SetVerticalScroll(0)
-    refreshMainScroll()
-end
-
 local function flcItemUsabilityReason(link, sourceTooltip)
     if not link then return nil end
 
@@ -3202,8 +3124,6 @@ SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
         render()
         print("|cff33ff99FLC:|r Lazy Mode " .. (DB.lazyMode and "enabled." or "disabled."))
     elseif msg == "go" then
-        DB.mainView = "GUIDE"
-        gearViewButton:SetText("Gear")
         syncQuests()
         focusCurrentQuest()
     elseif msg == "sync" then
@@ -3233,12 +3153,26 @@ SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
             print("|cffffcc00FLC:|r use /flc spec combat, assassination, or subtlety.")
         end
     elseif msg == "gearscan" then
-        DB.mainView = "GEAR"
-        DB.visible = true
-        frame:Show()
-        gearViewButton:SetText("Guide")
-        syncQuests()
-        print("|cff33ff99FLC:|r gear scanner opened in the main window.")
+        local scan = flcGearScanSnapshot and flcGearScanSnapshot() or nil
+        print("|cff33ff99FLC:|r gear upgrade summary:")
+        local shown = 0
+        for _, item in ipairs((scan and scan.priorities) or {}) do
+            if shown >= 3 then break end
+            if item.status ~= "OPTIONAL EMPTY" and item.status ~= "NOT EXPECTED YET" then
+                local text = tostring(item.slotName) .. " — " .. tostring(item.status)
+                if item.upgrade and item.upgrade.target then
+                    text = text .. ": " .. tostring(item.upgrade.target.name)
+                        .. string.format(" (~+%d%%) — %s", math.floor((item.upgrade.pct or 0) + 0.5), tostring(item.upgrade.target.source or "?"))
+                else
+                    text = text .. ": no verified worthwhile replacement yet"
+                end
+                print(text)
+                shown = shown + 1
+            end
+        end
+        if shown == 0 then
+            print("|cff33ff99No urgent gear upgrades found.|r")
+        end
     elseif msg == "gear" then
         DB.gearAdvisor = not DB.gearAdvisor
         print("|cff33ff99FLC:|r gear advisor " .. (DB.gearAdvisor and "enabled." or "disabled."))
