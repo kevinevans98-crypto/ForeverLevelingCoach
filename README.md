@@ -313,3 +313,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Main and Settings buttons are visually flattened, current-objective styling uses a simple accent strip, and queued steps use muted slate colors.
 
 - Navigation is now a minimal teal pointer with plain target/distance text and no bordered fantasy-style label box.
+
+- v0.27.1: Hotfix a malformed Talent color string introduced by the v0.27.0 modern UI theme; addon now loads normally.
