@@ -2738,6 +2738,15 @@ local function getNearestClassTrainer()
     local trainers = getClassTrainerData()
     if not trainers then return nil end
 
+    if trainers.locations then
+        for _, trainer in ipairs(trainers.locations) do
+            if trainer.aliases and zoneMatchesAliases(trainer.aliases) then
+                return trainer
+            end
+        end
+        return trainers.locations[1]
+    end
+
     if trainers.thunderBluff
         and zoneMatchesAliases({ "Thunder Bluff", "Mulgore", "Stonetalon Mountains", "Stonetalon" }) then
         return trainers.thunderBluff
