@@ -221,3 +221,9 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Remaining primary quests in the Lazy Mode queue are sorted by live score, so movement and objective progress can reorder the route.
 
 - Added a small route-switch margin to prevent the recommended quest from flickering between near-equal candidates.
+
+- v0.22.1: Added numeric objective-progress scoring.
+
+- FLC now parses progress such as 6/12 or 1/4 and averages it with completed objectives instead of only counting fully finished objective lines.
+
+- Route reasons now show the calculated quest progress percentage, making near-complete quests easier to understand in exports.
