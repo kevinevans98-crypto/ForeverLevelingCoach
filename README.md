@@ -469,3 +469,9 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Added Warsong Axe Shipment routing for Warsong Supplies at Booty Bay 26.4,73.3 beside Wharfmaster Lozgil.
 
 - Added objective-aware Leaders of the Fang guidance for Lady Anacondra and Lord Serpentis. These use dungeon text instead of fake fixed arrows because Anacondra has variable spawn points and reliable in-instance coordinates are not stored.
+
+- v0.42.0: Added the proactive Route Readiness Scanner. It audits every active known quest before it becomes STEP 1 for missing route entries, objective guidance, turn-in targets/waypoints, dungeon instructions, pickup metadata, and cross-zone travel support.
+
+- Readiness issues are classified BLOCKER, WARN, or INFO. Only BLOCKER/WARN issues can appear as non-disruptive HUD cards; INFO items stay in diagnostics so metadata gaps do not clutter leveling.
+
+- Export now includes RouteReadinessIssueCount, blocker/warning counts, RouteReadinessTop, and a full RouteReadiness section. The scanner never steals STEP 1 or navigation.
