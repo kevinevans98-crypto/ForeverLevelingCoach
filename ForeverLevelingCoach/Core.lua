@@ -1719,71 +1719,152 @@ local function applySettings()
     end
 end
 
+local function flcTalentSpellName(spellID, overrideName)
+    if overrideName and overrideName ~= "" then return overrideName end
+    if spellID then
+        if C_Spell and type(C_Spell.GetSpellName) == "function" then
+            local ok, name = pcall(C_Spell.GetSpellName, spellID)
+            if ok and name and name ~= "" then return name end
+        end
+        if type(GetSpellInfo) == "function" then
+            local ok, name = pcall(GetSpellInfo, spellID)
+            if ok and name and name ~= "" then return name end
+        end
+    end
+    return spellID and ("Spell " .. tostring(spellID)) or "Unknown Talent"
+end
+
 local function flcTalentExportSnapshot()
     local snapshot = {
         trees = {},
         spent = {},
         totalSpent = 0,
         available = false,
+        api = "none",
     }
 
-    if type(GetNumTalentTabs) ~= "function"
-        or type(GetTalentTabInfo) ~= "function"
-        or type(GetNumTalents) ~= "function"
-        or type(GetTalentInfo) ~= "function" then
-        return snapshot
-    end
+    -- Legacy Classic talent API, when exposed by the client.
+    if type(GetNumTalentTabs) == "function"
+        and type(GetTalentTabInfo) == "function"
+        and type(GetNumTalents) == "function"
+        and type(GetTalentInfo) == "function" then
 
-    local okTabs, numTabs = pcall(GetNumTalentTabs)
-    if not okTabs or not numTabs or numTabs <= 0 then
-        return snapshot
-    end
+        local okTabs, numTabs = pcall(GetNumTalentTabs)
+        if okTabs and numTabs and numTabs > 0 then
+            snapshot.available = true
+            snapshot.api = "classic"
 
-    snapshot.available = true
-
-    for tab = 1, numTabs do
-        local tabName = "Tree " .. tostring(tab)
-        local okTab, name, _, pointsSpent = pcall(GetTalentTabInfo, tab)
-        if okTab then
-            if name and name ~= "" then tabName = name end
-            pointsSpent = tonumber(pointsSpent) or 0
-        else
-            pointsSpent = 0
-        end
-
-        snapshot.trees[#snapshot.trees + 1] = {
-            name = tabName,
-            points = pointsSpent,
-        }
-        snapshot.totalSpent = snapshot.totalSpent + pointsSpent
-
-        local okCount, numTalents = pcall(GetNumTalents, tab)
-        if okCount and numTalents then
-            for talentIndex = 1, numTalents do
-                local okTalent, talentName, _, tier, column, rank, maxRank = pcall(GetTalentInfo, tab, talentIndex)
-                if okTalent and talentName and tonumber(rank) and tonumber(rank) > 0 then
-                    snapshot.spent[#snapshot.spent + 1] = {
-                        tree = tabName,
-                        name = talentName,
-                        rank = tonumber(rank) or 0,
-                        maxRank = tonumber(maxRank) or 0,
-                        tier = tonumber(tier) or 0,
-                        column = tonumber(column) or 0,
-                    }
+            for tab = 1, numTabs do
+                local tabName = "Tree " .. tostring(tab)
+                local okTab, _, name, _, _, pointsSpent = pcall(GetTalentTabInfo, tab)
+                if okTab then
+                    if name and name ~= "" then tabName = name end
+                    pointsSpent = tonumber(pointsSpent) or 0
+                else
+                    pointsSpent = 0
                 end
+
+                snapshot.trees[#snapshot.trees + 1] = { name = tabName, points = pointsSpent }
+                snapshot.totalSpent = snapshot.totalSpent + pointsSpent
+
+                local okCount, numTalents = pcall(GetNumTalents, tab)
+                if okCount and numTalents then
+                    for talentIndex = 1, numTalents do
+                        local okTalent, talentName, _, tier, column, rank, maxRank = pcall(GetTalentInfo, tab, talentIndex)
+                        if okTalent and talentName and tonumber(rank) and tonumber(rank) > 0 then
+                            snapshot.spent[#snapshot.spent + 1] = {
+                                tree = tabName,
+                                name = talentName,
+                                rank = tonumber(rank) or 0,
+                                maxRank = tonumber(maxRank) or 0,
+                                tier = tonumber(tier) or 0,
+                                column = tonumber(column) or 0,
+                            }
+                        end
+                    end
+                end
+            end
+
+            return snapshot
+        end
+    end
+
+    -- WoW Forever 1.60.1 uses the newer SharedTraits/ClassTalents API.
+    if C_ClassTalents and type(C_ClassTalents.GetActiveConfigID) == "function"
+        and C_Traits
+        and type(C_Traits.GetConfigInfo) == "function"
+        and type(C_Traits.GetTreeNodes) == "function"
+        and type(C_Traits.GetNodeInfo) == "function"
+        and type(C_Traits.GetEntryInfo) == "function"
+        and type(C_Traits.GetDefinitionInfo) == "function" then
+
+        local okConfig, configID = pcall(C_ClassTalents.GetActiveConfigID)
+        if okConfig and configID then
+            local okInfo, configInfo = pcall(C_Traits.GetConfigInfo, configID)
+            if okInfo and configInfo and configInfo.treeIDs then
+                snapshot.available = true
+                snapshot.api = "traits"
+
+                for treeIndex, treeID in ipairs(configInfo.treeIDs) do
+                    local treeName = "Trait Tree " .. tostring(treeIndex)
+                    if type(C_Traits.GetTreeInfo) == "function" then
+                        local okTree, treeInfo = pcall(C_Traits.GetTreeInfo, configID, treeID)
+                        if okTree and treeInfo and treeInfo.titleText and treeInfo.titleText ~= "" then
+                            treeName = treeInfo.titleText
+                        end
+                    end
+
+                    local treePoints = 0
+                    local okNodes, nodes = pcall(C_Traits.GetTreeNodes, treeID)
+                    if okNodes and nodes then
+                        for _, nodeID in ipairs(nodes) do
+                            local okNode, nodeInfo = pcall(C_Traits.GetNodeInfo, configID, nodeID)
+                            if okNode and nodeInfo then
+                                local committed = nodeInfo.entryIDsWithCommittedRanks or {}
+                                local rank = tonumber(nodeInfo.currentRank) or tonumber(nodeInfo.activeRank) or 0
+                                if #committed > 0 and rank > 0 then
+                                    treePoints = treePoints + rank
+
+                                    local entryID = committed[1]
+                                    local okEntry, entryInfo = pcall(C_Traits.GetEntryInfo, configID, entryID)
+                                    if okEntry and entryInfo and entryInfo.definitionID then
+                                        local okDef, defInfo = pcall(C_Traits.GetDefinitionInfo, entryInfo.definitionID)
+                                        if okDef and defInfo then
+                                            local talentName = flcTalentSpellName(defInfo.spellID, defInfo.overrideName)
+                                            snapshot.spent[#snapshot.spent + 1] = {
+                                                tree = treeName,
+                                                name = talentName,
+                                                rank = rank,
+                                                maxRank = tonumber(nodeInfo.maxRanks) or tonumber(entryInfo.maxRanks) or rank,
+                                                tier = 0,
+                                                column = 0,
+                                                nodeID = nodeID,
+                                                spellID = defInfo.spellID,
+                                            }
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+
+                    snapshot.trees[#snapshot.trees + 1] = { name = treeName, points = treePoints }
+                    snapshot.totalSpent = snapshot.totalSpent + treePoints
+                end
+
+                table.sort(snapshot.spent, function(a, b)
+                    if a.tree ~= b.tree then return a.tree < b.tree end
+                    return a.name < b.name
+                end)
+
+                return snapshot
             end
         end
     end
 
-    table.sort(snapshot.spent, function(a, b)
-        if a.tree ~= b.tree then return a.tree < b.tree end
-        if a.tier ~= b.tier then return a.tier < b.tier end
-        if a.column ~= b.column then return a.column < b.column end
-        return a.name < b.name
-    end)
-
     return snapshot
 end
+
 
 exportSnapshot = function()
     if not DB then copyDefaults() end
@@ -1830,6 +1911,7 @@ exportSnapshot = function()
         "WeaponPreference=" .. tostring((getClassProfile().weaponPreference and getClassProfile().weaponPreference.label) or "class-default"),
         "RecommendedSpec=" .. tostring(select(1, flcTalentRecommendation()) or "none"),
         "TalentRecommendation=" .. tostring(select(2, flcTalentRecommendation()) or "none"),
+        "TalentAPI=" .. tostring(talentSnapshot.api or "none"),
         "TalentPointsSpent=" .. tostring(talentSnapshot.totalSpent or 0),
         "TalentBuild=" .. ((function()
             if not talentSnapshot.available or #talentSnapshot.trees == 0 then return "unavailable" end
@@ -1874,14 +1956,19 @@ exportSnapshot = function()
         lines[#lines + 1] = "- none"
     else
         for _, talent in ipairs(talentSnapshot.spent) do
+            local extra = ""
+            if talent.nodeID or talent.spellID then
+                extra = string.format(" | node=%s | spell=%s", tostring(talent.nodeID or "none"), tostring(talent.spellID or "none"))
+            end
             lines[#lines + 1] = string.format(
-                "- %s | %s | %d/%d | tier=%d | column=%d",
+                "- %s | %s | %d/%d | tier=%d | column=%d%s",
                 tostring(talent.tree),
                 tostring(talent.name),
                 tonumber(talent.rank) or 0,
                 tonumber(talent.maxRank) or 0,
                 tonumber(talent.tier) or 0,
-                tonumber(talent.column) or 0
+                tonumber(talent.column) or 0,
+                extra
             )
         end
     end
