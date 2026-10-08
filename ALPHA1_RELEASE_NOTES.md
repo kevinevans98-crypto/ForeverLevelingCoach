@@ -1,6 +1,6 @@
 # Forever Leveling Coach — Alpha 1 Release Notes
 
-## Alpha 1 — v0.50.0
+## Alpha 1 — v0.51.0
 
 Forever Leveling Coach Alpha 1 is an early tester build focused on validating the core leveling experience before wider class and route expansion.
 
@@ -27,7 +27,14 @@ Forever Leveling Coach Alpha 1 is an early tester build focused on validating th
 - Talent guidance
 - Full `/flc export` diagnostics
 
-### New in v0.50.0
+### New in v0.51.0
+- Added Warlock as an optimized class on the generic class framework.
+- Added the current Affliction 1–30 leveling talent path.
+- Added Warlock-specific caster stat weights and cloth/weapon rules.
+- Extended trainer services to support profile-defined trainer hub lists.
+- Added Warlock trainer routing for Undercity and Orgrimmar, with nearby-zone preferences.
+
+### Retained from v0.50.0
 - Added Mage as an optimized class on the generic class framework.
 - Added the current Frost 1–30 leveling talent path.
 - Added Mage-specific caster stat weights and cloth/weapon rules.
