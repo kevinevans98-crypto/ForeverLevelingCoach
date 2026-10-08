@@ -30,6 +30,7 @@ local defaults = {
     travelHintHeight = 90,
     autoFlight = false,
     gearAdvisor = true,
+    displayMode = "COMPACT",
     relicAdvisor = true,
     lazyMode = true,
     autoAccept = true,
@@ -227,6 +228,7 @@ local exportSnapshot
 local syncQuests
 local getBestObjectiveTarget
 local flcGearScanSnapshot
+local applySettings
 
 local function isKnownQuest(questID)
     if Data.knownQuestIDs and Data.knownQuestIDs[questID] then return true end
@@ -916,15 +918,26 @@ frame:SetBackdrop({
     edgeSize = 24,
     insets = { left = 7, right = 7, top = 7, bottom = 7 },
 })
-frame:SetBackdropColor(0.05, 0.05, 0.05, 0.58)
-frame:SetBackdropBorderColor(0.72, 0.55, 0.20, 0.95)
+frame:SetBackdropColor(0.025, 0.025, 0.025, 0.90)
+frame:SetBackdropBorderColor(0.72, 0.55, 0.20, 0.98)
+
+local headerBar = frame:CreateTexture(nil, "BACKGROUND")
+headerBar:SetPoint("TOPLEFT", 8, -8)
+headerBar:SetPoint("TOPRIGHT", -8, -8)
+headerBar:SetHeight(30)
+headerBar:SetTexture("Interface/Buttons/WHITE8x8")
+headerBar:SetVertexColor(0.10, 0.08, 0.04, 0.72)
 
 local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-title:SetPoint("TOPLEFT", 14, -12)
+title:SetPoint("TOPLEFT", 16, -15)
 title:SetText("Forever Leveling Coach")
 
+local subtitle = frame:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+subtitle:SetPoint("LEFT", title, "RIGHT", 8, 0)
+subtitle:SetText("Horde 1-30")
+
 local versionText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-versionText:SetPoint("TOPRIGHT", -14, -15)
+versionText:SetPoint("TOPRIGHT", -14, -17)
 versionText:SetText("v" .. tostring(Data.version or "?"))
 
 local function focusCurrentQuest()
@@ -966,7 +979,7 @@ local function focusCurrentQuest()
 end
 
 local exportButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-exportButton:SetSize(72, 22)
+exportButton:SetSize(62, 22)
 exportButton:SetPoint("TOPRIGHT", -12, -38)
 exportButton:SetText("Export")
 
@@ -977,7 +990,7 @@ goButton:SetText("Go")
 goButton:SetScript("OnClick", focusCurrentQuest)
 
 local settingsButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-settingsButton:SetSize(70, 22)
+settingsButton:SetSize(64, 22)
 settingsButton:SetPoint("RIGHT", goButton, "LEFT", -4, 0)
 settingsButton:SetText("Settings")
 
@@ -986,9 +999,13 @@ exportButton:SetScript("OnClick", function()
     exportSnapshot()
 end)
 
-local routeText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-routeText:SetPoint("TOPLEFT", 14, -45)
-routeText:SetPoint("TOPRIGHT", -218, -45)
+local routeLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+routeLabel:SetPoint("TOPLEFT", 16, -43)
+routeLabel:SetText("CURRENT OBJECTIVE")
+
+local routeText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+routeText:SetPoint("TOPLEFT", 16, -57)
+routeText:SetPoint("TOPRIGHT", -214, -57)
 routeText:SetJustifyH("LEFT")
 routeText:SetText("Loading route...")
 
@@ -1009,7 +1026,7 @@ routeClickButton:SetScript("OnLeave", function()
 end)
 
 local mainScroll = CreateFrame("ScrollFrame", "ForeverLevelingCoachMainScroll", frame, "UIPanelScrollFrameTemplate")
-mainScroll:SetPoint("TOPLEFT", routeText, "BOTTOMLEFT", 0, -10)
+mainScroll:SetPoint("TOPLEFT", routeText, "BOTTOMLEFT", 0, -12)
 mainScroll:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -28, 18)
 mainScroll:EnableMouseWheel(true)
 
@@ -1017,7 +1034,7 @@ local mainScrollChild = CreateFrame("Frame", nil, mainScroll)
 mainScrollChild:SetSize(1, 1)
 mainScroll:SetScrollChild(mainScrollChild)
 
-local detailText = mainScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+local detailText = mainScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 detailText:SetPoint("TOPLEFT", 0, 0)
 detailText:SetPoint("TOPRIGHT", 0, 0)
 detailText:SetJustifyH("LEFT")
@@ -1150,7 +1167,7 @@ end)
 travelHintFrame:Hide()
 
 local settingsFrame = CreateFrame("Frame", "ForeverLevelingCoachSettingsFrame", UIParent, "BackdropTemplate")
-settingsFrame:SetSize(260, 338)
+settingsFrame:SetSize(300, 430)
 settingsFrame:SetPoint("TOPLEFT", frame, "TOPRIGHT", 8, 0)
 settingsFrame:SetFrameStrata("DIALOG")
 settingsFrame:SetClampedToScreen(true)
@@ -1163,28 +1180,41 @@ settingsFrame:SetBackdrop({
     edgeSize = 14,
     insets = { left = 5, right = 5, top = 5, bottom = 5 },
 })
-settingsFrame:SetBackdropColor(0.03, 0.03, 0.03, 0.94)
-settingsFrame:SetBackdropBorderColor(0.72, 0.55, 0.20, 0.95)
+settingsFrame:SetBackdropColor(0.025, 0.025, 0.025, 0.97)
+settingsFrame:SetBackdropBorderColor(0.72, 0.55, 0.20, 0.98)
 settingsFrame:Hide()
 
 local settingsTitle = settingsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-settingsTitle:SetPoint("TOPLEFT", 12, -12)
+settingsTitle:SetPoint("TOPLEFT", 14, -14)
 settingsTitle:SetText("FLC Settings")
 
 local settingsClose = CreateFrame("Button", nil, settingsFrame, "UIPanelCloseButton")
-settingsClose:SetPoint("TOPRIGHT", -2, -2)
+settingsClose:SetPoint("TOPRIGHT", -3, -3)
 
 local settingsButtons = {}
 local refreshSettingsPanel
 
-local function settingStateText(label, enabled)
-    return tostring(label) .. ": " .. (enabled and "ON" or "OFF")
+local function addSettingsSection(text, y)
+    local fs = settingsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    fs:SetPoint("TOPLEFT", 16, y)
+    fs:SetText(text)
+    local line = settingsFrame:CreateTexture(nil, "ARTWORK")
+    line:SetPoint("TOPLEFT", fs, "BOTTOMLEFT", 0, -3)
+    line:SetPoint("RIGHT", settingsFrame, "RIGHT", -16, 0)
+    line:SetHeight(1)
+    line:SetTexture("Interface/Buttons/WHITE8x8")
+    line:SetVertexColor(0.45, 0.35, 0.16, 0.65)
+    return fs
 end
 
-local function makeSettingsToggle(label, key, y, onChanged)
+local function settingStateText(label, enabled)
+    return tostring(label) .. "  [" .. (enabled and "|cff33ff99ON|r" or "|cffff5555OFF|r") .. "]"
+end
+
+local function makeSettingsToggle(label, key, x, y, width, onChanged)
     local button = CreateFrame("Button", nil, settingsFrame, "UIPanelButtonTemplate")
-    button:SetSize(220, 24)
-    button:SetPoint("TOP", 0, y)
+    button:SetSize(width or 126, 24)
+    button:SetPoint("TOPLEFT", x, y)
     button:SetScript("OnClick", function()
         if not DB then return end
         DB[key] = not DB[key]
@@ -1196,18 +1226,35 @@ local function makeSettingsToggle(label, key, y, onChanged)
     return button
 end
 
-makeSettingsToggle("Lazy Mode", "lazyMode", -42)
-makeSettingsToggle("Auto Accept", "autoAccept", -70)
-makeSettingsToggle("Auto Turn-In", "autoTurnIn", -98)
-makeSettingsToggle("Gear Advice", "gearAdvisor", -126)
-makeSettingsToggle("Navigation Arrow", "arrowVisible", -154)
-makeSettingsToggle("Flight Assist", "autoFlight", -182)
-makeSettingsToggle("Beginner Mode", "beginner", -210)
-makeSettingsToggle("Relic Advisor", "relicAdvisor", -238)
+addSettingsSection("GUIDE", -44)
+makeSettingsToggle("Lazy Mode", "lazyMode", 16, -68, 128)
+makeSettingsToggle("Beginner", "beginner", 154, -68, 128)
+makeSettingsToggle("Auto Accept", "autoAccept", 16, -98, 128)
+makeSettingsToggle("Auto Turn-In", "autoTurnIn", 154, -98, 128)
+
+addSettingsSection("NAVIGATION", -136)
+makeSettingsToggle("Arrow", "arrowVisible", 16, -160, 128)
+makeSettingsToggle("Flight Assist", "autoFlight", 154, -160, 128)
+
+addSettingsSection("ADVISORS", -198)
+makeSettingsToggle("Gear Advice", "gearAdvisor", 16, -222, 128)
+makeSettingsToggle("Relic Advisor", "relicAdvisor", 154, -222, 128)
+
+addSettingsSection("INTERFACE", -260)
+
+local displayModeButton = CreateFrame("Button", nil, settingsFrame, "UIPanelButtonTemplate")
+displayModeButton:SetSize(128, 24)
+displayModeButton:SetPoint("TOPLEFT", 16, -284)
+displayModeButton:SetScript("OnClick", function()
+    if not DB then return end
+    DB.displayMode = (DB.displayMode == "DETAILED") and "COMPACT" or "DETAILED"
+    if syncQuests then syncQuests() end
+    if refreshSettingsPanel then refreshSettingsPanel() end
+end)
 
 local lockButton = CreateFrame("Button", nil, settingsFrame, "UIPanelButtonTemplate")
-lockButton:SetSize(106, 24)
-lockButton:SetPoint("BOTTOMLEFT", 14, 42)
+lockButton:SetSize(128, 24)
+lockButton:SetPoint("TOPLEFT", 154, -284)
 lockButton:SetScript("OnClick", function()
     if not DB then return end
     DB.locked = not DB.locked
@@ -1217,9 +1264,43 @@ lockButton:SetScript("OnClick", function()
     if refreshSettingsPanel then refreshSettingsPanel() end
 end)
 
+local resetUIButton = CreateFrame("Button", nil, settingsFrame, "UIPanelButtonTemplate")
+resetUIButton:SetSize(128, 24)
+resetUIButton:SetPoint("TOPLEFT", 16, -314)
+resetUIButton:SetText("Reset UI")
+resetUIButton:SetScript("OnClick", function()
+    if not DB then return end
+
+    DB.point = defaults.point
+    DB.relativePoint = defaults.relativePoint
+    DB.x = defaults.x
+    DB.y = defaults.y
+    DB.width = defaults.width
+    DB.height = defaults.height
+    DB.scale = defaults.scale
+    DB.alpha = defaults.alpha
+
+    DB.arrowPoint = defaults.arrowPoint
+    DB.arrowRelativePoint = defaults.arrowRelativePoint
+    DB.arrowX = defaults.arrowX
+    DB.arrowY = defaults.arrowY
+    DB.arrowScale = defaults.arrowScale
+
+    DB.travelHintPoint = defaults.travelHintPoint
+    DB.travelHintRelativePoint = defaults.travelHintRelativePoint
+    DB.travelHintX = defaults.travelHintX
+    DB.travelHintY = defaults.travelHintY
+    DB.travelHintWidth = defaults.travelHintWidth
+    DB.travelHintHeight = defaults.travelHintHeight
+
+    applySettings()
+    if syncQuests then syncQuests() end
+    print("|cff33ff99FLC:|r UI positions and sizes reset.")
+end)
+
 local gearSummaryButton = CreateFrame("Button", nil, settingsFrame, "UIPanelButtonTemplate")
-gearSummaryButton:SetSize(106, 24)
-gearSummaryButton:SetPoint("LEFT", lockButton, "RIGHT", 8, 0)
+gearSummaryButton:SetSize(128, 24)
+gearSummaryButton:SetPoint("TOPLEFT", 154, -314)
 gearSummaryButton:SetText("Gear Summary")
 gearSummaryButton:SetScript("OnClick", function()
     local scan = flcGearScanSnapshot and flcGearScanSnapshot() or nil
@@ -1240,9 +1321,11 @@ gearSummaryButton:SetScript("OnClick", function()
     if shown == 0 then print("|cff33ff99No urgent gear upgrades found.|r") end
 end)
 
+addSettingsSection("ACTIONS", -352)
+
 local trainedButton = CreateFrame("Button", nil, settingsFrame, "UIPanelButtonTemplate")
-trainedButton:SetSize(220, 24)
-trainedButton:SetPoint("BOTTOM", 0, 12)
+trainedButton:SetSize(266, 24)
+trainedButton:SetPoint("TOPLEFT", 16, -376)
 trainedButton:SetText("Mark Class Training Done")
 trainedButton:SetScript("OnClick", function()
     if not DB then return end
@@ -1257,6 +1340,7 @@ refreshSettingsPanel = function()
     for key, entry in pairs(settingsButtons) do
         entry.button:SetText(settingStateText(entry.label, DB[key] and true or false))
     end
+    displayModeButton:SetText("View: " .. tostring(DB.displayMode or "COMPACT"))
     lockButton:SetText(DB.locked and "Unlock UI" or "Lock UI")
 end
 
@@ -1945,9 +2029,9 @@ local function render()
     -- Lazy play UI: show only the quest/task name plus ONE immediate action.
     -- Location is communicated by the safe same-zone arrow/local travel handoff.
     if DB and DB.lazyMode ~= false then
-        routeText:SetText("STEP 1: " .. (step.title or "Next step"))
+        routeText:SetText(step.title or "Next step")
     else
-        routeText:SetText(tag .. ": " .. (step.title or "Next step"))
+        routeText:SetText((tag or "DO") .. "  •  " .. (step.title or "Next step"))
     end
 
     local obj = objectiveSummary(active)
@@ -1974,11 +2058,14 @@ local function render()
         action = "FOLLOW THE ARROW"
     end
 
-    local detailLines = { "DO: " .. tostring(action) }
+    local detailLines = {
+        "|cffffcc00STEP 1|r  |cff33ff99" .. tostring(active and active.isComplete and "TURN IN" or "DO") .. "|r",
+        tostring(action),
+    }
 
     local specName, talentPick = flcTalentRecommendation()
     if specName and talentPick then
-        detailLines[#detailLines + 1] = "TALENT: " .. tostring(specName) .. " — " .. tostring(talentPick)
+        detailLines[#detailLines + 1] = "|cff66ccffTalent:|r " .. tostring(specName) .. " — " .. tostring(talentPick)
     end
 
     if DB and DB.lazyMode ~= false and step and step.cluster then
@@ -1995,16 +2082,24 @@ local function render()
             end
 
             detailLines[#detailLines + 1] = ""
-            local queueLabel = q.background and " (WHILE QUESTING)" or ""
-            detailLines[#detailLines + 1] = "STEP " .. tostring(stepNumber) .. ": " .. tostring(q.title or "Quest") .. queueLabel
-            if qAction and qAction ~= "" then
-                detailLines[#detailLines + 1] = "DO: " .. tostring(qAction)
+            local queueLabel = q.background and "  |cff888888• WHILE QUESTING|r" or ""
+            local statusLabel = q.active and q.active.isComplete and "|cff33ff99TURN IN|r" or "|cffffcc00NEXT|r"
+            detailLines[#detailLines + 1] = string.format(
+                "|cffc8a96bSTEP %d|r  %s%s",
+                stepNumber,
+                tostring(q.title or "Quest"),
+                queueLabel
+            )
+            if DB and DB.displayMode == "DETAILED" and qAction and qAction ~= "" then
+                detailLines[#detailLines + 1] = "  " .. statusLabel .. "  " .. tostring(qAction)
+            elseif not q.background and qAction and qAction ~= "" then
+                detailLines[#detailLines + 1] = "  " .. statusLabel .. "  " .. tostring(qAction)
             end
             stepNumber = stepNumber + 1
         end
     end
 
-    if DB and DB.gearAdvisor ~= false and flcGearScanSnapshot then
+    if DB and DB.gearAdvisor ~= false and DB.displayMode == "DETAILED" and flcGearScanSnapshot then
         local scan = flcGearScanSnapshot()
         local shown = 0
         for _, item in ipairs((scan and scan.priorities) or {}) do
@@ -2051,6 +2146,11 @@ local function render()
         end
     end
 
+    if DB and DB.displayMode ~= "DETAILED" then
+        detailLines[#detailLines + 1] = ""
+        detailLines[#detailLines + 1] = "|cff777777Compact view • Settings > View for more detail|r"
+    end
+
     detailText:SetText(table.concat(detailLines, "\n"))
     refreshMainScroll()
 
@@ -2068,7 +2168,7 @@ syncQuests = function()
     render()
 end
 
-local function applySettings()
+applySettings = function()
     frame:ClearAllPoints()
     frame:SetPoint(DB.point or "CENTER", UIParent, DB.relativePoint or "CENTER", DB.x or 0, DB.y or 0)
     frame:SetSize(DB.width or defaults.width, DB.height or defaults.height)
