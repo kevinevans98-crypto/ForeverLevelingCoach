@@ -1705,9 +1705,42 @@ goButton:SetText("Go")
 flcStyleFlatButton(goButton, true)
 goButton:SetScript("OnClick", focusCurrentQuest)
 
+-- Smart Travel is guidance only: never move the player or select a taxi node.
+local smartTravelButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+smartTravelButton:SetSize(72, 20)
+smartTravelButton:SetPoint("RIGHT", goButton, "LEFT", -4, 0)
+smartTravelButton:SetText("Travel")
+flcStyleFlatButton(smartTravelButton, false)
+smartTravelButton:SetScript("OnClick", function()
+    if syncQuests then syncQuests() end
+    local destination = currentAutoFlightTarget
+    if destination and destination ~= "" then
+        local known = false
+        if DB and DB.knownFlightPaths then
+            for name, unlocked in pairs(DB.knownFlightPaths) do
+                if unlocked and string.find(string.lower(name), string.lower(destination), 1, true) then
+                    known = true
+                    break
+                end
+            end
+        end
+        if known then
+            print("|cff33ff99FLC Travel:|r Open a flight master and select " .. destination .. " if reachable.")
+        else
+            print("|cff33ff99FLC Travel:|r Flight destination " .. destination .. " is not verified as learned. Follow the route manually.")
+        end
+    elseif currentTravelInstruction and currentTravelInstruction ~= "" and currentTravelInstruction ~= "none" then
+        print("|cff33ff99FLC Travel:|r " .. tostring(currentTravelInstruction))
+    else
+        print("|cff33ff99FLC Travel:|r No verified travel instruction for this objective yet. Use Go to view the objective.")
+    end
+    if focusCurrentQuest then focusCurrentQuest() end
+end)
+
+
 local settingsButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
 settingsButton:SetSize(58, 20)
-settingsButton:SetPoint("RIGHT", goButton, "LEFT", -4, 0)
+settingsButton:SetPoint("RIGHT", smartTravelButton, "LEFT", -4, 0)
 settingsButton:SetText("Settings")
 flcStyleFlatButton(settingsButton, false)
 
