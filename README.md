@@ -177,3 +177,11 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Added speed-first Shaman 23-30 routing, Lost Pages [6504], stale-quest XP penalties, and better Ashenvale objective guidance
 
 - SKIP route classification is now a hard exclusion: skipped quests cannot become STEP 1 or inflate nearby-cluster scoring
+
+- v0.19.0: Added a verified Undead Rogue Silverpine 10–20 route package to reduce fallback-only leveling.
+
+- Added Forever-exclusive Wild Eyes [91920] and Watching the Roads [95981] to automatic routing.
+
+- Added verified Return to Podrig, Wild Hearts/Return to Quinn, Prove Your Worth, Arugal's Folly, Dalaran investigation, and Recipe for Death classifications.
+
+- Elite/escort Silverpine steps are classified conservatively as OPTIONAL when they can hurt solo XP/hour.
