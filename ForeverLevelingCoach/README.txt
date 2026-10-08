@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.16.5
+Forever Leveling Coach v0.17.0
 
 Current scope
 -------------
@@ -347,3 +347,10 @@ Roadmap
 
 - Deathknell same-cave ordering improved: A Light in the Darkness -> Night Web's Hollow -> Marla's Last Wish
 - Night Web's Hollow action now shows the exact 10 Young + 8 Night Web Spider kill counts
+
+- Rogue talent/spec advisor added
+- Recommended leveling spec: Combat for fast questing and dungeon quest runs
+- Level-by-level talent path from 10-30 follows the current WoW Forever beta Combat leveling build
+- Lazy window shows the exact talent rank to buy for the current level
+- Level 30 target ends at Blade Flurry with 21 Combat points
+- Export now includes RecommendedSpec and TalentRecommendation
