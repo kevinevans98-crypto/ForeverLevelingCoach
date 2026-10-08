@@ -293,3 +293,9 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - The current quest title now gets the full window width instead of competing with Settings/Go/Export, preventing unnecessary title wrapping.
 
 - Increased the redesigned default height and shortened the compact footer so the bottom of the guide no longer feels clipped.
+
+- v0.26.2: Polished the leveling interface so STEP 1 dominates visually while queued/background quests are quieter.
+
+- Removed the compact-mode footer and softened the scroll bar chrome to reduce visual clutter.
+
+- Replaced the stock scrollbar-style navigation arrow with a larger GPS-style minimap arrow, gold tint, shadow, and separate target/distance panel.
