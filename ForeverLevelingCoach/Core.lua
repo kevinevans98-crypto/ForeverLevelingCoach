@@ -1587,7 +1587,8 @@ local function render()
     end
 
     local insideDungeonRoute = step and step.dungeon and step.cluster and zoneMatchesCluster(step.cluster)
-    if insideDungeonRoute then
+    local insideDungeonObjectiveMode = insideDungeonRoute and active and not active.isComplete
+    if insideDungeonObjectiveMode then
         currentObjectiveTarget = nil
         currentTravelTarget = nil
         currentNavigationWaypoint = nil
@@ -1719,7 +1720,12 @@ exportSnapshot = function()
         "Faction=" .. tostring(UnitFactionGroup("player") or "?"),
         "RecommendedStep=" .. tostring(currentRouteStep and currentRouteStep.title or "?"),
         "RecommendedQuestID=" .. tostring(currentRouteStep and currentRouteStep.questID or "none"),
-        "DungeonMode=" .. tostring(currentRouteStep and currentRouteStep.dungeon and "active" or "none"),
+        "DungeonMode=" .. tostring(
+            currentRouteStep and currentRouteStep.dungeon
+            and currentCluster and zoneMatchesCluster(currentCluster)
+            and currentByID[currentRouteStep.questID] and not currentByID[currentRouteStep.questID].isComplete
+            and "active" or "none"
+        ),
         "RecommendedCluster=" .. tostring(currentCluster or "none"),
         "ClusterActiveQuestCount=" .. tostring(currentClusterCount or 0),
         "RecommendedScore=" .. tostring(currentRouteScore or 0),
