@@ -730,6 +730,38 @@ local function hasIncompletePrimaryInCluster(step)
     return false
 end
 
+local function getEventUrgencyBonus(step, active)
+    if not step or not active or active.isComplete or not step.eventUrgency then
+        return 0, nil
+    end
+
+    local target = getBestObjectiveTarget and getBestObjectiveTarget(step, active) or nil
+    local waypoint = target and target.waypoint or step.waypoint
+    if not waypoint then return 0, nil end
+
+    local distance = waypointDistanceNormalized(waypoint)
+    if not distance then return 0, nil end
+
+    local weights = Data.scoring or {}
+    local maxDistance = tonumber(step.eventUrgencyDistance)
+        or tonumber(weights.eventUrgencyDistance)
+        or 0.08
+    if distance > maxDistance then return 0, nil end
+
+    local maxBonus = tonumber(step.eventUrgencyBonus)
+        or tonumber(weights.eventUrgencyMax)
+        or 0
+    if maxBonus <= 0 then return 0, nil end
+
+    -- Full urgency when right on top of the event start; taper smoothly to 0
+    -- at the configured radius so escorts do not dominate from far away.
+    local normalized = 1 - math.max(0, math.min(distance / maxDistance, 1))
+    local bonus = math.floor((maxBonus * normalized) + 0.5)
+    if bonus <= 0 then return 0, nil end
+
+    return bonus, string.format("nearby escort/event — do before leaving (+%d)", bonus)
+end
+
 local function scoreRouteStep(step, active, clusterCounts)
     local weights = Data.scoring or {}
     local score = 0
@@ -802,6 +834,12 @@ local function scoreRouteStep(step, active, clusterCounts)
     if waypointBonus > 0 then
         score = score + waypointBonus
         reasons[#reasons + 1] = waypointReason
+    end
+
+    local eventBonus, eventReason = getEventUrgencyBonus(step, active)
+    if eventBonus > 0 then
+        score = score + eventBonus
+        reasons[#reasons + 1] = eventReason
     end
 
     -- Speed-first tuning. Data.speedXP is a curated XP/min value (0..120),
