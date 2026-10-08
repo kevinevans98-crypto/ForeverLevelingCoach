@@ -475,3 +475,11 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Readiness issues are classified BLOCKER, WARN, or INFO. Only BLOCKER/WARN issues can appear as non-disruptive HUD cards; INFO items stay in diagnostics so metadata gaps do not clutter leveling.
 
 - Export now includes RouteReadinessIssueCount, blocker/warning counts, RouteReadinessTop, and a full RouteReadiness section. The scanner never steals STEP 1 or navigation.
+
+- v0.43.0: Cleared the Route Readiness warnings found in the v0.42 live export.
+
+- The Essence of Aku'Mai now has explicit Ashenvale → Darkshore/BFD travel guidance with the verified 32,94 approach waypoint.
+
+- Warsong Supplies now has explicit Ratchet → Booty Bay boat guidance for the Axe Shipment, while reminding the player to finish local Ashenvale supplies first.
+
+- Leaders of the Fang now includes verified pickup metadata for Nara Wildmane at Thunder Bluff 75.6,31.6.
