@@ -10,7 +10,7 @@ local defaults = {
     x = 0,
     y = 0,
     width = 430,
-    height = 120,
+    height = 138,
     scale = 1,
     alpha = 0.95,
     locked = false,
@@ -35,7 +35,7 @@ local defaults = {
     autoAccept = true,
     autoTurnIn = true,
     lastClassTrainerLevel = 0,
-    lastUIVersion = "0.15.2",
+    lastUIVersion = "0.16.1",
     lastCluster = nil,
 }
 
@@ -97,11 +97,11 @@ local function copyDefaults()
     charDB.knownFlightPaths = charDB.knownFlightPaths or {}
     charDB.navigationProgress = charDB.navigationProgress or {}
 
-    if charDB.lastUIVersion ~= "0.15.2" then
+    if charDB.lastUIVersion ~= "0.16.1" then
         charDB.width = 410
-        charDB.height = 120
+        charDB.height = 138
         charDB.alpha = 1
-        charDB.lastUIVersion = "0.15.2"
+        charDB.lastUIVersion = "0.16.1"
     end
 
     DB = charDB
@@ -527,6 +527,34 @@ local function scoreRouteStep(step, active, clusterCounts)
     return score, reasons
 end
 
+local function getNearbyClusterQuestNames(step, byID)
+    local names = {}
+    if not step or not step.cluster or not byID then return names end
+
+    local _, playerClass = UnitClass("player")
+    for _, routeStep in ipairs(Data.route or {}) do
+        if routeStep.cluster == step.cluster and routeStep.questID ~= step.questID then
+            local classMatch = (not routeStep.class) or routeStep.class == playerClass
+            local active = byID[routeStep.questID]
+            if classMatch and active and not isQuestCompleted(routeStep.questID) then
+                names[#names + 1] = {
+                    title = routeStep.title or active.title or ("Quest " .. tostring(routeStep.questID)),
+                    priority = routeStep.clusterPriority or 999,
+                    complete = active.isComplete and true or false,
+                }
+            end
+        end
+    end
+
+    table.sort(names, function(a, b)
+        if a.complete ~= b.complete then return a.complete end
+        if a.priority ~= b.priority then return a.priority < b.priority end
+        return tostring(a.title) < tostring(b.title)
+    end)
+
+    return names
+end
+
 local function getCurrentDungeonCluster()
     for clusterID, cluster in pairs(Data.clusters or {}) do
         if cluster.dungeon and zoneMatchesCluster(clusterID) then
@@ -624,7 +652,7 @@ frame:SetMovable(true)
 frame:SetResizable(true)
 frame:EnableMouse(true)
 frame:SetClampedToScreen(true)
-frame:SetResizeBounds(340, 105, 700, 300)
+frame:SetResizeBounds(340, 120, 700, 300)
 frame:SetBackdrop({
     bgFile = "Interface/DialogFrame/UI-DialogBox-Background-Dark",
     edgeFile = "Interface/DialogFrame/UI-DialogBox-Border",
@@ -1551,7 +1579,25 @@ local function render()
         action = "FOLLOW THE ARROW"
     end
 
-    detailText:SetText("DO: " .. tostring(action))
+    local detailLines = { "DO: " .. tostring(action) }
+
+    if DB and DB.lazyMode ~= false and step and step.cluster then
+        local nearby = getNearbyClusterQuestNames(step, currentByID)
+        if #nearby > 0 then
+            local labels = {}
+            local maxShown = 3
+            for i = 1, math.min(#nearby, maxShown) do
+                local q = nearby[i]
+                labels[#labels + 1] = (q.complete and "✓ " or "") .. tostring(q.title)
+            end
+            if #nearby > maxShown then
+                labels[#labels + 1] = "+" .. tostring(#nearby - maxShown) .. " more"
+            end
+            detailLines[#detailLines + 1] = "NEARBY: " .. table.concat(labels, " • ")
+        end
+    end
+
+    detailText:SetText(table.concat(detailLines, "\n"))
     refreshMainScroll()
 
     -- Keep the visible guide uncluttered: only the current recommended step
