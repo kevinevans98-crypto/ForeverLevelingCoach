@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.28.7",
+    version = "0.28.8",
     supported = {
         faction = "Horde",
         classes = {
@@ -338,17 +338,20 @@ ForeverLevelingCoach_Data = {
         ASHENVALE_ZORAM = {
             name = "Ashenvale / Zoram Strand",
             zoneAliases = { "Ashenvale", "Zoram'gar Outpost", "Zoram Strand" },
+            localAliases = { "Zoram'gar Outpost", "Zoram Strand" },
             note = "Bundle Zoram Strand naga/event quests while you are already on the west coast.",
         },
         ASHENVALE_THISTLEFUR = {
             name = "Ashenvale / Thistlefur",
             zoneAliases = { "Ashenvale", "Thistlefur Village", "Thistlefur Hold" },
+            localAliases = { "Thistlefur Village", "Thistlefur Hold" },
             finishBeforeTurnIn = true,
             note = "Bundle Thistlefur kills, Troll Charms, and Logging Rope when moving through central-west Ashenvale. Finish real local objectives before leaving for turn-ins.",
         },
         ASHENVALE_SPLINTERTREE = {
             name = "Ashenvale / Splintertree",
             zoneAliases = { "Ashenvale", "Splintertree Post" },
+            localAliases = { "Splintertree Post" },
             note = "Stack the nearby Ashenvale objectives before leaving the area.",
         },
         STONETALON_GRIMTOTEM = {
