@@ -1007,6 +1007,13 @@ local routeLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall"
 routeLabel:SetPoint("TOPLEFT", 16, -44)
 routeLabel:SetText("CURRENT OBJECTIVE")
 
+local objectiveHighlight = frame:CreateTexture(nil, "BACKGROUND")
+objectiveHighlight:SetPoint("TOPLEFT", 11, -58)
+objectiveHighlight:SetPoint("TOPRIGHT", -11, -58)
+objectiveHighlight:SetHeight(38)
+objectiveHighlight:SetTexture("Interface/Buttons/WHITE8x8")
+objectiveHighlight:SetVertexColor(0.23, 0.16, 0.035, 0.25)
+
 local routeText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 routeText:SetPoint("TOPLEFT", 16, -66)
 routeText:SetPoint("TOPRIGHT", -16, -66)
@@ -1037,6 +1044,13 @@ mainScroll:EnableMouseWheel(true)
 local mainScrollChild = CreateFrame("Frame", nil, mainScroll)
 mainScrollChild:SetSize(1, 1)
 mainScroll:SetScrollChild(mainScrollChild)
+if mainScroll.ScrollBar and mainScroll.ScrollBar.SetAlpha then
+    mainScroll.ScrollBar:SetAlpha(0.38)
+end
+local legacyScrollBar = _G["ForeverLevelingCoachMainScrollScrollBar"]
+if legacyScrollBar and legacyScrollBar.SetAlpha then
+    legacyScrollBar:SetAlpha(0.38)
+end
 
 local detailText = mainScrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 detailText:SetPoint("TOPLEFT", 0, 0)
@@ -1079,25 +1093,51 @@ resizeGrip:SetHighlightTexture("Interface/ChatFrame/UI-ChatIM-SizeGrabber-Highli
 resizeGrip:SetPushedTexture("Interface/ChatFrame/UI-ChatIM-SizeGrabber-Down")
 
 local arrowFrame = CreateFrame("Frame", "ForeverLevelingCoachArrowFrame", UIParent)
-arrowFrame:SetSize(120, 92)
+arrowFrame:SetSize(220, 112)
 arrowFrame:SetMovable(true)
 arrowFrame:EnableMouse(true)
 arrowFrame:SetClampedToScreen(true)
 arrowFrame:SetFrameStrata("HIGH")
 
--- Floating WoW-style navigation arrow: no window/background.
-local arrowTexture = arrowFrame:CreateTexture(nil, "ARTWORK")
-arrowTexture:SetSize(64, 64)
-arrowTexture:SetPoint("TOP", 0, 0)
-arrowTexture:SetTexture("Interface/Buttons/UI-ScrollBar-ScrollUpButton-Up")
-arrowTexture:SetAlpha(1)
+-- Clean GPS-style navigation indicator. The map/facing math below is unchanged;
+-- only the presentation is different from the old scrollbar-button texture.
+local arrowShadow = arrowFrame:CreateTexture(nil, "BACKGROUND")
+arrowShadow:SetSize(68, 68)
+arrowShadow:SetPoint("TOP", 2, -2)
+arrowShadow:SetTexture("Interface/Minimap/MinimapArrow")
+arrowShadow:SetVertexColor(0, 0, 0, 0.55)
 
-local arrowLabel = arrowFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-arrowLabel:SetPoint("TOP", arrowTexture, "BOTTOM", 0, -2)
-arrowLabel:SetWidth(180)
+local arrowTexture = arrowFrame:CreateTexture(nil, "ARTWORK")
+arrowTexture:SetSize(62, 62)
+arrowTexture:SetPoint("TOP", 0, 0)
+arrowTexture:SetTexture("Interface/Minimap/MinimapArrow")
+arrowTexture:SetVertexColor(1.0, 0.78, 0.12, 1.0)
+
+local arrowInfo = CreateFrame("Frame", nil, arrowFrame, "BackdropTemplate")
+arrowInfo:SetSize(210, 40)
+arrowInfo:SetPoint("TOP", arrowTexture, "BOTTOM", 0, -3)
+arrowInfo:SetBackdrop({
+    bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+    edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+    tile = true,
+    tileSize = 12,
+    edgeSize = 8,
+    insets = { left = 4, right = 4, top = 3, bottom = 3 },
+})
+arrowInfo:SetBackdropColor(0.015, 0.015, 0.015, 0.82)
+arrowInfo:SetBackdropBorderColor(0.55, 0.42, 0.14, 0.72)
+
+local arrowLabel = arrowInfo:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+arrowLabel:SetPoint("TOPLEFT", 7, -5)
+arrowLabel:SetPoint("TOPRIGHT", -7, -5)
 arrowLabel:SetJustifyH("CENTER")
-arrowLabel:SetShadowOffset(1, -1)
 arrowLabel:SetText("")
+
+local arrowDistance = arrowInfo:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+arrowDistance:SetPoint("TOP", arrowLabel, "BOTTOM", 0, -2)
+arrowDistance:SetWidth(196)
+arrowDistance:SetJustifyH("CENTER")
+arrowDistance:SetText("")
 
 local travelHintFrame = CreateFrame("Frame", "ForeverLevelingCoachTravelHintFrame", UIParent, "BackdropTemplate")
 travelHintFrame:SetSize(300, 90)
@@ -1555,6 +1595,7 @@ local function updateArrow()
     currentArrowState = "active-same-map"
     updateTravelHint(nil, currentArrowState)
     arrowTexture:SetRotation(relativeAngle)
+    arrowShadow:SetRotation(relativeAngle)
 
     currentArrowDebug = {
         playerMapID = playerMapID,
@@ -1570,15 +1611,16 @@ local function updateArrow()
 
     local meters = getWaypointDistanceMeters(playerMapID, px, py, waypoint.x, waypoint.y)
     local label = waypoint.label or currentRouteStep.title or "Route target"
+    arrowLabel:SetText(label)
     if meters then
         if meters >= 1000 then
-            arrowLabel:SetText(string.format("%s  •  %.2f km", label, meters / 1000))
+            arrowDistance:SetText(string.format("%.2f km", meters / 1000))
         else
-            arrowLabel:SetText(string.format("%s  •  %d m", label, math.floor(meters + 0.5)))
+            arrowDistance:SetText(string.format("%d m", math.floor(meters + 0.5)))
         end
     else
         local mapDistance = math.sqrt(dx * dx + dy * dy) * 100
-        arrowLabel:SetText(string.format("%s  •  %.1f%%", label, mapDistance))
+        arrowDistance:SetText(string.format("%.1f%% map distance", mapDistance))
     end
 end
 
@@ -2062,9 +2104,10 @@ local function render()
         action = "FOLLOW THE ARROW"
     end
 
+    local primaryState = active and active.isComplete and "TURN IN" or "DO NOW"
     local detailLines = {
-        "|cffffcc00STEP 1|r  |cff33ff99" .. tostring(active and active.isComplete and "TURN IN" or "DO") .. "|r",
-        tostring(action),
+        "|cffffcc00STEP 1|r  |cff33ff99" .. tostring(primaryState) .. "|r",
+        "|cffffffff" .. tostring(action) .. "|r",
     }
 
     local specName, talentPick = flcTalentRecommendation()
@@ -2086,18 +2129,20 @@ local function render()
             end
 
             detailLines[#detailLines + 1] = ""
-            local queueLabel = q.background and "  |cff888888• WHILE QUESTING|r" or ""
-            local statusLabel = q.active and q.active.isComplete and "|cff33ff99TURN IN|r" or "|cffffcc00NEXT|r"
+            local queueLabel = q.background and "  |cff707070WHILE QUESTING|r" or ""
+            local statusLabel = q.active and q.active.isComplete and "|cff6edb8fTURN IN|r" or "|cffbda66bNEXT|r"
+            local titleColor = q.background and "|cff8a8a8a" or "|ffc9c0aa"
             detailLines[#detailLines + 1] = string.format(
-                "|cffc8a96bSTEP %d|r  %s%s",
+                "|cff8f7a50STEP %d|r  %s%s|r%s",
                 stepNumber,
+                titleColor,
                 tostring(q.title or "Quest"),
                 queueLabel
             )
             if DB and DB.displayMode == "DETAILED" and qAction and qAction ~= "" then
-                detailLines[#detailLines + 1] = "  " .. statusLabel .. "  " .. tostring(qAction)
+                detailLines[#detailLines + 1] = "   " .. statusLabel .. "  |cffaaaaaa" .. tostring(qAction) .. "|r"
             elseif not q.background and qAction and qAction ~= "" then
-                detailLines[#detailLines + 1] = "  " .. statusLabel .. "  " .. tostring(qAction)
+                detailLines[#detailLines + 1] = "   " .. statusLabel .. "  |cffaaaaaa" .. tostring(qAction) .. "|r"
             end
             stepNumber = stepNumber + 1
         end
@@ -2148,11 +2193,6 @@ local function render()
                 shown = shown + 1
             end
         end
-    end
-
-    if DB and DB.displayMode ~= "DETAILED" then
-        detailLines[#detailLines + 1] = ""
-        detailLines[#detailLines + 1] = "|cff777777Compact • Settings > View for details|r"
     end
 
     detailText:SetText(table.concat(detailLines, "\n"))
