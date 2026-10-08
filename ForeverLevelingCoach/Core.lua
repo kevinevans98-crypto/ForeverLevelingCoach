@@ -976,6 +976,11 @@ goButton:SetPoint("RIGHT", exportButton, "LEFT", -4, 0)
 goButton:SetText("Go")
 goButton:SetScript("OnClick", focusCurrentQuest)
 
+local settingsButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+settingsButton:SetSize(70, 22)
+settingsButton:SetPoint("RIGHT", goButton, "LEFT", -4, 0)
+settingsButton:SetText("Settings")
+
 exportButton:SetScript("OnClick", function()
     syncQuests()
     exportSnapshot()
@@ -983,7 +988,7 @@ end)
 
 local routeText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 routeText:SetPoint("TOPLEFT", 14, -45)
-routeText:SetPoint("TOPRIGHT", -142, -45)
+routeText:SetPoint("TOPRIGHT", -218, -45)
 routeText:SetJustifyH("LEFT")
 routeText:SetText("Loading route...")
 
@@ -1143,6 +1148,128 @@ travelHintResizeGrip:SetScript("OnMouseUp", function()
 end)
 
 travelHintFrame:Hide()
+
+local settingsFrame = CreateFrame("Frame", "ForeverLevelingCoachSettingsFrame", UIParent, "BackdropTemplate")
+settingsFrame:SetSize(260, 338)
+settingsFrame:SetPoint("TOPLEFT", frame, "TOPRIGHT", 8, 0)
+settingsFrame:SetFrameStrata("DIALOG")
+settingsFrame:SetClampedToScreen(true)
+settingsFrame:EnableMouse(true)
+settingsFrame:SetBackdrop({
+    bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+    edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+    tile = true,
+    tileSize = 16,
+    edgeSize = 14,
+    insets = { left = 5, right = 5, top = 5, bottom = 5 },
+})
+settingsFrame:SetBackdropColor(0.03, 0.03, 0.03, 0.94)
+settingsFrame:SetBackdropBorderColor(0.72, 0.55, 0.20, 0.95)
+settingsFrame:Hide()
+
+local settingsTitle = settingsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+settingsTitle:SetPoint("TOPLEFT", 12, -12)
+settingsTitle:SetText("FLC Settings")
+
+local settingsClose = CreateFrame("Button", nil, settingsFrame, "UIPanelCloseButton")
+settingsClose:SetPoint("TOPRIGHT", -2, -2)
+
+local settingsButtons = {}
+local refreshSettingsPanel
+
+local function settingStateText(label, enabled)
+    return tostring(label) .. ": " .. (enabled and "ON" or "OFF")
+end
+
+local function makeSettingsToggle(label, key, y, onChanged)
+    local button = CreateFrame("Button", nil, settingsFrame, "UIPanelButtonTemplate")
+    button:SetSize(220, 24)
+    button:SetPoint("TOP", 0, y)
+    button:SetScript("OnClick", function()
+        if not DB then return end
+        DB[key] = not DB[key]
+        if onChanged then onChanged(DB[key]) end
+        if syncQuests then syncQuests() end
+        if refreshSettingsPanel then refreshSettingsPanel() end
+    end)
+    settingsButtons[key] = { button = button, label = label }
+    return button
+end
+
+makeSettingsToggle("Lazy Mode", "lazyMode", -42)
+makeSettingsToggle("Auto Accept", "autoAccept", -70)
+makeSettingsToggle("Auto Turn-In", "autoTurnIn", -98)
+makeSettingsToggle("Gear Advice", "gearAdvisor", -126)
+makeSettingsToggle("Navigation Arrow", "arrowVisible", -154)
+makeSettingsToggle("Flight Assist", "autoFlight", -182)
+makeSettingsToggle("Beginner Mode", "beginner", -210)
+makeSettingsToggle("Relic Advisor", "relicAdvisor", -238)
+
+local lockButton = CreateFrame("Button", nil, settingsFrame, "UIPanelButtonTemplate")
+lockButton:SetSize(106, 24)
+lockButton:SetPoint("BOTTOMLEFT", 14, 42)
+lockButton:SetScript("OnClick", function()
+    if not DB then return end
+    DB.locked = not DB.locked
+    resizeGrip:SetShown(not DB.locked)
+    arrowFrame:EnableMouse(not DB.locked)
+    travelHintResizeGrip:SetShown(not DB.locked)
+    if refreshSettingsPanel then refreshSettingsPanel() end
+end)
+
+local gearSummaryButton = CreateFrame("Button", nil, settingsFrame, "UIPanelButtonTemplate")
+gearSummaryButton:SetSize(106, 24)
+gearSummaryButton:SetPoint("LEFT", lockButton, "RIGHT", 8, 0)
+gearSummaryButton:SetText("Gear Summary")
+gearSummaryButton:SetScript("OnClick", function()
+    local scan = flcGearScanSnapshot and flcGearScanSnapshot() or nil
+    print("|cff33ff99FLC:|r gear upgrade summary:")
+    local shown = 0
+    for _, item in ipairs((scan and scan.priorities) or {}) do
+        if shown >= 3 then break end
+        if item.status ~= "OPTIONAL EMPTY" and item.status ~= "NOT EXPECTED YET" then
+            local line = tostring(item.slotName) .. " — " .. tostring(item.status)
+            if item.upgrade and item.upgrade.target then
+                line = line .. ": " .. tostring(item.upgrade.target.name)
+                    .. string.format(" (~+%d%%)", math.floor((item.upgrade.pct or 0) + 0.5))
+            end
+            print(line)
+            shown = shown + 1
+        end
+    end
+    if shown == 0 then print("|cff33ff99No urgent gear upgrades found.|r") end
+end)
+
+local trainedButton = CreateFrame("Button", nil, settingsFrame, "UIPanelButtonTemplate")
+trainedButton:SetSize(220, 24)
+trainedButton:SetPoint("BOTTOM", 0, 12)
+trainedButton:SetText("Mark Class Training Done")
+trainedButton:SetScript("OnClick", function()
+    if not DB then return end
+    DB.lastClassTrainerLevel = UnitLevel("player") or DB.lastClassTrainerLevel or 0
+    currentTrainingDue = false
+    if syncQuests then syncQuests() end
+    print("|cff33ff99FLC:|r marked class training complete for level " .. tostring(DB.lastClassTrainerLevel) .. ".")
+end)
+
+refreshSettingsPanel = function()
+    if not DB then return end
+    for key, entry in pairs(settingsButtons) do
+        entry.button:SetText(settingStateText(entry.label, DB[key] and true or false))
+    end
+    lockButton:SetText(DB.locked and "Unlock UI" or "Lock UI")
+end
+
+settingsButton:SetScript("OnClick", function()
+    if settingsFrame:IsShown() then
+        settingsFrame:Hide()
+    else
+        refreshSettingsPanel()
+        settingsFrame:ClearAllPoints()
+        settingsFrame:SetPoint("TOPLEFT", frame, "TOPRIGHT", 8, 0)
+        settingsFrame:Show()
+    end
+end)
 
 local function saveArrowPosition()
     local point, _, relativePoint, x, y = arrowFrame:GetPoint(1)
@@ -1963,6 +2090,9 @@ local function applySettings()
         arrowFrame:Hide()
     else
         updateArrow()
+    end
+    if settingsFrame and settingsFrame:IsShown() and refreshSettingsPanel then
+        refreshSettingsPanel()
     end
 end
 
@@ -3224,13 +3354,19 @@ SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
     elseif msg == "hide" then
         DB.visible = false
         frame:Hide()
+        settingsFrame:Hide()
+    elseif msg == "settings" then
+        DB.visible = true
+        frame:Show()
+        refreshSettingsPanel()
+        settingsFrame:Show()
     elseif msg == "show" or msg == "" then
         DB.visible = true
         frame:Show()
         syncQuests()
     else
         print("|cff33ff99Forever Leveling Coach v" .. tostring(Data.version) .. "|r")
-        print("/flc show, hide, go, lazy, spec, relic, trained, autoaccept, autoturnin, sync, export, gear, gearscan, autoflight, arrow, lock, unlock, beginner")
+        print("/flc show, hide, settings, go, lazy, spec, relic, trained, autoaccept, autoturnin, sync, export, gear, gearscan, autoflight, arrow, lock, unlock, beginner")
     end
 end
 
