@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.17.7
+Forever Leveling Coach v0.17.8
 
 Current scope
 -------------
@@ -388,3 +388,6 @@ Roadmap
 - Added verified turn-ins for The Book of Ur [1013] -> Keeper Bel'dugur, Undercity 53.7,54.5
 - Added verified turn-in for Arugal Must Die [1014] -> Dalar Dawnweaver, The Sepulcher 44.2,39.8
 - DungeonMode export now reports active only when there is an unfinished current dungeon objective
+
+- Added turn-in proximity scoring: completed quests are now scored using their actual turn-in waypoint instead of the quest's original objective waypoint
+- This makes local hand-ins win before cross-map hand-ins when both are complete (for example, Arugal Must Die at The Sepulcher before The Book of Ur in Undercity while still in Silverpine)
