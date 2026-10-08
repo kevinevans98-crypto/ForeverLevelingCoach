@@ -1561,7 +1561,7 @@ local function render()
     -- Lazy play UI: show only the quest/task name plus ONE immediate action.
     -- Location is communicated by the safe same-zone arrow/local travel handoff.
     if DB and DB.lazyMode ~= false then
-        routeText:SetText(step.title or "Next step")
+        routeText:SetText("STEP 1: " .. (step.title or "Next step"))
     else
         routeText:SetText(tag .. ": " .. (step.title or "Next step"))
     end
@@ -1594,6 +1594,7 @@ local function render()
 
     if DB and DB.lazyMode ~= false and step and step.cluster then
         local clusterQuests = getNearbyClusterQuestNames(step, currentByID)
+        local stepNumber = 2
         for _, q in ipairs(clusterQuests) do
             local qAction = nil
             if q.active and q.active.isComplete then
@@ -1604,19 +1605,20 @@ local function render()
             end
 
             detailLines[#detailLines + 1] = ""
-            detailLines[#detailLines + 1] = tostring(q.title or "Quest")
+            detailLines[#detailLines + 1] = "STEP " .. tostring(stepNumber) .. ": " .. tostring(q.title or "Quest")
             if qAction and qAction ~= "" then
                 detailLines[#detailLines + 1] = "DO: " .. tostring(qAction)
             end
+            stepNumber = stepNumber + 1
         end
     end
 
     detailText:SetText(table.concat(detailLines, "\n"))
     refreshMainScroll()
 
-    -- Keep the visible guide uncluttered: only the current recommended step
-    -- and its objective/instruction are shown. Full quest data remains available
-    -- through /flc export and the background scanner.
+    -- Lazy window is an ordered checklist. STEP 1 is the live routed objective
+    -- and owns the navigation arrow; later steps are queued quests in the same cluster.
+    -- Full diagnostics remain available through /flc export.
     questText:SetText("")
     questText:Hide()
     updateArrow()
