@@ -1,13 +1,13 @@
 # Forever Leveling Coach — Alpha 1 Release Notes
 
-## Alpha 1 — v0.44.0
+## Alpha 1 — v0.45.0
 
 Forever Leveling Coach Alpha 1 is an early tester build focused on validating the core leveling experience before wider class and route expansion.
 
 ### Primary test scope
-- Horde Shaman
-- Levels 1–30
-- Rogue support remains experimental
+- All standard Horde classes, levels 1–30, can use the core addon
+- Shaman and Rogue currently have the deepest class-specific optimization
+- Other classes use the universal routing/navigation engine with generic class behavior where custom data is not yet available
 
 ### Core systems included
 - Automatic quest routing
@@ -27,7 +27,13 @@ Forever Leveling Coach Alpha 1 is an early tester build focused on validating th
 - Talent guidance
 - Full `/flc export` diagnostics
 
-### New in v0.44.0
+### New in v0.45.0
+- Added universal Horde class support foundation.
+- Warrior, Hunter, Rogue, Priest, Shaman, Mage, Warlock, and Druid now pass the core support gate.
+- Added generic class profiles so unsupported class-specific systems fail safely instead of blocking the entire addon.
+- Shaman and Rogue retain their existing specialized behavior.
+
+### Retained from v0.44.0
 - Added chain-aware completed-quest scoring.
 - Follow-up quest unlocks can add +45 route value.
 - Same-NPC follow-ups can add another +35.
