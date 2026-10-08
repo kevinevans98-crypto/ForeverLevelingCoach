@@ -165,3 +165,5 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Added Fields of Grief [365]/[407], A Rogue's Deal [8] routing, and local-objective-before-hub turn-in deferral
 
 - Added Gordo's Task [5481] and integrated it into the Deathknell-to-Brill no-backtracking route
+
+- SFK completed-quest exit fix and verified Book of Ur / Arugal turn-in routing
