@@ -201,3 +201,9 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Added race filtering to the route engine so starter quests from the wrong race can never win scoring.
 
 - Skyborne Shamans now receive Zephras Isle-specific level 1-12 fallback guidance without fabricated quest IDs.
+
+- v0.21.1: Added background-quest routing so incidental quests cannot get FLC stuck on STEP 1.
+
+- Background quests never own STEP 1, the navigation arrow, or the Go button; they remain visible in the local quest queue.
+
+- The Lost Pages [6504] is now a background quest and is prioritized as STEP 2 while a real Thistlefur objective drives navigation.
