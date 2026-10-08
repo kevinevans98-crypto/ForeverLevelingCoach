@@ -1,4 +1,4 @@
-Forever Leveling Coach v0.15.0
+Forever Leveling Coach v0.15.1
 
 Current scope
 -------------
@@ -6,7 +6,7 @@ WoW Forever Beta
 Horde Shaman
 Levels 1-30
 
-v0.15.0 highlights
+v0.15.1 highlights
 -----------------
 - Quest-ID-based automatic routing foundation
 - Live quest-log syncing
@@ -304,3 +304,9 @@ Roadmap
 - Export now includes Race
 - Character progression state is separated per character: known flight paths, discovered quests, navigation progress, trainer level, and route cluster no longer leak from Shamm to Ms
 - Rogue route data is intentionally empty at level 1 until live Forever quest IDs are discovered; the addon can now collect those cleanly without Shaman profile contamination
+
+- Rogue route has begun with live-verified Undead starter quest The Mindless Ones [364]
+- Deathknell starter cluster added
+- The Mindless Ones routes Ms to the zombie field around 33,63, then back to Shadow Priest Sarvis at 30.8,66.2
+- Next-chain pickup recorded as Rattling the Rattlecages from Sarvis
+- Route steps can now be class-specific so Rogue-only starter guidance cannot leak onto Shaman
