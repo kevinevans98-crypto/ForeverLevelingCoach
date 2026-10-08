@@ -59,6 +59,7 @@ local function getClassProfile()
             classFile = classFile,
             weaponPreference = nil,
             usesRelics = false,
+            rogueGearProfile = Data.rogueGearProfile,
         }
     end
     return {
@@ -1866,6 +1867,13 @@ local function flcItemScore(link, tooltip)
     if stats then
         for stat, value in pairs(stats) do
             local weight = FLC_GEAR_WEIGHTS[stat]
+            if classFile == "ROGUE" then
+                if stat == "ITEM_MOD_AGILITY_SHORT" then weight = 2.2 end
+                if stat == "ITEM_MOD_STAMINA_SHORT" then weight = 0.8 end
+                if stat == "ITEM_MOD_STRENGTH_SHORT" then weight = 0.5 end
+                if stat == "ITEM_MOD_INTELLECT_SHORT" then weight = 0 end
+                if stat == "ITEM_MOD_SPIRIT_SHORT" then weight = 0 end
+            end
             if weight and value then
                 score = score + (value * weight)
             end
@@ -1930,6 +1938,37 @@ local function flcItemUsabilityReason(link, sourceTooltip)
     return nil
 end
 
+local function flcRogueGearReason(itemType, itemSubType, equipLoc)
+    local _, classFile = UnitClass("player")
+    if classFile ~= "ROGUE" then return nil end
+    local profile = Data.rogueGearProfile or {}
+
+    if itemType == "Armor" then
+        if itemSubType == "Leather" then
+            return nil
+        elseif itemSubType == "Cloth" then
+            return "ROGUE_CLOTH", "Leather is preferred for Rogue leveling"
+        elseif equipLoc ~= "INVTYPE_CLOAK" and equipLoc ~= "INVTYPE_NECK"
+            and equipLoc ~= "INVTYPE_FINGER" and equipLoc ~= "INVTYPE_TRINKET" then
+            return "UNUSABLE", "Rogues cannot use this armor type"
+        end
+    elseif itemType == "Weapon" then
+        local ranged = equipLoc == "INVTYPE_RANGED" or equipLoc == "INVTYPE_RANGEDRIGHT" or equipLoc == "INVTYPE_THROWN"
+        if ranged then
+            if profile.rangedWeapons and profile.rangedWeapons[itemSubType] then return nil end
+            return "UNUSABLE", "Rogue ranged weapons: thrown, bows, crossbows, guns"
+        end
+        if equipLoc == "INVTYPE_2HWEAPON" then
+            return "UNUSABLE", "Rogues cannot use two-handed weapons"
+        end
+        if profile.meleeWeapons and profile.meleeWeapons[itemSubType] then
+            return nil
+        end
+        return "UNUSABLE", "Rogue melee: daggers, 1H swords, 1H maces, fist weapons"
+    end
+    return nil
+end
+
 local function flcGearEvaluateItem(link, sourceTooltip)
     if not link or not GetItemInfo then return nil end
     local _, _, _, _, requiredLevel, itemType, itemSubType, _, equipLoc = GetItemInfo(link)
@@ -1937,6 +1976,9 @@ local function flcGearEvaluateItem(link, sourceTooltip)
 
     local slots = FLC_EQUIP_SLOTS[equipLoc]
     if not slots then return nil end
+
+    local rogueGrade, rogueReason = flcRogueGearReason(itemType, itemSubType, equipLoc)
+    if rogueGrade then return rogueGrade, rogueReason end
 
     local classProfile = getClassProfile()
     local weaponPreference = classProfile and classProfile.weaponPreference
@@ -2024,6 +2066,8 @@ local function flcAddGearAdvice(tooltip, tooltipData)
             tooltip:AddLine("FLC: CANNOT USE", 1.0, 0.25, 0.25)
         elseif grade == "PREFERENCE" then
             tooltip:AddLine("FLC: NOT YOUR 2H TARGET", 1.0, 0.82, 0.2)
+        elseif grade == "ROGUE_CLOTH" then
+            tooltip:AddLine("FLC: SKIP — LEATHER IS BETTER", 1.0, 0.82, 0.2)
         else
             tooltip:AddLine("FLC: KEEP CURRENT ITEM", 1.0, 0.35, 0.35)
         end
