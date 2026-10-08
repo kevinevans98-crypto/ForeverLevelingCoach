@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.28.8",
+    version = "0.29.0",
     supported = {
         faction = "Horde",
         classes = {
@@ -83,6 +83,8 @@ ForeverLevelingCoach_Data = {
         [3376] = true, -- Break Sharptusk!
         [748] = true, -- Poison Water
         [745] = true, -- Sharing the Land
+        [25] = true, -- Stonetalon Standstill (verified Forever/classic route data)
+        [6621] = true, -- King of the Foulweald (verified follow-up)
         [6503] = true, -- Ashenvale Outrunners
         [6504] = true, -- The Lost Pages (Classic quest live-verified on Shamm; 3650 XP in Forever)
         [6441] = true, -- Satyr Horns
@@ -2307,6 +2309,13 @@ ForeverLevelingCoach_Data = {
             cluster = "ASHENVALE_ZORAM",
             clusterPriority = 1,
             note = "Fast local kill quest while at Zoram'gar. Kill Wrathtail naga on the nearby coast.",
+            pickupTarget = {
+                npc = "Marukai",
+                role = "Quest giver",
+                zone = "Zoram'gar Outpost, Ashenvale",
+                coords = "11.7, 34.9",
+                waypoint = { mapID = 1440, x = 0.117, y = 0.349, label = "Marukai" },
+            },
             objectiveTargets = {
                 {
                     objectiveContains = "Wrathtail Head",
@@ -2361,6 +2370,13 @@ ForeverLevelingCoach_Data = {
             cluster = "ASHENVALE_THISTLEFUR",
             clusterPriority = 1,
             note = "Efficient kill quest that stacks with Troll Charm and Logging Rope.",
+            pickupTarget = {
+                npc = "Karang Amakkar",
+                role = "Quest giver",
+                zone = "Zoram'gar Outpost, Ashenvale",
+                coords = "11.9, 34.5",
+                waypoint = { mapID = 1440, x = 0.119, y = 0.345, label = "Karang Amakkar" },
+            },
             turnInTarget = {
                 role = "Quest turn-in",
                 name = "Karang Amakkar",
@@ -2375,6 +2391,7 @@ ForeverLevelingCoach_Data = {
                 waypoint = { mapID = 1440, x = 0.119, y = 0.345, label = "Karang Amakkar" },
             },
             nextPickup = {
+                questID = 6621,
                 title = "King of the Foulweald",
                 npc = "Karang Amakkar",
                 role = "Quest giver",
@@ -2402,6 +2419,108 @@ ForeverLevelingCoach_Data = {
             },
         },
         {
+            questID = 25,
+            questLevel = 25,
+            speedXP = 80,
+            title = "Stonetalon Standstill",
+            tag = "DO",
+            minLevel = 23,
+            maxLevel = 30,
+            cluster = "ASHENVALE_SPLINTERTREE",
+            clusterPriority = 4,
+            note = "Verified Horde Ashenvale quest from Splintertree. Clear Mystral Lake and scout the gazebo while moving southwest; return to Mastok Wrilehiss.",
+            pickupTarget = {
+                npc = "Mastok Wrilehiss",
+                role = "Quest giver",
+                zone = "Splintertree Post, Ashenvale",
+                coords = "73.7, 60.0",
+                waypoint = { mapID = 1440, x = 0.737, y = 0.600, label = "Mastok Wrilehiss" },
+            },
+            objectiveTargets = {
+                {
+                    objectiveContains = "Befouled Water Elemental",
+                    role = "Kill / scout",
+                    name = "Mystral Lake",
+                    zone = "Ashenvale",
+                    coords = "around 49, 70",
+                    locationType = "LAKE OBJECTIVES",
+                    instruction = "Kill 12 Befouled Water Elementals and scout the gazebo at Mystral Lake around 49, 70.",
+                    action = "CLEAR MYSTRAL LAKE + SCOUT GAZEBO",
+                    useArrow = true,
+                    waypoint = { mapID = 1440, x = 0.490, y = 0.700, label = "Mystral Lake" },
+                },
+                {
+                    objectiveContains = "gazebo",
+                    role = "Scout",
+                    name = "Mystral Lake gazebo",
+                    zone = "Ashenvale",
+                    coords = "around 49, 70",
+                    locationType = "SCOUT OBJECTIVE",
+                    instruction = "Scout the gazebo overlooking the Alliance outpost at Mystral Lake around 49, 70.",
+                    action = "SCOUT THE GAZEBO",
+                    useArrow = true,
+                    waypoint = { mapID = 1440, x = 0.490, y = 0.700, label = "Mystral Lake gazebo" },
+                },
+            },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Mastok Wrilehiss",
+                zone = "Splintertree Post, Ashenvale",
+                coords = "73.7, 60.0",
+                locationType = "QUEST TURN-IN",
+                instruction = "Return to Mastok Wrilehiss at Splintertree Post around 73.7, 60.0.",
+                action = "TURN IN STONETALON STANDSTILL",
+                useArrow = true,
+                waypoint = { mapID = 1440, x = 0.737, y = 0.600, label = "Mastok Wrilehiss" },
+            },
+        },
+        {
+            questID = 6621,
+            questLevel = 26,
+            speedXP = 45,
+            title = "King of the Foulweald",
+            tag = "OPTIONAL",
+            minLevel = 21,
+            maxLevel = 30,
+            cluster = "ASHENVALE_THISTLEFUR",
+            clusterPriority = 4,
+            pickupPrereqQuestIDs = { 216 },
+            note = "Verified elite follow-up to Between a Rock and a Thistlefur. Good with help; do not let the group requirement stall a faster solo route.",
+            pickupTarget = {
+                npc = "Karang Amakkar",
+                role = "Quest giver",
+                zone = "Zoram'gar Outpost, Ashenvale",
+                coords = "11.9, 34.5",
+                waypoint = { mapID = 1440, x = 0.119, y = 0.345, label = "Karang Amakkar" },
+            },
+            objectiveTargets = {
+                {
+                    objectiveContains = "Murgut's Totem",
+                    role = "Elite event / loot",
+                    name = "Chief Murgut",
+                    zone = "Greenpaw Village, Ashenvale",
+                    coords = "around 57.0, 63.8",
+                    locationType = "ELITE EVENT — bring help if needed",
+                    locationNote = "Place Karang's Banner on the Foulweald Totem Mound, defend it, defeat Chief Murgut, and loot Murgut's Totem.",
+                    instruction = "At Greenpaw Village around 57.0, 63.8, place Karang's Banner, defend the mound, defeat Chief Murgut, and loot Murgut's Totem.",
+                    action = "DEFEND BANNER + KILL CHIEF MURGUT",
+                    useArrow = true,
+                    waypoint = { mapID = 1440, x = 0.570, y = 0.638, label = "Chief Murgut / Foulweald Totem Mound" },
+                },
+            },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Karang Amakkar",
+                zone = "Zoram'gar Outpost, Ashenvale",
+                coords = "11.9, 34.5",
+                locationType = "QUEST TURN-IN",
+                instruction = "Return Murgut's Totem to Karang Amakkar at Zoram'gar Outpost around 11.9, 34.5.",
+                action = "TURN IN KING OF THE FOULWEALD",
+                useArrow = true,
+                waypoint = { mapID = 1440, x = 0.119, y = 0.345, label = "Karang Amakkar" },
+            },
+        },
+        {
             questID = 6504,
             cluster = "ASHENVALE_THISTLEFUR",
             clusterPriority = 1,
@@ -2413,6 +2532,13 @@ ForeverLevelingCoach_Data = {
             minLevel = 20,
             maxLevel = 27,
             note = "High-value Ashenvale quest (3650 XP in Forever). Farm the pages while doing Troll Charm / Thistlefur objectives so there is no dedicated detour.",
+            pickupTarget = {
+                npc = "Gurda Ragescar",
+                role = "Quest giver",
+                zone = "Near Splintertree Post, Ashenvale",
+                coords = "70.0, 71.2",
+                waypoint = { mapID = 1440, x = 0.700, y = 0.712, label = "Gurda Ragescar" },
+            },
             objectiveTargets = {
                 {
                     objectiveContains = "Shredder Operating Manual",
@@ -2449,6 +2575,13 @@ ForeverLevelingCoach_Data = {
             cluster = "ASHENVALE_THISTLEFUR",
             clusterPriority = 2,
             note = "Stacks with Thistlefur kills; collect charms from chests in Thistlefur Hold.",
+            pickupTarget = {
+                npc = "Mitsuwa",
+                role = "Quest giver",
+                zone = "Zoram'gar Outpost, Ashenvale",
+                coords = "11.6, 34.9",
+                waypoint = { mapID = 1440, x = 0.116, y = 0.349, label = "Mitsuwa" },
+            },
             turnInTarget = {
                 role = "Quest turn-in",
                 name = "Mitsuwa",
@@ -2571,6 +2704,13 @@ ForeverLevelingCoach_Data = {
             minLevel = 22,
             maxLevel = 30,
             note = "Long multi-zone supply quest. Do local Ashenvale pieces opportunistically; do not let it interrupt a stronger route.",
+            pickupTarget = {
+                npc = "Locke Okarr",
+                role = "Quest giver",
+                zone = "Splintertree Post, Ashenvale",
+                coords = "71.4, 67.6",
+                waypoint = { mapID = 1440, x = 0.714, y = 0.676, label = "Locke Okarr" },
+            },
             objectiveTargets = {
                 {
                     objectiveContains = "Warsong Oil",
@@ -2628,6 +2768,13 @@ ForeverLevelingCoach_Data = {
             minLevel = 19,
             maxLevel = 27,
             note = "Good Splintertree-area kill quest. Pair it with other nearby Ashenvale objectives instead of making a separate trip.",
+            pickupTarget = {
+                npc = "Kuray'bin",
+                role = "Quest giver",
+                zone = "Splintertree Post, Ashenvale",
+                coords = "71.1, 68.1",
+                waypoint = { mapID = 1440, x = 0.711, y = 0.681, label = "Kuray'bin" },
+            },
             objectiveTargets = {
                 {
                     objectiveContains = "Ashenvale Outrunner",
@@ -2655,6 +2802,13 @@ ForeverLevelingCoach_Data = {
             minLevel = 21,
             maxLevel = 29,
             note = "Worth doing while questing around Splintertree and the nearby satyr camps. Avoid a long standalone detour just for this quest.",
+            pickupTarget = {
+                npc = "Pixel",
+                role = "Quest giver",
+                zone = "Splintertree Post, Ashenvale",
+                coords = "73.1, 61.5",
+                waypoint = { mapID = 1440, x = 0.731, y = 0.615, label = "Pixel" },
+            },
         },
         {
             questID = 6981,
