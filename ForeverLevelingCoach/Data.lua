@@ -3710,6 +3710,9 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 6441,
+            -- Alpha observation: level 23 Shaman encountered level 25-27 satyrs.
+            soloEnemyMinLevel = 25,
+            soloEnemyMaxLevel = 27,
             cluster = "ASHENVALE_SPLINTERTREE",
             questLevel = 26,
             speedXP = 35,
