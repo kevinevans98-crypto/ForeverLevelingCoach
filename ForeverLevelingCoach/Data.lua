@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.17.4",
+    version = "0.17.5",
     supported = {
         faction = "Horde",
         classes = {
@@ -27,6 +27,8 @@ ForeverLevelingCoach_Data = {
         [381] = true, -- The Scarlet Crusade (verified in Forever DB)
         [382] = true, -- The Red Messenger (live-verified on Ms; Forever DB cross-check)
         [383] = true, -- Vital Intelligence (Forever DB chain follow-up)
+        [407] = true, -- Fields of Grief (Classic chain follow-up verified in Forever DB)
+        [365] = true, -- Fields of Grief (Classic quest verified present on Ms)
         [86784] = true, -- Sticks and Bones (Forever-exclusive Brill side quest)
         [96607] = true, -- The Great Outdoors (Forever-exclusive Undead camping tutorial follow-up)
         [96656] = true, -- The Adventurer (Forever-exclusive Undead camping intro; live-verified on Ms)
@@ -418,8 +420,109 @@ ForeverLevelingCoach_Data = {
             },
         },
         {
+            questID = 8,
+            class = "ROGUE",
+            deferTurnInForQuestIDs = { 365 },
+            cluster = "TIRISFAL_BRILL",
+            clusterPriority = 4,
+            title = "A Rogue's Deal",
+            tag = "DO",
+            minLevel = 1,
+            maxLevel = 9,
+            note = "Classic delivery quest verified present in Forever. Turn it in when entering Brill.",
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Innkeeper Renee",
+                zone = "Brill, Tirisfal Glades",
+                coords = "61.7, 52.0",
+                locationType = "QUEST TURN-IN / INN",
+                instruction = "Deliver the Nondescript Letter to Innkeeper Renee in Brill at 61.7, 52.0.",
+                action = "TURN IN A ROGUE'S DEAL",
+                useArrow = true,
+                waypoint = { mapID = 1420, x = 0.617, y = 0.520, label = "Innkeeper Renee" },
+            },
+        },
+        {
+            questID = 365,
+            class = "ROGUE",
+            cluster = "TIRISFAL_BRILL",
+            clusterPriority = 1,
+            title = "Fields of Grief",
+            tag = "DO",
+            minLevel = 4,
+            maxLevel = 9,
+            note = "Classic quest verified present on Ms. Grab the pumpkins before heading east to Brill so you do not backtrack.",
+            waypoint = { mapID = 1420, x = 0.359, y = 0.505, label = "Tirisfal Pumpkin farm" },
+            objectiveTargets = {
+                {
+                    objectiveContains = "Tirisfal Pumpkin",
+                    role = "Ground loot",
+                    name = "Tirisfal Pumpkin Farm",
+                    zone = "Tirisfal Glades",
+                    coords = "around 35.9, 50.5",
+                    locationType = "FARM — ground objects",
+                    instruction = "Loot 10 Tirisfal Pumpkins at the farm north of Deathknell around 35.9, 50.5.",
+                    action = "LOOT 10 TIRISFAL PUMPKINS",
+                    useArrow = true,
+                    waypoint = { mapID = 1420, x = 0.359, y = 0.505, label = "Tirisfal Pumpkin farm" },
+                },
+            },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Apothecary Johaan",
+                zone = "Brill, Tirisfal Glades",
+                coords = "59.4, 52.4",
+                locationType = "QUEST TURN-IN",
+                instruction = "Take the pumpkins to Apothecary Johaan in Brill at 59.4, 52.4.",
+                action = "TURN IN FIELDS OF GRIEF",
+                useArrow = true,
+                waypoint = { mapID = 1420, x = 0.594, y = 0.524, label = "Apothecary Johaan" },
+            },
+            nextPickup = {
+                title = "Fields of Grief",
+                npc = "Apothecary Johaan",
+                role = "Quest giver",
+                zone = "Brill, Tirisfal Glades",
+                coords = "59.4, 52.4",
+                showWhileActive = false,
+                waypoint = { mapID = 1420, x = 0.594, y = 0.524, label = "Apothecary Johaan" },
+            },
+        },
+        {
+            questID = 407,
+            class = "ROGUE",
+            cluster = "TIRISFAL_BRILL",
+            clusterPriority = 2,
+            title = "Fields of Grief",
+            tag = "DO",
+            minLevel = 4,
+            maxLevel = 10,
+            note = "Classic follow-up in Brill. Very short handoff inside the inn cellar.",
+            personTarget = {
+                role = "Quest target",
+                name = "Captured Scarlet Zealot",
+                zone = "Gallow's End Tavern cellar, Brill",
+                coords = "62.0, 51.3",
+                locationType = "INN CELLAR",
+                instruction = "Take the Laced Pumpkin to the Captured Scarlet Zealot in the Gallow's End Tavern cellar at 62.0, 51.3.",
+                action = "GIVE THE LACED PUMPKIN TO THE ZEALOT",
+                useArrow = true,
+                waypoint = { mapID = 1420, x = 0.620, y = 0.513, label = "Captured Scarlet Zealot" },
+            },
+            turnInTarget = {
+                role = "Quest turn-in",
+                name = "Captured Scarlet Zealot",
+                zone = "Gallow's End Tavern cellar, Brill",
+                coords = "62.0, 51.3",
+                action = "TURN IN FIELDS OF GRIEF",
+                useArrow = true,
+                waypoint = { mapID = 1420, x = 0.620, y = 0.513, label = "Captured Scarlet Zealot" },
+            },
+        },
+        {
             questID = 96656,
             class = "ROGUE",
+            deferTurnInForQuestIDs = { 365 },
             cluster = "TIRISFAL_BRILL",
             clusterPriority = 1,
             title = "The Adventurer",
@@ -543,6 +646,7 @@ ForeverLevelingCoach_Data = {
         {
             questID = 383,
             class = "ROGUE",
+            deferTurnInForQuestIDs = { 365 },
             cluster = "TIRISFAL_BRILL",
             clusterPriority = 1,
             title = "Vital Intelligence",
