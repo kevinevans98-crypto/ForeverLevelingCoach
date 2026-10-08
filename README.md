@@ -185,3 +185,11 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Added verified Return to Podrig, Wild Hearts/Return to Quinn, Prove Your Worth, Arugal's Folly, Dalaran investigation, and Recipe for Death classifications.
 
 - Elite/escort Silverpine steps are classified conservatively as OPTIONAL when they can hurt solo XP/hour.
+
+- v0.20.0: Added a verified universal Horde Shaman 10–20 Barrens/Stonetalon route package.
+
+- Added Barrens Oases [886], Disrupt the Attacks [871], Raptor Thieves [869], Centaur Bracers [855], and Samophlange [894] to Shaman automatic routing.
+
+- Added The Spirits of Stonetalon [1061], Boulderslide Ravine [6421], Blood Feeders [6461], and Report to Kadrak [6542] as the Shaman bridge into the existing Ashenvale route.
+
+- Shaman levels 1–10 remain intentionally race-specific; a later race-aware router will cover Orc/Troll, Tauren, and Skyborne starter zones without mixing incompatible quest paths.
