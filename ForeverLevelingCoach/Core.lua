@@ -217,6 +217,7 @@ local currentNavigationStepCount = nil
 local currentFastTravelSuggestion = nil
 local currentFastTravelMode = nil
 local currentNextQuestPickup = nil
+local currentPickupSuggestions = {}
 local currentPersonTarget = nil
 local currentObjectiveTarget = nil
 local currentTravelTarget = nil
@@ -393,6 +394,101 @@ local function waypointDistanceNormalized(waypoint)
     local px, py = pos:GetXY()
     local dx, dy = waypoint.x - px, waypoint.y - py
     return math.sqrt(dx * dx + dy * dy)
+end
+
+
+local function pickupBaseEligible(step)
+    if not step or not step.questID or not step.pickupTarget then return false end
+
+    local level = UnitLevel("player") or 1
+    if level < (step.minLevel or 1) or level > (step.maxLevel or 999) then return false end
+
+    local _, playerClass = UnitClass("player")
+    if step.class and step.class ~= playerClass then return false end
+
+    if step.races then
+        local raceKeys = getPlayerRaceKeys()
+        local matched = false
+        for raceKey, enabled in pairs(step.races) do
+            if enabled and raceKeys[string.upper(raceKey)] then
+                matched = true
+                break
+            end
+        end
+        if not matched then return false end
+    end
+
+    for _, prereqID in ipairs(step.pickupPrereqQuestIDs or {}) do
+        if not isQuestCompleted(prereqID) then return false end
+    end
+
+    return true
+end
+
+local function getPickupSuggestions(byID, routeStep)
+    local suggestions = {}
+    byID = byID or {}
+
+    for _, step in ipairs(Data.route or {}) do
+        if pickupBaseEligible(step)
+            and not byID[step.questID]
+            and not isQuestCompleted(step.questID) then
+
+            local pickup = step.pickupTarget
+            local localCluster = step.cluster and zoneMatchesCluster(step.cluster) or false
+            local distance = pickup and pickup.waypoint and waypointDistanceNormalized(pickup.waypoint) or nil
+            local near = distance and distance <= (step.pickupNearDistance or 0.08) or false
+            local sameRouteCluster = routeStep and routeStep.cluster and step.cluster == routeStep.cluster
+            local tag = step.tag or "DO"
+            local classification = nil
+
+            if tag == "SKIP" then
+                if localCluster or near then classification = "SKIP" end
+            elseif tag == "IMPORTANT" or tag == "DO" then
+                if localCluster or near then
+                    classification = "PICK UP NOW"
+                elseif sameRouteCluster then
+                    classification = "PICK UP IF NEARBY"
+                end
+            elseif tag == "OPTIONAL" then
+                if localCluster or near or sameRouteCluster then
+                    classification = "PICK UP IF NEARBY"
+                end
+            end
+
+            if classification then
+                local rank = classification == "PICK UP NOW" and 1
+                    or classification == "PICK UP IF NEARBY" and 2
+                    or 3
+                suggestions[#suggestions + 1] = {
+                    questID = step.questID,
+                    title = step.title or ("Quest " .. tostring(step.questID)),
+                    classification = classification,
+                    rank = rank,
+                    distance = distance,
+                    pickup = pickup,
+                    step = step,
+                }
+            end
+        end
+    end
+
+    table.sort(suggestions, function(a, b)
+        if a.rank ~= b.rank then return a.rank < b.rank end
+        if a.distance and b.distance and a.distance ~= b.distance then
+            return a.distance < b.distance
+        elseif a.distance and not b.distance then
+            return true
+        elseif b.distance and not a.distance then
+            return false
+        end
+        local ap = (a.step and a.step.clusterPriority) or 999
+        local bp = (b.step and b.step.clusterPriority) or 999
+        if ap ~= bp then return ap < bp end
+        return tostring(a.title) < tostring(b.title)
+    end)
+
+    return suggestions
 end
 
 local function getNavigationStep(step, travel)
@@ -1170,7 +1266,7 @@ local function renderQuestCards(cards)
                 card:SetPoint("TOPRIGHT", mainScrollChild, "TOPRIGHT", 0, 0)
             end
 
-            card.step:SetText("STEP " .. tostring(info.step or i))
+            card.step:SetText(info.label or ("STEP " .. tostring(info.step or i)))
             card.status:SetText(info.status or "")
             card.title:SetText(info.title or "")
             card.action:SetText(info.action or "")
@@ -1182,6 +1278,13 @@ local function renderQuestCards(cards)
                 card.status:SetTextColor(0.46, 0.90, 0.69)
                 card.title:SetTextColor(0.95, 0.97, 0.98)
                 card.action:SetTextColor(0.76, 0.82, 0.85)
+            elseif info.pickup then
+                local pickupNow = info.pickupClass == "PICK UP NOW"
+                card.accent:SetVertexColor(pickupNow and 0.20 or 0.32, pickupNow and 0.82 or 0.58, pickupNow and 0.74 or 0.58, pickupNow and 0.95 or 0.65)
+                card.step:SetTextColor(pickupNow and 0.38 or 0.55, pickupNow and 0.82 or 0.68, pickupNow and 0.76 or 0.68)
+                card.status:SetTextColor(pickupNow and 0.46 or 0.62, pickupNow and 0.90 or 0.72, pickupNow and 0.69 or 0.72)
+                card.title:SetTextColor(0.86, 0.91, 0.92)
+                card.action:SetTextColor(0.66, 0.74, 0.76)
             elseif info.background then
                 card.accent:SetVertexColor(0.32, 0.38, 0.41, 0.55)
                 card.step:SetTextColor(0.42, 0.48, 0.51)
@@ -2127,6 +2230,7 @@ local function render()
         currentClusterCount = 0
     end
     currentRouteStep = step
+    currentPickupSuggestions = getPickupSuggestions(currentByID, step)
     local routeFlightTarget = step and step.flightTarget or nil
     if active and active.isComplete and step and step.turnInFlightTarget then
         routeFlightTarget = step.turnInFlightTarget
@@ -2342,6 +2446,31 @@ local function render()
                 background = q.background and true or false,
             }
             stepNumber = stepNumber + 1
+        end
+    end
+
+    if DB and DB.lazyMode ~= false and currentPickupSuggestions then
+        for _, suggestion in ipairs(currentPickupSuggestions) do
+            if #cardData >= #questCards then break end
+            if suggestion.classification ~= "SKIP" then
+                local pickup = suggestion.pickup or {}
+                local actionText = "PICK UP QUEST"
+                if pickup.npc then
+                    actionText = "TALK TO " .. string.upper(tostring(pickup.npc))
+                end
+
+                cardData[#cardData + 1] = {
+                    label = "PICKUP",
+                    step = stepNumber,
+                    status = suggestion.classification,
+                    title = tostring(suggestion.title or "Quest"),
+                    action = actionText,
+                    pickup = true,
+                    pickupClass = suggestion.classification,
+                    background = false,
+                }
+                stepNumber = stepNumber + 1
+            end
         end
     end
 
@@ -2661,6 +2790,7 @@ exportSnapshot = function()
         "NextQuestPickupNPC=" .. tostring(currentNextQuestPickup and currentNextQuestPickup.npc or "none"),
         "NextQuestPickupZone=" .. tostring(currentNextQuestPickup and currentNextQuestPickup.zone or "none"),
         "NextQuestPickupCoords=" .. tostring(currentNextQuestPickup and currentNextQuestPickup.coords or "none"),
+        "PickupSuggestionCount=" .. tostring(#(currentPickupSuggestions or {})),
         "MarkedPersonRole=" .. tostring(currentPersonTarget and currentPersonTarget.role or "none"),
         "MarkedPersonName=" .. tostring(currentPersonTarget and currentPersonTarget.name or "none"),
         "MarkedPersonZone=" .. tostring(currentPersonTarget and currentPersonTarget.zone or "none"),
@@ -2755,6 +2885,23 @@ exportSnapshot = function()
     else
         for _, name in ipairs(knownFlights) do
             lines[#lines + 1] = "- " .. name
+        end
+    end
+
+    lines[#lines + 1] = "PickupSuggestions:"
+    if not currentPickupSuggestions or #currentPickupSuggestions == 0 then
+        lines[#lines + 1] = "- none"
+    else
+        for _, suggestion in ipairs(currentPickupSuggestions) do
+            local pickup = suggestion.pickup or {}
+            lines[#lines + 1] = string.format("- %d | %s | %s | npc=%s | zone=%s | coords=%s%s",
+                tonumber(suggestion.questID) or 0,
+                tostring(suggestion.title or "?"),
+                tostring(suggestion.classification or "?"),
+                tostring(pickup.npc or "unknown"),
+                tostring(pickup.zone or "unknown"),
+                tostring(pickup.coords or "unknown"),
+                suggestion.distance and string.format(" | mapDistance=%.3f", suggestion.distance) or "")
         end
     end
 
