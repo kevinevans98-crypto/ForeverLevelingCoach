@@ -69,6 +69,39 @@ local function getClassProfile()
     }
 end
 
+local function flcTalentRecommendation()
+    local level = UnitLevel("player") or 1
+    local _, classFile = UnitClass("player")
+    if classFile ~= "ROGUE" then return nil, nil end
+
+    local build = Data.rogueLevelingBuild
+    if not build then return nil, nil end
+
+    if level < 10 then
+        return build.name, "Talents unlock at level 10"
+    end
+
+    local pick = build.talentsByLevel and build.talentsByLevel[level]
+    if pick then
+        return build.name, string.format("%s %d/%d", pick.talent, pick.rank or 1, pick.maxRank or 1)
+    end
+
+    if level >= 30 then
+        return build.name, "Blade Flurry build complete for level 30"
+    end
+
+    -- If the player levels past a point without checking the addon, surface the
+    -- latest intended pick for that level rather than inventing a new build.
+    for l = level, 10, -1 do
+        pick = build.talentsByLevel and build.talentsByLevel[l]
+        if pick then
+            return build.name, string.format("%s %d/%d", pick.talent, pick.rank or 1, pick.maxRank or 1)
+        end
+    end
+
+    return build.name, nil
+end
+
 local function copyDefaults()
     ForeverLevelingCoachDB = ForeverLevelingCoachDB or {}
     ForeverLevelingCoachDB.characters = ForeverLevelingCoachDB.characters or {}
@@ -1592,6 +1625,11 @@ local function render()
 
     local detailLines = { "DO: " .. tostring(action) }
 
+    local specName, talentPick = flcTalentRecommendation()
+    if specName and talentPick then
+        detailLines[#detailLines + 1] = "TALENT: " .. tostring(specName) .. " — " .. tostring(talentPick)
+    end
+
     if DB and DB.lazyMode ~= false and step and step.cluster then
         local clusterQuests = getNearbyClusterQuestNames(step, currentByID)
         local stepNumber = 2
@@ -1692,6 +1730,8 @@ exportSnapshot = function()
         "LazyTravelTarget=" .. tostring(currentTravelTarget and currentTravelTarget.name or "none"),
         "GearAdvisorEnabled=" .. tostring(DB and DB.gearAdvisor ~= false or false),
         "WeaponPreference=" .. tostring((getClassProfile().weaponPreference and getClassProfile().weaponPreference.label) or "class-default"),
+        "RecommendedSpec=" .. tostring(select(1, flcTalentRecommendation()) or "none"),
+        "TalentRecommendation=" .. tostring(select(2, flcTalentRecommendation()) or "none"),
         "RelicAdvisorEnabled=" .. tostring(DB and DB.relicAdvisor ~= false or false),
         "EquippedRelic=" .. tostring(select(1, flcRelicStatus()) or (select(3, flcRelicStatus()) == "not-applicable" and "not-applicable" or "none")),
         "KnownRelicTarget=" .. tostring(select(2, flcRelicStatus()) or (select(3, flcRelicStatus()) == "not-applicable" and "not-applicable" or "none")),
