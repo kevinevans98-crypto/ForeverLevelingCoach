@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.55.0",
+    version = "0.56.0",
     supported = {
         faction = "Horde",
         classes = {
@@ -1005,7 +1005,7 @@ ForeverLevelingCoach_Data = {
             zoneAliases = { "Tirisfal Glades", "Brill" },
             note = "Fast Undead hub after Deathknell. Stack Brill, Scarlet, plague, and Agamand work.",
         },
-        SILVERPINE_ROGUE = {
+        SILVERPINE_SHARED = {
             name = "Silverpine Forest",
             zoneAliases = { "Silverpine Forest", "The Sepulcher" },
             note = "Primary Undead follow-up zone after Tirisfal for fast 10-18 leveling.",
@@ -1015,12 +1015,12 @@ ForeverLevelingCoach_Data = {
             zoneAliases = { "Tirisfal Glades", "Deathknell", "Shadow Grave" },
             note = "Undead starter cluster. Keep early Deathknell quests stacked together.",
         },
-        DUROTAR_SHAMAN_START = {
+        DUROTAR_START = {
             name = "Durotar / Valley of Trials",
             zoneAliases = { "Durotar", "Valley of Trials", "Sen'jin Village", "Razor Hill" },
             note = "Orc/Troll Shaman starter route. Stack Valley of Trials quests before moving south/east through Durotar.",
         },
-        MULGORE_SHAMAN_START = {
+        MULGORE_START = {
             name = "Mulgore / Camp Narache",
             zoneAliases = { "Mulgore", "Camp Narache", "Bloodhoof Village", "Red Cloud Mesa" },
             note = "Tauren Shaman starter route. Clear Camp Narache efficiently, then continue through Bloodhoof Village.",
@@ -1113,7 +1113,6 @@ ForeverLevelingCoach_Data = {
     route = {
         {
             questID = 98389,
-            class = "ROGUE",
             cluster = "TIRISFAL_DEATHKNELL",
             clusterPriority = 1,
             title = "A Light in the Darkness",
@@ -1149,7 +1148,6 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 382,
-            class = "ROGUE",
             cluster = "TIRISFAL_DEATHKNELL",
             clusterPriority = 1,
             title = "The Red Messenger",
@@ -1219,7 +1217,6 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 5481,
-            class = "ROGUE",
             cluster = "TIRISFAL_BRILL",
             clusterPriority = 1,
             title = "Gordo's Task",
@@ -1256,7 +1253,6 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 365,
-            class = "ROGUE",
             cluster = "TIRISFAL_BRILL",
             clusterPriority = 1,
             title = "Fields of Grief",
@@ -1303,7 +1299,6 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 407,
-            class = "ROGUE",
             cluster = "TIRISFAL_BRILL",
             clusterPriority = 2,
             title = "Fields of Grief",
@@ -1334,7 +1329,6 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 96656,
-            class = "ROGUE",
             deferTurnInForQuestIDs = { 365, 5481 },
             cluster = "TIRISFAL_BRILL",
             clusterPriority = 1,
@@ -1377,7 +1371,6 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 96607,
-            class = "ROGUE",
             cluster = "TIRISFAL_BRILL",
             clusterPriority = 2,
             title = "The Great Outdoors",
@@ -1424,7 +1417,6 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 86784,
-            class = "ROGUE",
             cluster = "TIRISFAL_BRILL",
             clusterPriority = 8,
             title = "Sticks and Bones",
@@ -1459,7 +1451,6 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 383,
-            class = "ROGUE",
             deferTurnInForQuestIDs = { 365, 5481 },
             cluster = "TIRISFAL_BRILL",
             clusterPriority = 1,
@@ -1491,7 +1482,6 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 381,
-            class = "ROGUE",
             cluster = "TIRISFAL_DEATHKNELL",
             clusterPriority = 1,
             title = "The Scarlet Crusade",
@@ -1528,7 +1518,6 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 6395,
-            class = "ROGUE",
             cluster = "TIRISFAL_DEATHKNELL",
             clusterPriority = 3,
             title = "Marla's Last Wish",
@@ -1578,7 +1567,6 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 380,
-            class = "ROGUE",
             cluster = "TIRISFAL_DEATHKNELL",
             clusterPriority = 2,
             title = "Night Web's Hollow",
@@ -1612,7 +1600,6 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 376,
-            class = "ROGUE",
             cluster = "TIRISFAL_DEATHKNELL",
             clusterPriority = 1,
             title = "The Damned",
@@ -1660,7 +1647,6 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 3901,
-            class = "ROGUE",
             cluster = "TIRISFAL_DEATHKNELL",
             clusterPriority = 2,
             title = "Rattling the Rattlecages",
@@ -1718,7 +1704,6 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 3902,
-            class = "ROGUE",
             cluster = "TIRISFAL_DEATHKNELL",
             clusterPriority = 3,
             title = "Scavenging Deathknell",
@@ -1789,7 +1774,6 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 367,
-            class = "ROGUE",
             cluster = "TIRISFAL_BRILL",
             clusterPriority = 1,
             title = "A New Plague",
@@ -1821,7 +1805,6 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 368,
-            class = "ROGUE",
             cluster = "TIRISFAL_BRILL",
             clusterPriority = 2,
             title = "A New Plague",
@@ -1853,7 +1836,6 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 369,
-            class = "ROGUE",
             cluster = "TIRISFAL_BRILL",
             clusterPriority = 3,
             title = "A New Plague",
@@ -1885,7 +1867,6 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 371,
-            class = "ROGUE",
             cluster = "TIRISFAL_BRILL",
             clusterPriority = 4,
             title = "At War With The Scarlet Crusade",
@@ -1917,7 +1898,6 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 372,
-            class = "ROGUE",
             cluster = "TIRISFAL_BRILL",
             clusterPriority = 5,
             title = "At War With The Scarlet Crusade",
@@ -1949,7 +1929,6 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 408,
-            class = "ROGUE",
             cluster = "TIRISFAL_BRILL",
             clusterPriority = 6,
             title = "The Family Crypt",
@@ -1981,7 +1960,6 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 364,
-            class = "ROGUE",
             cluster = "TIRISFAL_DEATHKNELL",
             clusterPriority = 1,
             title = "The Mindless Ones",
@@ -2054,14 +2032,13 @@ ForeverLevelingCoach_Data = {
                 waypoint = { mapID = 1420, x = 0.308, y = 0.662, label = "Shadow Priest Sarvis" },
             },
         },
-        -- Verified Undead Rogue Silverpine route.
+        -- Verified shared Horde/Undead Silverpine route.
         -- Quest IDs are confirmed in current Forever databases. Coordinates
         -- below are used only where current Forever/Classic-Forever sources
         -- agree on the location.
         {
             questID = 6324,
-            class = "ROGUE",
-            cluster = "SILVERPINE_ROGUE",
+            cluster = "SILVERPINE_SHARED",
             clusterPriority = 0,
             questLevel = 10,
             speedXP = 110,
@@ -2084,8 +2061,7 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 429,
-            class = "ROGUE",
-            cluster = "SILVERPINE_ROGUE",
+            cluster = "SILVERPINE_SHARED",
             clusterPriority = 1,
             questLevel = 11,
             speedXP = 75,
@@ -2097,8 +2073,7 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 430,
-            class = "ROGUE",
-            cluster = "SILVERPINE_ROGUE",
+            cluster = "SILVERPINE_SHARED",
             clusterPriority = 2,
             questLevel = 11,
             speedXP = 95,
@@ -2110,8 +2085,7 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 91920,
-            class = "ROGUE",
-            cluster = "SILVERPINE_ROGUE",
+            cluster = "SILVERPINE_SHARED",
             clusterPriority = 3,
             questLevel = 11,
             speedXP = 85,
@@ -2134,8 +2108,7 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 435,
-            class = "ROGUE",
-            cluster = "SILVERPINE_ROGUE",
+            cluster = "SILVERPINE_SHARED",
             clusterPriority = 4,
             questLevel = 11,
             speedXP = 55,
@@ -2158,8 +2131,7 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 421,
-            class = "ROGUE",
-            cluster = "SILVERPINE_ROGUE",
+            cluster = "SILVERPINE_SHARED",
             clusterPriority = 1,
             questLevel = 10,
             speedXP = 105,
@@ -2182,8 +2154,7 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 422,
-            class = "ROGUE",
-            cluster = "SILVERPINE_ROGUE",
+            cluster = "SILVERPINE_SHARED",
             clusterPriority = 2,
             questLevel = 11,
             speedXP = 95,
@@ -2204,8 +2175,7 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 423,
-            class = "ROGUE",
-            cluster = "SILVERPINE_ROGUE",
+            cluster = "SILVERPINE_SHARED",
             clusterPriority = 3,
             questLevel = 14,
             speedXP = 90,
@@ -2226,8 +2196,7 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 424,
-            class = "ROGUE",
-            cluster = "SILVERPINE_ROGUE",
+            cluster = "SILVERPINE_SHARED",
             clusterPriority = 4,
             questLevel = 15,
             speedXP = 85,
@@ -2248,8 +2217,7 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 99,
-            class = "ROGUE",
-            cluster = "SILVERPINE_ROGUE",
+            cluster = "SILVERPINE_SHARED",
             clusterPriority = 5,
             questLevel = 15,
             speedXP = 55,
@@ -2270,8 +2238,7 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 98298,
-            class = "ROGUE",
-            cluster = "SILVERPINE_ROGUE",
+            cluster = "SILVERPINE_SHARED",
             clusterPriority = 6,
             questLevel = 16,
             speedXP = 100,
@@ -2292,8 +2259,7 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 477,
-            class = "ROGUE",
-            cluster = "SILVERPINE_ROGUE",
+            cluster = "SILVERPINE_SHARED",
             clusterPriority = 1,
             questLevel = 14,
             speedXP = 95,
@@ -2306,8 +2272,7 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 478,
-            class = "ROGUE",
-            cluster = "SILVERPINE_ROGUE",
+            cluster = "SILVERPINE_SHARED",
             clusterPriority = 2,
             questLevel = 14,
             speedXP = 85,
@@ -2319,8 +2284,7 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 481,
-            class = "ROGUE",
-            cluster = "SILVERPINE_ROGUE",
+            cluster = "SILVERPINE_SHARED",
             clusterPriority = 3,
             questLevel = 14,
             speedXP = 70,
@@ -2341,8 +2305,7 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 95981,
-            class = "ROGUE",
-            cluster = "SILVERPINE_ROGUE",
+            cluster = "SILVERPINE_SHARED",
             clusterPriority = 4,
             questLevel = 20,
             speedXP = 105,
@@ -2354,8 +2317,7 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 450,
-            class = "ROGUE",
-            cluster = "SILVERPINE_ROGUE",
+            cluster = "SILVERPINE_SHARED",
             clusterPriority = 6,
             questLevel = 15,
             speedXP = 55,
@@ -2376,8 +2338,7 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 451,
-            class = "ROGUE",
-            cluster = "SILVERPINE_ROGUE",
+            cluster = "SILVERPINE_SHARED",
             clusterPriority = 5,
             questLevel = 18,
             speedXP = 85,
@@ -2388,12 +2349,11 @@ ForeverLevelingCoach_Data = {
             note = "High-XP Silverpine material step. Gather the lake mosses and Hardened Tumor while doing nearby objectives, then turn the package in at Undercity when travel lines up.",
         },
 
-        -- Race-aware Horde Shaman starter routing.
+        -- Race-aware shared Horde starter routing.
         {
             questID = 5843,
-            class = "SHAMAN",
             races = { ORC = true, TROLL = true },
-            cluster = "DUROTAR_SHAMAN_START",
+            cluster = "DUROTAR_START",
             clusterPriority = 0,
             title = "Welcome!",
             tag = "OPTIONAL",
@@ -2403,9 +2363,8 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 4641,
-            class = "SHAMAN",
             races = { ORC = true, TROLL = true },
-            cluster = "DUROTAR_SHAMAN_START",
+            cluster = "DUROTAR_START",
             clusterPriority = 0,
             title = "Your Place In The World",
             tag = "DO",
@@ -2415,9 +2374,8 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 5441,
-            class = "SHAMAN",
             races = { ORC = true, TROLL = true },
-            cluster = "DUROTAR_SHAMAN_START",
+            cluster = "DUROTAR_START",
             clusterPriority = 2,
             title = "Lazy Peons",
             tag = "DO",
@@ -2427,9 +2385,8 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 792,
-            class = "SHAMAN",
             races = { ORC = true, TROLL = true },
-            cluster = "DUROTAR_SHAMAN_START",
+            cluster = "DUROTAR_START",
             clusterPriority = 1,
             title = "Vile Familiars",
             tag = "DO",
@@ -2440,9 +2397,8 @@ ForeverLevelingCoach_Data = {
 
         {
             questID = 5844,
-            class = "SHAMAN",
             races = { TAUREN = true },
-            cluster = "MULGORE_SHAMAN_START",
+            cluster = "MULGORE_START",
             clusterPriority = 0,
             title = "Welcome!",
             tag = "OPTIONAL",
@@ -2452,9 +2408,8 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 752,
-            class = "SHAMAN",
             races = { TAUREN = true },
-            cluster = "MULGORE_SHAMAN_START",
+            cluster = "MULGORE_START",
             clusterPriority = 1,
             title = "A Humble Task",
             tag = "DO",
@@ -2464,9 +2419,8 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 747,
-            class = "SHAMAN",
             races = { TAUREN = true },
-            cluster = "MULGORE_SHAMAN_START",
+            cluster = "MULGORE_START",
             clusterPriority = 1,
             title = "The Hunt Begins",
             tag = "DO",
@@ -2476,9 +2430,8 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 781,
-            class = "SHAMAN",
             races = { TAUREN = true },
-            cluster = "MULGORE_SHAMAN_START",
+            cluster = "MULGORE_START",
             clusterPriority = 2,
             title = "Attack on Camp Narache",
             tag = "DO",
@@ -2488,9 +2441,8 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 3376,
-            class = "SHAMAN",
             races = { TAUREN = true },
-            cluster = "MULGORE_SHAMAN_START",
+            cluster = "MULGORE_START",
             clusterPriority = 3,
             title = "Break Sharptusk!",
             tag = "DO",
@@ -2500,9 +2452,8 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 748,
-            class = "SHAMAN",
             races = { TAUREN = true },
-            cluster = "MULGORE_SHAMAN_START",
+            cluster = "MULGORE_START",
             clusterPriority = 1,
             title = "Poison Water",
             tag = "DO",
@@ -2512,9 +2463,8 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 745,
-            class = "SHAMAN",
             races = { TAUREN = true },
-            cluster = "MULGORE_SHAMAN_START",
+            cluster = "MULGORE_START",
             clusterPriority = 2,
             title = "Sharing the Land",
             tag = "DO",
@@ -2523,12 +2473,11 @@ ForeverLevelingCoach_Data = {
             note = "Dense Palemane kill quest from Bloodhoof Village. Good XP while clearing the nearby gnoll camps.",
         },
 
-        -- Verified Horde Shaman universal route after the race-specific starter zone.
-        -- Forever's Horde leveling route sends Orc/Troll/Tauren Shamans into
+        -- Verified shared Horde route after the race-specific starter zone.
+        -- Shared Horde leveling route sends compatible characters into
         -- The Barrens, then Stonetalon, before the existing Ashenvale package.
         {
             questID = 886,
-            class = "SHAMAN",
             cluster = "BARRENS_CROSSROADS",
             clusterPriority = 0,
             questLevel = 10,
@@ -2552,7 +2501,6 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 871,
-            class = "SHAMAN",
             cluster = "BARRENS_CROSSROADS",
             clusterPriority = 1,
             questLevel = 12,
@@ -2575,7 +2523,6 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 869,
-            class = "SHAMAN",
             cluster = "BARRENS_CROSSROADS",
             clusterPriority = 2,
             questLevel = 13,
@@ -2598,7 +2545,6 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 855,
-            class = "SHAMAN",
             cluster = "BARRENS_CROSSROADS",
             clusterPriority = 3,
             questLevel = 14,
@@ -2621,7 +2567,6 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 894,
-            class = "SHAMAN",
             cluster = "BARRENS_CROSSROADS",
             clusterPriority = 4,
             questLevel = 14,
@@ -2648,7 +2593,6 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 1061,
-            class = "SHAMAN",
             cluster = "STONETALON_SUNROCK",
             clusterPriority = 0,
             questLevel = 17,
@@ -2661,7 +2605,6 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 6421,
-            class = "SHAMAN",
             cluster = "STONETALON_SUNROCK",
             clusterPriority = 1,
             questLevel = 18,
@@ -2684,7 +2627,6 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 6461,
-            class = "SHAMAN",
             cluster = "STONETALON_SUNROCK",
             clusterPriority = 2,
             questLevel = 19,
@@ -2707,7 +2649,6 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 6542,
-            class = "SHAMAN",
             cluster = "STONETALON_SUNROCK",
             clusterPriority = 3,
             questLevel = 19,
@@ -2829,6 +2770,7 @@ ForeverLevelingCoach_Data = {
 
         {
             questID = 96,
+            class = "SHAMAN",
             flightTarget = "Ratchet",
             cluster = "BARRENS_RATCHET",
             clusterPriority = 0,
@@ -2872,6 +2814,7 @@ ForeverLevelingCoach_Data = {
         },
         {
             questID = 1103,
+            class = "SHAMAN",
             flightTarget = "Ratchet",
             cluster = "SILVERPINE_WATER",
             clusterPriority = 3,
