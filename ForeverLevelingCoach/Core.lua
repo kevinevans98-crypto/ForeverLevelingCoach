@@ -2711,40 +2711,51 @@ getBestObjectiveTarget = function(step, active)
     return bestTarget
 end
 
+local function getClassTrainerData()
+    local profile = getClassProfile()
+    if not profile then return nil, nil end
+    local configured = Data.classProfiles and Data.classProfiles[profile.classFile]
+    local trainerKey = configured and configured.trainerData
+    return trainerKey and Data[trainerKey] or nil, configured
+end
+
 local function isClassTrainingDue()
     if not DB then return false end
-    local _, classFile = UnitClass("player")
-    local level = UnitLevel("player") or 1
-    if classFile ~= "SHAMAN" then return false end
+    local trainers, configured = getClassTrainerData()
+    if not trainers or not configured then return false end
 
-    -- Live Forever Beta verification: at level 22 the spellbook's
-    -- What's Training panel shows 0 available and the next Shaman ranks at 24.
-    -- For the current 22-30 route, only begin reminders at 24.
-    if level < 24 or (level % 2) ~= 0 then return false end
+    local level = UnitLevel("player") or 1
+    local startLevel = tonumber(configured.trainingStart)
+    local interval = tonumber(configured.trainingInterval)
+    if not startLevel or not interval or interval <= 0 then return false end
+    if level < startLevel or ((level - startLevel) % interval) ~= 0 then return false end
+
     return (tonumber(DB.lastClassTrainerLevel) or 0) < level
 end
 
-local function getNearestShamanTrainer()
-    local trainers = Data.shamanTrainers or {}
+local function getNearestClassTrainer()
+    local trainers = getClassTrainerData()
+    if not trainers then return nil end
 
-    -- Prefer Thunder Bluff when already in/near Mulgore or Stonetalon.
-    if zoneMatchesAliases({ "Thunder Bluff", "Mulgore", "Stonetalon Mountains", "Stonetalon" }) then
+    if trainers.thunderBluff
+        and zoneMatchesAliases({ "Thunder Bluff", "Mulgore", "Stonetalon Mountains", "Stonetalon" }) then
         return trainers.thunderBluff
     end
 
-    -- Ashenvale, Durotar and The Barrens naturally feed into Orgrimmar.
-    return trainers.orgrimmar
+    return trainers.orgrimmar or trainers.thunderBluff
 end
 
 local function getTrainingStep()
-    local trainer = getNearestShamanTrainer()
+    local trainer = getNearestClassTrainer()
     if not trainer then return nil end
 
+    local profile = getClassProfile()
+    local className = profile and profile.className or "Class"
     local inTrainerCity = zoneMatchesAliases({ trainer.city })
     return {
         questID = nil,
         training = true,
-        title = "Train Shaman",
+        title = "Train " .. className,
         tag = "IMPORTANT",
         flightTarget = inTrainerCity and nil or trainer.city,
         personTarget = {
@@ -2752,15 +2763,15 @@ local function getTrainingStep()
             name = trainer.name,
             zone = trainer.zone,
             coords = trainer.coords,
-            locationType = "SHAMAN TRAINER",
-            locationNote = "Buy your new Shaman abilities/ranks for this level.",
-            approach = "Go to the Shaman trainers and learn the available upgrades.",
+            locationType = string.upper(className) .. " TRAINER",
+            locationNote = "Buy your new " .. className .. " abilities/ranks for this level.",
+            approach = "Go to the class trainer and learn the available upgrades.",
             useArrow = true,
             waypoint = {
                 mapID = trainer.mapID,
                 x = trainer.x,
                 y = trainer.y,
-                label = "Shaman Trainer",
+                label = className .. " Trainer",
             },
         },
         note = "Class training is due at this level.",
@@ -2770,8 +2781,8 @@ end
 local function scanCurrentClassTrainer()
     if not DB then return end
     local npcName = UnitName and UnitName("npc")
-    local trainers = Data.shamanTrainers or {}
-    if not npcName or not trainers.names or not trainers.names[npcName] then return end
+    local trainers = getClassTrainerData()
+    if not npcName or not trainers or not trainers.names or not trainers.names[npcName] then return end
 
     local available = 0
     local level = UnitLevel("player") or 1
@@ -3001,7 +3012,7 @@ local function render()
     end
 
     currentTrainingDue = isClassTrainingDue()
-    currentTrainingTarget = currentTrainingDue and getNearestShamanTrainer() or nil
+    currentTrainingTarget = currentTrainingDue and getNearestClassTrainer() or nil
 
     local step, active = chooseRouteStep(currentByID)
     local inTrainerCity = zoneMatchesAliases({ "Orgrimmar", "Thunder Bluff" })
