@@ -1,5 +1,5 @@
 ForeverLevelingCoach_Data = {
-    version = "0.23.2",
+    version = "0.24.0",
     supported = {
         faction = "Horde",
         classes = {
@@ -2760,6 +2760,82 @@ ForeverLevelingCoach_Data = {
             [10] = { tag = "DO", title = "Zephras Isle", note = "Continue the Skyborne starter story; the zone remains appropriate through level 12." },
             [11] = { tag = "DO", title = "Zephras Isle", note = "Finish the remaining Skyborne island quests before transitioning to Horde mainland routing." },
             [12] = { tag = "DO", title = "Zephras Isle → Barrens", note = "Finish the Zephras starter story, then transition to the Horde mainland and the Barrens route." },
+        },
+    },
+
+    -- Verified Forever gear-upgrade targets. Keep this catalog conservative:
+    -- only add sources whose item/source relationship is supported by current
+    -- Forever data. The scanner still compares each target against the player's
+    -- actual equipped score before recommending it.
+    gearUpgradeTargets = {
+        SHAMAN = {
+            [9] = { -- Wrist
+                {
+                    itemID = 271202,
+                    name = "Witherbite Bracers",
+                    itemLevel = 20,
+                    requiredLevel = 15,
+                    stats = { Agility = 4, SpellPower = 5 },
+                    sourceType = "DUNGEON",
+                    source = "Witherfang — Ruins of Lordaeron",
+                    sourceNote = "Verified Forever boss drop; optional gear farm, not a leveling detour.",
+                    sourcePriority = 45,
+                    routeFriendly = false,
+                },
+                {
+                    itemID = 1306,
+                    name = "Wolfmane Wristguards",
+                    itemLevel = 20,
+                    requiredLevel = 14,
+                    stats = { Agility = 2, Stamina = 2 },
+                    sourceType = "QUEST",
+                    source = "Earthen Arise — Stonetalon Mountains",
+                    sourceNote = "Horde quest reward after Boulderslide Ravine; route-friendly if the chain is still available.",
+                    sourcePriority = 75,
+                    routeFriendly = true,
+                    questID = 6481,
+                },
+            },
+            [10] = { -- Hands
+                {
+                    itemID = 720,
+                    name = "Brawler Gloves",
+                    itemLevel = 28,
+                    requiredLevel = 23,
+                    stats = { Strength = 8, Stamina = 7 },
+                    sourceType = "WORLD/AH",
+                    source = "World drop / Auction House",
+                    sourceNote = "Verified Forever item; opportunistic buy/drop only, do not farm a specific mob for it.",
+                    sourcePriority = 35,
+                    routeFriendly = false,
+                },
+                {
+                    itemID = 16740,
+                    name = "Shredder Operating Gloves",
+                    itemLevel = 31,
+                    requiredLevel = 23,
+                    stats = { Agility = 2, Stamina = 5, Intellect = 6 },
+                    sourceType = "QUEST",
+                    source = "The Lost Pages — Ashenvale",
+                    sourceNote = "Verified Horde quest reward; scanner will only recommend it if it actually beats your current gloves.",
+                    sourcePriority = 90,
+                    routeFriendly = true,
+                    questID = 6504,
+                },
+                {
+                    itemID = 16741,
+                    name = "Oilrag Handwraps",
+                    itemLevel = 31,
+                    requiredLevel = 23,
+                    stats = { Stamina = 2, Intellect = 2, SpellPower = 9 },
+                    sourceType = "QUEST",
+                    source = "The Lost Pages — Ashenvale",
+                    sourceNote = "Verified Horde quest reward; caster-oriented and only recommended when its score wins.",
+                    sourcePriority = 90,
+                    routeFriendly = true,
+                    questID = 6504,
+                },
+            },
         },
     },
 
