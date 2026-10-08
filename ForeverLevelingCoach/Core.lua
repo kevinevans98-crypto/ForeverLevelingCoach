@@ -4087,22 +4087,58 @@ end
 
 
 -- Gear Advisor ---------------------------------------------------------------
--- Lightweight leveling heuristic for Horde Shaman. The goal is a quick
--- "equip / keep" answer on hover, not a full endgame simulator.
+-- Class-optimized weights are used only where FLC has verified class logic.
+-- Every other class gets conservative neutral weights so the shared Gear
+-- Advisor does not accidentally apply Shaman priorities to a Mage/Priest/etc.
 local FLC_GEAR_WEIGHTS = {
-    ITEM_MOD_STRENGTH_SHORT = 2.0,
-    ITEM_MOD_AGILITY_SHORT = 1.4,
-    ITEM_MOD_STAMINA_SHORT = 0.7,
-    ITEM_MOD_INTELLECT_SHORT = 0.5,
-    ITEM_MOD_SPIRIT_SHORT = 0.2,
-    ITEM_MOD_ATTACK_POWER_SHORT = 0.5,
-    ITEM_MOD_CRIT_RATING_SHORT = 0.6,
-    ITEM_MOD_HIT_RATING_SHORT = 0.8,
-    ITEM_MOD_HASTE_RATING_SHORT = 0.4,
-    ITEM_MOD_ARMOR_PENETRATION_RATING_SHORT = 0.4,
-    ITEM_MOD_SPELL_POWER_SHORT = 0.15,
-    ITEM_MOD_DAMAGE_PER_SECOND_SHORT = 10.0,
+    GENERIC = {
+        ITEM_MOD_STRENGTH_SHORT = 1.0,
+        ITEM_MOD_AGILITY_SHORT = 1.0,
+        ITEM_MOD_STAMINA_SHORT = 0.8,
+        ITEM_MOD_INTELLECT_SHORT = 1.0,
+        ITEM_MOD_SPIRIT_SHORT = 0.6,
+        ITEM_MOD_ATTACK_POWER_SHORT = 0.25,
+        ITEM_MOD_CRIT_RATING_SHORT = 0.4,
+        ITEM_MOD_HIT_RATING_SHORT = 0.4,
+        ITEM_MOD_HASTE_RATING_SHORT = 0.4,
+        ITEM_MOD_ARMOR_PENETRATION_RATING_SHORT = 0.2,
+        ITEM_MOD_SPELL_POWER_SHORT = 0.4,
+        ITEM_MOD_DAMAGE_PER_SECOND_SHORT = 5.0,
+    },
+    SHAMAN = {
+        ITEM_MOD_STRENGTH_SHORT = 2.0,
+        ITEM_MOD_AGILITY_SHORT = 1.4,
+        ITEM_MOD_STAMINA_SHORT = 0.7,
+        ITEM_MOD_INTELLECT_SHORT = 0.5,
+        ITEM_MOD_SPIRIT_SHORT = 0.2,
+        ITEM_MOD_ATTACK_POWER_SHORT = 0.5,
+        ITEM_MOD_CRIT_RATING_SHORT = 0.6,
+        ITEM_MOD_HIT_RATING_SHORT = 0.8,
+        ITEM_MOD_HASTE_RATING_SHORT = 0.4,
+        ITEM_MOD_ARMOR_PENETRATION_RATING_SHORT = 0.4,
+        ITEM_MOD_SPELL_POWER_SHORT = 0.15,
+        ITEM_MOD_DAMAGE_PER_SECOND_SHORT = 10.0,
+    },
+    ROGUE = {
+        ITEM_MOD_STRENGTH_SHORT = 0.5,
+        ITEM_MOD_AGILITY_SHORT = 2.2,
+        ITEM_MOD_STAMINA_SHORT = 0.8,
+        ITEM_MOD_INTELLECT_SHORT = 0,
+        ITEM_MOD_SPIRIT_SHORT = 0,
+        ITEM_MOD_ATTACK_POWER_SHORT = 0.5,
+        ITEM_MOD_CRIT_RATING_SHORT = 0.6,
+        ITEM_MOD_HIT_RATING_SHORT = 0.8,
+        ITEM_MOD_HASTE_RATING_SHORT = 0.4,
+        ITEM_MOD_ARMOR_PENETRATION_RATING_SHORT = 0.4,
+        ITEM_MOD_SPELL_POWER_SHORT = 0,
+        ITEM_MOD_DAMAGE_PER_SECOND_SHORT = 10.0,
+    },
 }
+
+local function flcGearWeights()
+    local _, classFile = UnitClass("player")
+    return FLC_GEAR_WEIGHTS[classFile] or FLC_GEAR_WEIGHTS.GENERIC
+end
 
 local FLC_EQUIP_SLOTS = {
     INVTYPE_HEAD = {1},
@@ -4200,17 +4236,10 @@ local function flcItemScore(link, tooltip)
         local ok, value = pcall(C_Item.GetItemStats, link)
         if ok then stats = value end
     end
-    local _, classFile = UnitClass("player")
+    local weights = flcGearWeights()
     if stats then
         for stat, value in pairs(stats) do
-            local weight = FLC_GEAR_WEIGHTS[stat]
-            if classFile == "ROGUE" then
-                if stat == "ITEM_MOD_AGILITY_SHORT" then weight = 2.2 end
-                if stat == "ITEM_MOD_STAMINA_SHORT" then weight = 0.8 end
-                if stat == "ITEM_MOD_STRENGTH_SHORT" then weight = 0.5 end
-                if stat == "ITEM_MOD_INTELLECT_SHORT" then weight = 0 end
-                if stat == "ITEM_MOD_SPIRIT_SHORT" then weight = 0 end
-            end
+            local weight = weights[stat]
             if weight and value then
                 score = score + (value * weight)
             end
@@ -4237,31 +4266,24 @@ local function flcStaticUpgradeScore(target)
     if not target then return 0 end
     local stats = target.stats or {}
     local score = 0
-    local _, playerClass = UnitClass("player")
+    local liveWeights = flcGearWeights()
+    local keyByName = {
+        Strength = "ITEM_MOD_STRENGTH_SHORT",
+        Agility = "ITEM_MOD_AGILITY_SHORT",
+        Stamina = "ITEM_MOD_STAMINA_SHORT",
+        Intellect = "ITEM_MOD_INTELLECT_SHORT",
+        Spirit = "ITEM_MOD_SPIRIT_SHORT",
+        AttackPower = "ITEM_MOD_ATTACK_POWER_SHORT",
+        Crit = "ITEM_MOD_CRIT_RATING_SHORT",
+        Hit = "ITEM_MOD_HIT_RATING_SHORT",
+        Haste = "ITEM_MOD_HASTE_RATING_SHORT",
+        ArmorPen = "ITEM_MOD_ARMOR_PENETRATION_RATING_SHORT",
+        SpellPower = "ITEM_MOD_SPELL_POWER_SHORT",
+        DPS = "ITEM_MOD_DAMAGE_PER_SECOND_SHORT",
+    }
 
     local function weight(name)
-        if playerClass == "ROGUE" then
-            if name == "Agility" then return 2.2 end
-            if name == "Stamina" then return 0.8 end
-            if name == "Strength" then return 0.5 end
-            if name == "Intellect" or name == "Spirit" then return 0 end
-        end
-
-        local weights = {
-            Strength = 2.0,
-            Agility = 1.4,
-            Stamina = 0.7,
-            Intellect = 0.5,
-            Spirit = 0.2,
-            AttackPower = 0.5,
-            Crit = 0.6,
-            Hit = 0.8,
-            Haste = 0.4,
-            ArmorPen = 0.4,
-            SpellPower = 0.15,
-            DPS = 10.0,
-        }
-        return weights[name] or 0
+        return liveWeights[keyByName[name]] or 0
     end
 
     for statName, value in pairs(stats) do
