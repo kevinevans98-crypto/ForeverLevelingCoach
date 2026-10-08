@@ -449,3 +449,9 @@ Do not invent Forever quest IDs or waypoint coordinates. Route data should be ve
 - Removed the redundant Splintertree flight target from Satyr Horns so being at Splintertree no longer produces a bogus flight-master instruction.
 
 - Satyr Horns can now own normal same-map arrow navigation for both collection and turn-in.
+
+- v0.39.0: Cross-zone turn-in deferral now names the highest-value current-map DO/IMPORTANT quest instead of the first matching route entry.
+
+- The local defer target is ranked with the same unfinished-quest factors used by normal routing: priority, progress, cluster value, proximity, local order, XP/min, and stale-level penalty.
+
+- Export now includes CrossZoneDeferBestLocal for easier validation of cross-zone defer explanations.
