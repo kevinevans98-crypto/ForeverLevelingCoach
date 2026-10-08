@@ -1211,6 +1211,62 @@ local function getEventUrgencyBonus(step, active)
     return bonus, string.format("nearby escort/event — do before leaving (+%d)", bonus)
 end
 
+local function getTurnInChainBonus(step)
+    if not step or not step.nextPickup or not step.nextPickup.questID then
+        return 0, nil
+    end
+
+    local pickup = step.nextPickup
+    local nextQuestID = tonumber(pickup.questID)
+    if not nextQuestID or isQuestCompleted(nextQuestID) then
+        return 0, nil
+    end
+
+    local nextStep = getStepByQuestID(nextQuestID)
+    if nextStep and not routeStepEligible(nextStep) then
+        return 0, nil
+    end
+
+    if nextStep and nextStep.pickupPrereqQuestIDs then
+        for _, prereqID in ipairs(nextStep.pickupPrereqQuestIDs) do
+            if tonumber(prereqID) ~= tonumber(step.questID) and not isQuestCompleted(prereqID) then
+                return 0, nil
+            end
+        end
+    end
+
+    local weights = Data.scoring or {}
+    local bonus = tonumber(weights.chainFollowupTurnIn) or 0
+    local sameNPC = false
+
+    local turnIn = step.turnInTarget
+    if turnIn then
+        local turnInName = string.lower(tostring(turnIn.name or turnIn.npc or ""))
+        local pickupName = string.lower(tostring(pickup.npc or pickup.name or ""))
+        if turnInName ~= "" and pickupName ~= "" and turnInName == pickupName then
+            sameNPC = true
+        else
+            local a = turnIn.waypoint
+            local b = pickup.waypoint
+            if a and b and a.mapID == b.mapID and a.x and a.y and b.x and b.y then
+                local dx, dy = a.x - b.x, a.y - b.y
+                sameNPC = math.sqrt(dx * dx + dy * dy) <= 0.01
+            end
+        end
+    end
+
+    if sameNPC then
+        bonus = bonus + (tonumber(weights.sameNpcFollowupTurnIn) or 0)
+    end
+
+    if bonus <= 0 then return 0, nil end
+
+    if sameNPC then
+        return bonus, string.format("unlocks same-NPC follow-up (+%d)", bonus)
+    end
+    return bonus, string.format("unlocks follow-up quest (+%d)", bonus)
+end
+
 local function scoreRouteStep(step, active, clusterCounts)
     local weights = Data.scoring or {}
     local score = 0
@@ -1234,6 +1290,12 @@ local function scoreRouteStep(step, active, clusterCounts)
             end
             score = score - penalty
             reasons[#reasons + 1] = string.format("defer turn-in: %s (-%d)", tostring(decisionReason or "finish nearby work first"), penalty)
+        else
+            local chainBonus, chainReason = getTurnInChainBonus(step)
+            if chainBonus > 0 then
+                score = score + chainBonus
+                reasons[#reasons + 1] = chainReason
+            end
         end
     else
         local progress = getObjectiveProgress(active)
