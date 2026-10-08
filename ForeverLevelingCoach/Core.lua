@@ -3762,6 +3762,10 @@ exportSnapshot = function()
         "AddonVersion=" .. tostring(Data.version or "?"),
         "Character=" .. tostring(UnitName("player") or "?"),
         "Level=" .. tostring(UnitLevel("player") or "?"),
+        "CurrentXP=" .. tostring((UnitXP and UnitXP("player")) or "unknown"),
+        "XPToNextLevel=" .. tostring((UnitXPMax and UnitXPMax("player")) or "unknown"),
+        "XPPercent=" .. tostring((UnitXP and UnitXPMax and (UnitXPMax("player") or 0) > 0)
+            and string.format("%.2f", 100 * UnitXP("player") / UnitXPMax("player")) or "unknown"),
         "Class=" .. tostring(classFile or "?"),
         "Faction=" .. tostring(UnitFactionGroup("player") or "?"),
         "RecommendedStep=" .. tostring(currentRouteStep and currentRouteStep.title or "?"),
