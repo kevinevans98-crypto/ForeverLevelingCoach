@@ -1359,6 +1359,34 @@ local function scoreRouteStep(step, active, clusterCounts)
         reasons[#reasons + 1] = string.format("fast XP/min (+%d)", bonus)
     end
 
+    -- Solo-safety: use curated observed mob levels only. Unknown mobs get no
+    -- penalty rather than an invented level. Completed quests remain turn-ins.
+    if not (active and active.isComplete) and not step.dungeon then
+        local enemyMin = tonumber(step.soloEnemyMinLevel)
+        local enemyMax = tonumber(step.soloEnemyMaxLevel)
+        if enemyMin and enemyMax then
+            local playerLevel = UnitLevel("player") or 1
+            local minGap = enemyMin - playerLevel
+            local maxGap = enemyMax - playerLevel
+            local penalty = 0
+            if minGap >= 4 then
+                penalty = 800
+            elseif maxGap >= 4 then
+                penalty = 500
+            elseif maxGap == 3 then
+                penalty = 250
+            elseif maxGap == 2 then
+                penalty = 75
+            end
+            if penalty > 0 then
+                score = score - penalty
+                reasons[#reasons + 1] = string.format(
+                    "solo safety: observed enemies %d-%d vs level %d (-%d)",
+                    enemyMin, enemyMax, playerLevel, penalty)
+            end
+        end
+    end
+
     -- Quests far below the player's level lose value quickly. Keep a small
     -- grace band so efficient green quests in the same cluster still finish.
     if step.questLevel then
@@ -3734,6 +3762,10 @@ exportSnapshot = function()
         "AddonVersion=" .. tostring(Data.version or "?"),
         "Character=" .. tostring(UnitName("player") or "?"),
         "Level=" .. tostring(UnitLevel("player") or "?"),
+        "CurrentXP=" .. tostring((UnitXP and UnitXP("player")) or "unknown"),
+        "XPToNextLevel=" .. tostring((UnitXPMax and UnitXPMax("player")) or "unknown"),
+        "XPPercent=" .. tostring((UnitXP and UnitXPMax and (UnitXPMax("player") or 0) > 0)
+            and string.format("%.2f", 100 * UnitXP("player") / UnitXPMax("player")) or "unknown"),
         "Class=" .. tostring(classFile or "?"),
         "Faction=" .. tostring(UnitFactionGroup("player") or "?"),
         "RecommendedStep=" .. tostring(currentRouteStep and currentRouteStep.title or "?"),
