@@ -1,0 +1,33 @@
+name: Alpha feedback triage
+on:
+  issues:
+    types: [opened, edited, reopened]
+permissions:
+  issues: write
+jobs:
+  triage:
+    if: contains(github.event.issue.title, '[Alpha Bug]') || contains(github.event.issue.labels.*.name, 'alpha-feedback')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Classify feedback
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const text = [issue.title, issue.body || ''].join('\n').toLowerCase();
+            const labels = ['alpha-feedback'];
+            if (/blocker -|crash|unusable/.test(text)) labels.push('priority:blocker');
+            else if (/high -|wrong arrow|incorrect route|waypoint/.test(text)) labels.push('priority:high');
+            else if (/medium -|missing quest|incorrect advice/.test(text)) labels.push('priority:medium');
+            else labels.push('priority:low');
+            if (/quest|turn.in|pickup/.test(text)) labels.push('area:quests');
+            if (/arrow|waypoint|navigation|route/.test(text)) labels.push('area:routing');
+            if (/gear|trainer|talent/.test(text)) labels.push('area:advice');
+            for (const name of labels) {
+              try { await github.rest.issues.getLabel({ ...context.repo, name }); }
+              catch (e) {
+                if (e.status !== 404) throw e;
+                await github.rest.issues.createLabel({ ...context.repo, name, color: 'ededed' });
+              }
+            }
+            await github.rest.issues.addLabels({ ...context.repo, issue_number: issue.number, labels });
