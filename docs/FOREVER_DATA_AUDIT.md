@@ -78,3 +78,17 @@ Goal: optimize a *local quest loop*, not just a single highest-scored quest. Kee
 ### Stable release gate
 
 Only after syntax/fixture checks, in-game route validation, regression review, and a successful updater test: bump version consistently in metadata and export, merge alpha PR, and publish stable v0.59.0. Do not claim these checks passed until executed.
+
+## Alpha tester quick start (v0.59.0 preparation)
+
+**Build:** use the alpha branch package only; do not overwrite a working stable addon without a backup. The alpha branch is not yet a released or validated build.
+
+**Test:** play normally for 20–30 minutes in the assigned class/zone. Watch for wrong arrows, missing nearby quests, needless backtracking, incorrect training or gear advice, Lua errors, and stuck turn-ins.
+
+**Report:** click **Report** in the addon or type `/flc report`. Copy the diagnostic text into an issue. Replace the bracketed Expected/Actual/Reproduce/Frequency fields with observations. Include an optional screenshot and the error text if available. Reports are manual; the addon does **not** upload or transmit them.
+
+**Privacy:** exports include character name, class, faction, level, current location/coordinates, quests and gear. Review and redact identifying details before posting publicly. Never include account credentials or private chat.
+
+**Triage labels:** blocker (crash, unplayable), high (wrong route or unsafe waypoint), medium (missing quest/incorrect guidance), low (cosmetic). Include exact quest ID and addon version. Deduplicate issues by quest ID + zone + symptom.
+
+**Release rule:** verify syntax and in-game behavior before sending a build to outside testers. Keep test and stable installations clearly separated.
