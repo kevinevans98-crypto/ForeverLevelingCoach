@@ -3192,6 +3192,22 @@ local function render()
     local travelInstruction, navigationWaypoint = getTravelInstruction(step)
     currentTravelInstruction = travelInstruction
     currentNavigationWaypoint = navigationWaypoint
+    -- Some verified targets provide an action but no instruction. Keep the
+    -- beginner-facing travel text usable without fabricating coordinates.
+    if (not currentTravelInstruction or currentTravelInstruction == "") and step then
+        if active and active.isComplete and step.turnInTarget then
+            local target = step.turnInTarget
+            currentTravelInstruction = "Turn in " .. tostring(step.title or "quest")
+                .. (target.name and (" to " .. tostring(target.name)) or "")
+                .. (target.coords and (" at " .. tostring(target.coords)) or "") .. "."
+        else
+            local target = getBestObjectiveTarget(step, active)
+            if target then
+                currentTravelInstruction = target.instruction or target.action
+                    or ("Work on " .. tostring(step.title or "quest") .. ".")
+            end
+        end
+    end
     currentFastTravelSuggestion, currentFastTravelMode = getFastTravelSuggestion(step, travelInstruction)
 
     if active and active.isComplete then
@@ -4072,6 +4088,27 @@ exportSnapshot = function()
                 tostring(pickup.coords or "unknown"),
                 suggestion.distance and string.format(" | mapDistance=%.3f", suggestion.distance) or "")
         end
+    end
+
+    -- Suggest parallel verified local objectives; never route an unverified
+    -- quest based solely on its name or the player's current zone.
+    lines[#lines + 1] = "ParallelLocalObjectives:"
+    local parallel = getNearbyClusterQuestNames(currentRouteStep, currentByID)
+    local parallelCount = 0
+    for _, item in ipairs(parallel) do
+        if not item.complete and item.step and item.active then
+            local target = getBestObjectiveTarget(item.step, item.active)
+            if target then
+                parallelCount = parallelCount + 1
+                lines[#lines + 1] = string.format("- %d | %s | %s | %s",
+                    item.step.questID or 0, tostring(item.title or "?"),
+                    tostring(target.action or target.instruction or "Work on objective"),
+                    tostring(target.coords or "location not specified"))
+            end
+        end
+    end
+    if parallelCount == 0 then
+        lines[#lines + 1] = "- none with verified objective targets"
     end
 
     -- Full active-quest overview complements the primary arrow. Only quests
