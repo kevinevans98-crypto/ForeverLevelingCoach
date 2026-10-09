@@ -1387,6 +1387,42 @@ local function scoreRouteStep(step, active, clusterCounts)
         end
     end
 
+    -- Level-aware zone efficiency: reward quests close to the player's level
+    -- and clusters containing several eligible active quests. These are
+    -- heuristic scores, NOT invented XP/hour estimates. Never override the
+    -- existing dungeon lock, verified objectives, or solo-safety penalties.
+    if not (active and active.isComplete) and not step.dungeon then
+        local playerLevel = UnitLevel("player") or 1
+        local questLevel = tonumber(step.questLevel)
+        if questLevel then
+            local delta = questLevel - playerLevel
+            local levelBonus = 0
+            if delta >= -2 and delta <= 1 then
+                levelBonus = 65
+            elseif delta >= -4 and delta <= 2 then
+                levelBonus = 30
+            elseif delta < -4 then
+                levelBonus = -math.min(180, (-delta - 4) * 30)
+            elseif delta > 2 then
+                levelBonus = -math.min(150, (delta - 2) * 50)
+            end
+            if levelBonus ~= 0 then
+                score = score + levelBonus
+                reasons[#reasons + 1] = string.format(
+                    "quest level %d vs player %d (%+d)", questLevel, playerLevel, levelBonus)
+            end
+        end
+        -- Cluster counts are drawn from eligible quests in the live quest log.
+        -- Cap the bonus so quest density cannot overwhelm route safety.
+        local eligibleCount = step.cluster and (clusterCounts[step.cluster] or 0) or 0
+        if eligibleCount >= 2 then
+            local densityBonus = math.min(60, (eligibleCount - 1) * 20)
+            score = score + densityBonus
+            reasons[#reasons + 1] = string.format(
+                "level-ready quest cluster: %d active (+%d)", eligibleCount, densityBonus)
+        end
+    end
+
     -- Quests far below the player's level lose value quickly. Keep a small
     -- grace band so efficient green quests in the same cluster still finish.
     if step.questLevel then
