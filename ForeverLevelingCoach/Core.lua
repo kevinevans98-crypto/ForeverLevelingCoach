@@ -4601,6 +4601,16 @@ local function flcGearSlotStatus(slotDef, playerLevel)
     end
 
     if not link then
+        -- Classic/Forever Rogues unlock Dual Wield at level 10. Do not
+        -- recommend an off-hand weapon before the slot can be used.
+        local _, playerClass = UnitClass("player")
+        if slot == 17 and playerClass == "ROGUE" and playerLevel < 10 then
+            return {
+                slot = slot, slotName = slotDef.name, status = "NOT EXPECTED YET",
+                reason = "Rogues unlock Dual Wield at level 10; no off-hand needed yet",
+                score = 0, expected = false,
+            }
+        end
         local expected = playerLevel >= (slotDef.expectedLevel or 1)
 
         if slotDef.optionalEmpty and not expected then
