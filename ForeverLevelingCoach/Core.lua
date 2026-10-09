@@ -3473,6 +3473,33 @@ local function render()
         end
     end
 
+    -- Keep uncovered active quests visible without pretending their objectives are
+    -- in the current cluster. They remain un-routed until locations are verified.
+    if DB and DB.lazyMode ~= false then
+        local unknown = {}
+        for questID, quest in pairs(currentByID or {}) do
+            local covered = false
+            for _, routeStep in ipairs(Data.route or {}) do
+                if routeStep.questID == questID then covered = true break end
+            end
+            if not covered then
+                unknown[#unknown + 1] = { id = questID, quest = quest }
+            end
+        end
+        table.sort(unknown, function(a, b) return a.id < b.id end)
+        for _, entry in ipairs(unknown) do
+            if #cardData >= #questCards then break end
+            cardData[#cardData + 1] = {
+                step = stepNumber,
+                status = entry.quest.isComplete and "READY / UNVERIFIED" or "TRACKED / UNVERIFIED",
+                title = tostring(entry.quest.title or ("Quest " .. entry.id)),
+                action = "LOCATION NOT VERIFIED",
+                background = true,
+            }
+            stepNumber = stepNumber + 1
+        end
+    end
+
     if DB and DB.lazyMode ~= false and currentPickupSuggestions then
         for _, suggestion in ipairs(currentPickupSuggestions) do
             if #cardData >= #questCards then break end
@@ -4045,6 +4072,42 @@ exportSnapshot = function()
                 tostring(pickup.coords or "unknown"),
                 suggestion.distance and string.format(" | mapDistance=%.3f", suggestion.distance) or "")
         end
+    end
+
+    -- Full active-quest overview complements the primary arrow. Only quests
+    -- with verified route metadata are labeled as part of the local cluster.
+    lines[#lines + 1] = "MultiQuestPlan:"
+    lines[#lines + 1] = "- Primary arrow: " .. tostring(currentRouteStep and currentRouteStep.title or "none")
+    local plan = {}
+    for questID, quest in pairs(currentByID or {}) do
+        local routeStep = nil
+        for _, candidate in ipairs(Data.route or {}) do
+            if candidate.questID == questID then routeStep = candidate break end
+        end
+        local classification = "ACTIVE / LOCATION UNVERIFIED"
+        if routeStep and currentCluster and routeStep.cluster == currentCluster then
+            classification = "VERIFIED LOCAL CLUSTER"
+        elseif routeStep then
+            classification = "VERIFIED OTHER CLUSTER"
+        end
+        plan[#plan + 1] = {
+            id = questID,
+            quest = quest,
+            classification = classification,
+        }
+    end
+    table.sort(plan, function(a, b)
+        if a.classification ~= b.classification then
+            return a.classification < b.classification
+        end
+        return a.id < b.id
+    end)
+    for _, entry in ipairs(plan) do
+        lines[#lines + 1] = string.format("- %s | %d | %s | %s | %s",
+            entry.classification, entry.id,
+            tostring(entry.quest.title or "?"),
+            entry.quest.isComplete and "READY TO TURN IN" or "IN PROGRESS",
+            tostring(objectiveSummary(entry.quest) or "objectives unknown"))
     end
 
     lines[#lines + 1] = "ScoredCandidates:"
