@@ -1,0 +1,62 @@
+name: Alpha bug report
+description: Report a Forever Leveling Coach alpha issue
+title: "[Alpha Bug] "
+labels: ["alpha-feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: "Use /flc report or the Report button. Review and redact character names or other identifying information before posting. Never post account credentials."
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - Blocker - crash or unusable
+        - High - incorrect route or waypoint
+        - Medium - missing quest or advice
+        - Low - visual or minor
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Addon version
+      placeholder: "e.g. alpha build ID"
+    validations:
+      required: true
+  - type: input
+    id: zone
+    attributes:
+      label: Zone and quest ID
+      placeholder: "e.g. Tirisfal Glades, 367"
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Redacted /flc report diagnostics
+      description: "Optional, but extremely helpful. Check for private character information."
+      render: text
+  - type: textarea
+    id: errors
+    attributes:
+      label: Lua errors or screenshots
+      description: "Paste errors or attach images if available."

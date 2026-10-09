@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Alpha tester instructions
+    url: https://github.com/kevinevans98-crypto/ForeverLevelingCoach/blob/alpha/forever-data-audit/docs/FOREVER_DATA_AUDIT.md
+    about: Read the alpha tester quick start and privacy guidance.

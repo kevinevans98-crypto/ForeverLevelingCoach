@@ -253,6 +253,7 @@ local currentAutoFlightTarget = nil
 local currentAutoFlightStatus = "idle"
 local taxiOpenSerial = 0
 local exportSnapshot
+local testerReportMode = false
 local syncQuests
 local getBestObjectiveTarget
 local flcGearScanSnapshot
@@ -1387,6 +1388,42 @@ local function scoreRouteStep(step, active, clusterCounts)
         end
     end
 
+    -- Level-aware zone efficiency: reward quests close to the player's level
+    -- and clusters containing several eligible active quests. These are
+    -- heuristic scores, NOT invented XP/hour estimates. Never override the
+    -- existing dungeon lock, verified objectives, or solo-safety penalties.
+    if not (active and active.isComplete) and not step.dungeon then
+        local playerLevel = UnitLevel("player") or 1
+        local questLevel = tonumber(step.questLevel)
+        if questLevel then
+            local delta = questLevel - playerLevel
+            local levelBonus = 0
+            if delta >= -2 and delta <= 1 then
+                levelBonus = 65
+            elseif delta >= -4 and delta <= 2 then
+                levelBonus = 30
+            elseif delta < -4 then
+                levelBonus = -math.min(180, (-delta - 4) * 30)
+            elseif delta > 2 then
+                levelBonus = -math.min(150, (delta - 2) * 50)
+            end
+            if levelBonus ~= 0 then
+                score = score + levelBonus
+                reasons[#reasons + 1] = string.format(
+                    "quest level %d vs player %d (%+d)", questLevel, playerLevel, levelBonus)
+            end
+        end
+        -- Cluster counts are drawn from eligible quests in the live quest log.
+        -- Cap the bonus so quest density cannot overwhelm route safety.
+        local eligibleCount = step.cluster and (clusterCounts[step.cluster] or 0) or 0
+        if eligibleCount >= 2 then
+            local densityBonus = math.min(60, (eligibleCount - 1) * 20)
+            score = score + densityBonus
+            reasons[#reasons + 1] = string.format(
+                "level-ready quest cluster: %d active (+%d)", eligibleCount, densityBonus)
+        end
+    end
+
     -- Quests far below the player's level lose value quickly. Keep a small
     -- grace band so efficient green quests in the same cluster still finish.
     if step.questLevel then
@@ -1691,6 +1728,18 @@ local function flcStyleFlatButton(button, accent)
         text:SetTextColor(accent and 0.42 or 0.82, accent and 0.92 or 0.86, accent and 0.86 or 0.89)
     end
 end
+
+local reportButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+reportButton:SetSize(54, 20)
+reportButton:SetPoint("TOPRIGHT", -10, -56)
+reportButton:SetText("Report")
+flcStyleFlatButton(reportButton, false)
+reportButton:SetScript("OnClick", function()
+    syncQuests()
+    testerReportMode = true
+    exportSnapshot()
+    testerReportMode = false
+end)
 
 local exportButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
 exportButton:SetSize(54, 20)
@@ -3117,6 +3166,14 @@ local function render()
         routeFlightTarget = step.turnInFlightTarget
     end
     currentAutoFlightTarget = routeFlightTarget
+    -- Do not recommend a flight to the city the player is already in.
+    -- Restrict this check to the two known trainer cities; never infer a
+    -- remote destination from an unverified coordinate or taxi node.
+    if currentAutoFlightTarget
+        and ((zoneMatchesAliases({ "Thunder Bluff" }) and taxiNameMatches(currentAutoFlightTarget, "Thunder Bluff"))
+            or (zoneMatchesAliases({ "Orgrimmar" }) and taxiNameMatches(currentAutoFlightTarget, "Orgrimmar"))) then
+        currentAutoFlightTarget = nil
+    end
     currentAutoFlightStatus = currentAutoFlightTarget and "waiting-for-flight-master" or "no-target"
     currentPersonTarget = step and step.personTarget or nil
     if active and active.isComplete and step and step.turnInTarget then
@@ -3148,6 +3205,22 @@ local function render()
     local travelInstruction, navigationWaypoint = getTravelInstruction(step)
     currentTravelInstruction = travelInstruction
     currentNavigationWaypoint = navigationWaypoint
+    -- Some verified targets provide an action but no instruction. Keep the
+    -- beginner-facing travel text usable without fabricating coordinates.
+    if (not currentTravelInstruction or currentTravelInstruction == "") and step then
+        if active and active.isComplete and step.turnInTarget then
+            local target = step.turnInTarget
+            currentTravelInstruction = "Turn in " .. tostring(step.title or "quest")
+                .. (target.name and (" to " .. tostring(target.name)) or "")
+                .. (target.coords and (" at " .. tostring(target.coords)) or "") .. "."
+        else
+            local target = getBestObjectiveTarget(step, active)
+            if target then
+                currentTravelInstruction = target.instruction or target.action
+                    or ("Work on " .. tostring(step.title or "quest") .. ".")
+            end
+        end
+    end
     currentFastTravelSuggestion, currentFastTravelMode = getFastTravelSuggestion(step, travelInstruction)
 
     if active and active.isComplete then
@@ -3426,6 +3499,33 @@ local function render()
                 }
                 stepNumber = stepNumber + 1
             end
+        end
+    end
+
+    -- Keep uncovered active quests visible without pretending their objectives are
+    -- in the current cluster. They remain un-routed until locations are verified.
+    if DB and DB.lazyMode ~= false then
+        local unknown = {}
+        for questID, quest in pairs(currentByID or {}) do
+            local covered = false
+            for _, routeStep in ipairs(Data.route or {}) do
+                if routeStep.questID == questID then covered = true break end
+            end
+            if not covered then
+                unknown[#unknown + 1] = { id = questID, quest = quest }
+            end
+        end
+        table.sort(unknown, function(a, b) return a.id < b.id end)
+        for _, entry in ipairs(unknown) do
+            if #cardData >= #questCards then break end
+            cardData[#cardData + 1] = {
+                step = stepNumber,
+                status = entry.quest.isComplete and "READY / UNVERIFIED" or "TRACKED / UNVERIFIED",
+                title = tostring(entry.quest.title or ("Quest " .. entry.id)),
+                action = "LOCATION NOT VERIFIED",
+                background = true,
+            }
+            stepNumber = stepNumber + 1
         end
     end
 
@@ -3760,6 +3860,7 @@ exportSnapshot = function()
     local lines = {
         "Forever Leveling Coach Export",
         "AddonVersion=" .. tostring(Data.version or "?"),
+        "ReportType=" .. (testerReportMode and "ALPHA BUG REPORT" or "DIAGNOSTIC EXPORT"),
         "Character=" .. tostring(UnitName("player") or "?"),
         "Level=" .. tostring(UnitLevel("player") or "?"),
         "CurrentXP=" .. tostring((UnitXP and UnitXP("player")) or "unknown"),
@@ -4001,6 +4102,73 @@ exportSnapshot = function()
                 tostring(pickup.coords or "unknown"),
                 suggestion.distance and string.format(" | mapDistance=%.3f", suggestion.distance) or "")
         end
+    end
+
+    -- Suggest parallel verified local objectives; never route an unverified
+    -- quest based solely on its name or the player's current zone.
+    lines[#lines + 1] = "ParallelLocalObjectives:"
+    local parallel = getNearbyClusterQuestNames(currentRouteStep, currentByID)
+    local parallelCount = 0
+    for _, item in ipairs(parallel) do
+        if not item.complete and item.step and item.active then
+            local target = getBestObjectiveTarget(item.step, item.active)
+            if target then
+                parallelCount = parallelCount + 1
+                lines[#lines + 1] = string.format("- %d | %s | %s | %s",
+                    item.step.questID or 0, tostring(item.title or "?"),
+                    tostring(target.action or target.instruction or "Work on objective"),
+                    tostring(target.coords or "location not specified"))
+            end
+        end
+    end
+    if parallelCount == 0 then
+        lines[#lines + 1] = "- none with verified objective targets"
+    end
+
+    -- Full active-quest overview complements the primary arrow. Only quests
+    -- with verified route metadata are labeled as part of the local cluster.
+    lines[#lines + 1] = "MultiQuestPlan:"
+    lines[#lines + 1] = "- Primary arrow: " .. tostring(currentRouteStep and currentRouteStep.title or "none")
+    local plan = {}
+    for questID, quest in pairs(currentByID or {}) do
+        local routeStep = nil
+        for _, candidate in ipairs(Data.route or {}) do
+            if candidate.questID == questID then routeStep = candidate break end
+        end
+        local classification = "ACTIVE / LOCATION UNVERIFIED"
+        if routeStep and currentCluster and routeStep.cluster == currentCluster then
+            classification = "VERIFIED LOCAL CLUSTER"
+        elseif routeStep then
+            classification = "VERIFIED OTHER CLUSTER"
+        end
+        plan[#plan + 1] = {
+            id = questID,
+            quest = quest,
+            classification = classification,
+        }
+    end
+    table.sort(plan, function(a, b)
+        if a.classification ~= b.classification then
+            return a.classification < b.classification
+        end
+        return a.id < b.id
+    end)
+    for _, entry in ipairs(plan) do
+        lines[#lines + 1] = string.format("- %s | %d | %s | %s | %s",
+            entry.classification, entry.id,
+            tostring(entry.quest.title or "?"),
+            entry.quest.isComplete and "READY TO TURN IN" or "IN PROGRESS",
+            tostring(objectiveSummary(entry.quest) or "objectives unknown"))
+    end
+
+    if testerReportMode then
+        lines[#lines + 1] = "TesterReport:"
+        lines[#lines + 1] = "- Expected: [describe what should happen]"
+        lines[#lines + 1] = "- Actual: [describe what happened]"
+        lines[#lines + 1] = "- Steps to reproduce: [list actions]"
+        lines[#lines + 1] = "- Frequency: [once / sometimes / always]"
+        lines[#lines + 1] = "- Lua error: [paste error separately if one appeared]"
+        lines[#lines + 1] = "- Privacy: review Character and other diagnostics before sharing"
     end
 
     lines[#lines + 1] = "ScoredCandidates:"
@@ -4557,6 +4725,16 @@ local function flcGearSlotStatus(slotDef, playerLevel)
     end
 
     if not link then
+        -- Classic/Forever Rogues unlock Dual Wield at level 10. Do not
+        -- recommend an off-hand weapon before the slot can be used.
+        local _, playerClass = UnitClass("player")
+        if slot == 17 and playerClass == "ROGUE" and playerLevel < 10 then
+            return {
+                slot = slot, slotName = slotDef.name, status = "NOT EXPECTED YET",
+                reason = "Rogues unlock Dual Wield at level 10; no off-hand needed yet",
+                score = 0, expected = false,
+            }
+        end
         local expected = playerLevel >= (slotDef.expectedLevel or 1)
 
         if slotDef.optionalEmpty and not expected then
@@ -5029,6 +5207,11 @@ SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
     elseif msg == "sync" then
         syncQuests()
         print("|cff33ff99FLC:|r quest log synced.")
+    elseif msg == "report" then
+        syncQuests()
+        testerReportMode = true
+        exportSnapshot()
+        testerReportMode = false
     elseif msg == "export" then
         syncQuests()
         exportSnapshot()
@@ -5129,7 +5312,7 @@ SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
         syncQuests()
     else
         print("|cff33ff99Forever Leveling Coach v" .. tostring(Data.version) .. "|r")
-        print("/flc show, hide, settings, go, lazy, spec, relic, trained, autoaccept, autoturnin, sync, export, gear, gearscan, autoflight, arrow, lock, unlock, beginner")
+        print("/flc show, hide, settings, go, lazy, spec, relic, trained, autoaccept, autoturnin, sync, export, report, gear, gearscan, autoflight, arrow, lock, unlock, beginner")
     end
 end
 
