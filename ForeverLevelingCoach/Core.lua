@@ -253,6 +253,7 @@ local currentAutoFlightTarget = nil
 local currentAutoFlightStatus = "idle"
 local taxiOpenSerial = 0
 local exportSnapshot
+local testerReportMode = false
 local syncQuests
 local getBestObjectiveTarget
 local flcGearScanSnapshot
@@ -1727,6 +1728,18 @@ local function flcStyleFlatButton(button, accent)
         text:SetTextColor(accent and 0.42 or 0.82, accent and 0.92 or 0.86, accent and 0.86 or 0.89)
     end
 end
+
+local reportButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+reportButton:SetSize(54, 20)
+reportButton:SetPoint("TOPRIGHT", -10, -56)
+reportButton:SetText("Report")
+flcStyleFlatButton(reportButton, false)
+reportButton:SetScript("OnClick", function()
+    syncQuests()
+    testerReportMode = true
+    exportSnapshot()
+    testerReportMode = false
+end)
 
 local exportButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
 exportButton:SetSize(54, 20)
@@ -3847,6 +3860,7 @@ exportSnapshot = function()
     local lines = {
         "Forever Leveling Coach Export",
         "AddonVersion=" .. tostring(Data.version or "?"),
+        "ReportType=" .. (testerReportMode and "ALPHA BUG REPORT" or "DIAGNOSTIC EXPORT"),
         "Character=" .. tostring(UnitName("player") or "?"),
         "Level=" .. tostring(UnitLevel("player") or "?"),
         "CurrentXP=" .. tostring((UnitXP and UnitXP("player")) or "unknown"),
@@ -4145,6 +4159,16 @@ exportSnapshot = function()
             tostring(entry.quest.title or "?"),
             entry.quest.isComplete and "READY TO TURN IN" or "IN PROGRESS",
             tostring(objectiveSummary(entry.quest) or "objectives unknown"))
+    end
+
+    if testerReportMode then
+        lines[#lines + 1] = "TesterReport:"
+        lines[#lines + 1] = "- Expected: [describe what should happen]"
+        lines[#lines + 1] = "- Actual: [describe what happened]"
+        lines[#lines + 1] = "- Steps to reproduce: [list actions]"
+        lines[#lines + 1] = "- Frequency: [once / sometimes / always]"
+        lines[#lines + 1] = "- Lua error: [paste error separately if one appeared]"
+        lines[#lines + 1] = "- Privacy: review Character and other diagnostics before sharing"
     end
 
     lines[#lines + 1] = "ScoredCandidates:"
@@ -5183,6 +5207,11 @@ SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
     elseif msg == "sync" then
         syncQuests()
         print("|cff33ff99FLC:|r quest log synced.")
+    elseif msg == "report" then
+        syncQuests()
+        testerReportMode = true
+        exportSnapshot()
+        testerReportMode = false
     elseif msg == "export" then
         syncQuests()
         exportSnapshot()
@@ -5283,7 +5312,7 @@ SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
         syncQuests()
     else
         print("|cff33ff99Forever Leveling Coach v" .. tostring(Data.version) .. "|r")
-        print("/flc show, hide, settings, go, lazy, spec, relic, trained, autoaccept, autoturnin, sync, export, gear, gearscan, autoflight, arrow, lock, unlock, beginner")
+        print("/flc show, hide, settings, go, lazy, spec, relic, trained, autoaccept, autoturnin, sync, export, report, gear, gearscan, autoflight, arrow, lock, unlock, beginner")
     end
 end
 
