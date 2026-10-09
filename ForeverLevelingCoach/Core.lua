@@ -3117,6 +3117,14 @@ local function render()
         routeFlightTarget = step.turnInFlightTarget
     end
     currentAutoFlightTarget = routeFlightTarget
+    -- Do not recommend a flight to the city the player is already in.
+    -- Restrict this check to the two known trainer cities; never infer a
+    -- remote destination from an unverified coordinate or taxi node.
+    if currentAutoFlightTarget
+        and ((zoneMatchesAliases({ "Thunder Bluff" }) and taxiNameMatches(currentAutoFlightTarget, "Thunder Bluff"))
+            or (zoneMatchesAliases({ "Orgrimmar" }) and taxiNameMatches(currentAutoFlightTarget, "Orgrimmar"))) then
+        currentAutoFlightTarget = nil
+    end
     currentAutoFlightStatus = currentAutoFlightTarget and "waiting-for-flight-master" or "no-target"
     currentPersonTarget = step and step.personTarget or nil
     if active and active.isComplete and step and step.turnInTarget then
