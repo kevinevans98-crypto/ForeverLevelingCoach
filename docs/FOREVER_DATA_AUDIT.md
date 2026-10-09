@@ -42,3 +42,39 @@ This is a verification backlog, **not** a claim that all external database entri
 - [ ] Class trainer history persists after training.
 - [ ] Talent recommendation avoids maxed/incorrect ranks.
 - [ ] First-run and repeat-run dungeon XP reported separately.
+
+## v0.59.0 Alpha 1 batch delivery and release gates
+
+Goal: optimize a *local quest loop*, not just a single highest-scored quest. Keep stable v0.58.0 untouched until the alpha passes.
+
+### Batch A — Brill (Horde level 5–10)
+
+- [ ] Cover observed missing quests by ID: 404 A Putrid Task, 427 At War With The Scarlet Crusade, 5482 Doom Weed, 358 Graverobbers, 398 WANTED: Maggot Eye.
+- [ ] Audit Forever candidates separately: 99134 Discipline, 99141 Patience, 96658 Cooking, 97955 First Aid, 97960 Skinning. No invented locations or NPCs.
+- [ ] Verify each quest's objectives, prerequisite/pickup, objective coordinates, and turn-in against in-game Forever Beta observations before adding navigable targets.
+- [ ] Export all active quests and distinguish VERIFIED LOCAL CLUSTER from LOCATION UNVERIFIED; do not claim that unknown quests are locally routed.
+- [ ] Score parallel verified objectives for travel efficiency, shared kills/loot, remaining progress, and turn-in proximity; retain a safe single navigation arrow.
+- [ ] Avoid oscillating between objectives when score differences are small; preserve route-switch margin.
+- [ ] Batch nearby turn-ins only when NPC/hub locations are verified.
+- [ ] Ensure CurrentTravelStep is meaningful for verified objective and turn-in targets.
+- [ ] Level-6 Rogue off-hand is NOT EXPECTED YET; trainer reminders should be actionable.
+- [ ] Fix misleading RouteDataGapCount=0 when unresolved unknown quests exist (or add a distinct unknown coverage count).
+
+### Batch B — automated checks before gameplay
+
+- [ ] Parse every changed Lua file with a compatible Lua syntax checker.
+- [ ] Run fixtures for: incomplete parallel quests; completed turn-in; unknown quest; quest chain transition; unavailable quest; class-specific level gating; map mismatch.
+- [ ] Verify no fabricated waypoints, duplicated quest cards, or accidental stable-branch changes.
+- [ ] Verify export reflects actual active quest count, known/unknown count, primary target, parallel targets, and decision reasons.
+- [ ] Review licenses and data provenance before importing any third-party quest database or art.
+
+### Batch C — one focused gameplay session
+
+1. Install alpha separately and confirm the alpha version/build identifier in export.
+2. On Ms, accept multiple Brill quests, then play 30–60 minutes completing overlapping objectives.
+3. Export at start, after two completed objectives, after grouped turn-ins, and at end; note bad arrows or backtracking.
+4. Compare travel and objective order to actual opportunities seen in-game. Record regressions and fix in a single batch.
+
+### Stable release gate
+
+Only after syntax/fixture checks, in-game route validation, regression review, and a successful updater test: bump version consistently in metadata and export, merge alpha PR, and publish stable v0.59.0. Do not claim these checks passed until executed.
