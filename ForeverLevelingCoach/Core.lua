@@ -90,6 +90,12 @@ local function flcTalentRecommendation()
     end
 
     local pick = build.talentsByLevel and build.talentsByLevel[level]
+    -- Forever trait trees can award talents before the guide's planned level.
+    -- Do not tell a shaman to purchase Stormstrike again when it is learned.
+    if profile.classFile == "SHAMAN" and pick and pick.talent == "Stormstrike"
+        and IsPlayerSpell and IsPlayerSpell(17364) then
+        return build.name, "Stormstrike already learned; next planned talent: Improved Stormstrike at level 26"
+    end
     if pick then
         local text = string.format("%s %d/%d", pick.talent, pick.rank or 1, pick.maxRank or 1)
         if pick.note then text = tostring(pick.note) .. " — " .. text end
