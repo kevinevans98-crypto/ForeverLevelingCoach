@@ -4131,14 +4131,36 @@ exportSnapshot = function()
             table.concat(item.reasons or {}, " | "))
     end
 
+    -- Quest XP comes from the live client, never from estimated database values.
+    local pendingQuestXP, pendingQuestXPUnknown = 0, 0
+    local function getQuestRewardXP(questID)
+        if not questID then return nil end
+        local api = C_QuestLog and C_QuestLog.GetQuestLogRewardXP
+        if type(api) == "function" then
+            local ok, value = pcall(api, questID)
+            if ok and type(value) == "number" and value >= 0 then return value end
+        end
+        return nil
+    end
     lines[#lines + 1] = "Quests:"
     for _, q in ipairs(currentQuests) do
+        local rewardXP = getQuestRewardXP(q.questID)
+        if q.isComplete then
+            if rewardXP then pendingQuestXP = pendingQuestXP + rewardXP
+            else pendingQuestXPUnknown = pendingQuestXPUnknown + 1 end
+        end
+        lines[#lines + 1] = string.format("QuestRewardXP=%d | %s", q.questID or 0, rewardXP and tostring(rewardXP) or "unknown")
         local routeStatus = isKnownQuest(q.questID) and "KNOWN" or "NEW/UNVERIFIED"
         lines[#lines + 1] = string.format("- %d | %s | %s | %s", q.questID, q.title, q.isComplete and "complete" or "active", routeStatus)
         for _, obj in ipairs(q.objectives or {}) do
             lines[#lines + 1] = string.format("  %s %s", obj.finished and "[done]" or "[ ]", obj.text or "")
         end
     end
+
+    lines[#lines + 1] = "PendingQuestXP=" .. tostring(pendingQuestXP)
+    lines[#lines + 1] = "PendingQuestXPUnknownCount=" .. tostring(pendingQuestXPUnknown)
+    local remainingXP = (UnitXPMax and UnitXPMax("player") or 0) - (UnitXP and UnitXP("player") or 0)
+    lines[#lines + 1] = "PendingQuestXPEnoughToLevel=" .. (pendingQuestXP >= remainingXP and "yes" or (pendingQuestXPUnknown > 0 and "unknown" or "no"))
 
     lines[#lines + 1] = "QuestCleanupDropButtons=" .. tostring(currentQuestCleanup and #currentQuestCleanup > 0 and "enabled" or "none")
     lines[#lines + 1] = "QuestCleanup:"
