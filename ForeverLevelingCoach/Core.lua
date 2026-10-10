@@ -4138,7 +4138,7 @@ exportSnapshot = function()
         local api = C_QuestLog and C_QuestLog.GetQuestLogRewardXP
         if type(api) == "function" then
             local ok, value = pcall(api, questID)
-            if ok and type(value) == "number" and value >= 0 then return value end
+            if ok and type(value) == "number" and value > 0 then return value end
         end
         -- Resolve the log index using the same C_QuestLog API as our quest scanner.
         if type(GetQuestLogRewardXP) == "function"
@@ -4150,7 +4150,7 @@ exportSnapshot = function()
                     local okInfo, info = pcall(C_QuestLog.GetInfo, index)
                     if okInfo and info and not info.isHeader and info.questID == questID then
                         local okXP, xp = pcall(GetQuestLogRewardXP, index)
-                        if okXP and type(xp) == "number" and xp >= 0 then return xp end
+                        if okXP and type(xp) == "number" and xp > 0 then return xp end
                         break
                     end
                 end
