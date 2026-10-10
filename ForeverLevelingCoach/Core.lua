@@ -1317,6 +1317,19 @@ local function scoreRouteStep(step, active, clusterCounts)
         end
     end
 
+    -- Completed turn-ins in another map should not dominate nearby active work.
+    -- This is a conservative map-level penalty, not a fabricated travel-time estimate.
+    if active and active.isComplete and step.turnInTarget and step.turnInTarget.waypoint
+        and C_Map and C_Map.GetBestMapForUnit then
+        local playerMapID = C_Map.GetBestMapForUnit("player")
+        local targetMapID = step.turnInTarget.waypoint.mapID
+        if playerMapID and targetMapID and playerMapID ~= targetMapID then
+            local penalty = 220
+            score = score - penalty
+            reasons[#reasons + 1] = string.format("distant cross-zone turn-in (-%d)", penalty)
+        end
+    end
+
     if step.cluster then
         local count = clusterCounts[step.cluster] or 1
         if count > 1 then
