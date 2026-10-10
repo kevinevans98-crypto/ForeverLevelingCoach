@@ -3042,7 +3042,19 @@ ForeverLevelingCoach_Data = {
             maxLevel = 27,
             cluster = "ASHENVALE_ZORAM",
             clusterPriority = 2,
-            note = "Elite escort/event. Good if you have help; skip if solo time is tight.",
+            note = "Elite escort/event. Party with nearby players before the boss spawns: kill credit is not shared with players outside your party. Secure your group's tag on Vorsha. Skip if solo time is tight.",
+            travelGuide = {
+                {
+                    zoneAliases = { "The Barrens", "Barrens", "Ratchet", "Crossroads" },
+                    instruction = "Travel north through the Barrens into Ashenvale, then follow the western route to Zoram'gar Outpost. If your flight map offers Zoram'gar, flying is preferable.",
+                    waypoint = { mapID = 1413, x = 0.458, y = 0.068, label = "Road north toward Ashenvale" },
+                },
+                {
+                    zoneAliases = { "Ashenvale", "Zoram'gar Outpost" },
+                    instruction = "Travel to Muglash at Zoram'gar Outpost (12.1, 34.6). Join a party before the Vorsha event and secure your party's kill tag.",
+                    waypoint = { mapID = 1440, x = 0.121, y = 0.346, label = "Muglash — Vorsha event" },
+                },
+            },
             pickupTarget = {
                 npc = "Muglash",
                 role = "Quest giver / escort start",
