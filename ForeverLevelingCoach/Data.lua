@@ -3974,6 +3974,20 @@ ForeverLevelingCoach_Data = {
             minLevel = 18,
             maxLevel = 30,
             note = "Alpha: quest-log-verified objective. Collect 15 Glittering Sunstones. Exact waypoint and turn-in location still need in-game verification.",
+            objectiveTargets = {
+                {
+                    objectiveContains = "Glittering Sunstone",
+                    role = "Quest objective area",
+                    name = "Glittering Sunstones",
+                    zone = "Stonetalon Mountains",
+                    coords = "33.11, 65.83",
+                    locationType = "CLIENT QUEST POI — APPROXIMATE AREA",
+                    instruction = "Travel toward the quest area shown on the game map; use roads around impassable terrain.",
+                    action = "COMPLETE QUEST OBJECTIVE",
+                    useArrow = true,
+                    waypoint = { mapID = 1442, x = 0.3311, y = 0.6583, label = "Glittering Sunstones" },
+                },
+            },
         },
         {
             questID = 6284,
@@ -3984,6 +3998,20 @@ ForeverLevelingCoach_Data = {
             minLevel = 18,
             maxLevel = 30,
             note = "Alpha: quest-log-verified objective. Collect Besseleth's Fang. Verify the boss location before enabling an arrow. Exact waypoint and turn-in location still need in-game verification.",
+            objectiveTargets = {
+                {
+                    objectiveContains = "Besseleth's Fang",
+                    role = "Quest objective area",
+                    name = "Besseleth's Fang",
+                    zone = "Stonetalon Mountains",
+                    coords = "53.08, 72.50",
+                    locationType = "CLIENT QUEST POI — APPROXIMATE AREA",
+                    instruction = "Travel toward the quest area shown on the game map; use roads around impassable terrain.",
+                    action = "COMPLETE QUEST OBJECTIVE",
+                    useArrow = true,
+                    waypoint = { mapID = 1442, x = 0.5308, y = 0.725, label = "Besseleth's Fang" },
+                },
+            },
         },
         {
             questID = 1094,
