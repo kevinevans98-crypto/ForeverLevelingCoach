@@ -143,6 +143,14 @@ local function copyDefaults()
         end
     end
 
+    -- Alpha XP testing: explicitly disable automation for existing characters too.
+    -- This avoids saved true values silently overriding test defaults.
+    if not charDB.xpTestManualQuestMode then
+        charDB.autoAccept = false
+        charDB.autoTurnIn = false
+        charDB.xpTestManualQuestMode = true
+    end
+
     charDB.discoveredQuests = charDB.discoveredQuests or {}
     charDB.knownFlightPaths = charDB.knownFlightPaths or {}
     charDB.navigationProgress = charDB.navigationProgress or {}
