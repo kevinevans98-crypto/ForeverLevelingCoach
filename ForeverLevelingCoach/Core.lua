@@ -5226,58 +5226,6 @@ SlashCmdList.FOREVERLEVELINGCOACH = function(msg)
     end
 end
 
--- Alpha world-map quest ping. Only use route waypoints with explicit map coordinates.
--- Keep the pin on the map canvas so zooming and panning do not misplace it.
-local questMapPing
-local questMapPingElapsed = 0
-local function refreshQuestMapPing()
-    local map = WorldMapFrame
-    local canvas = map and map.ScrollContainer and map.ScrollContainer.Child
-    if not canvas or not map:IsShown() then
-        if questMapPing then questMapPing:Hide() end
-        return
-    end
-    local wp = currentNavigationWaypoint
-    local shownMapID = map.GetMapID and map:GetMapID()
-    if not wp or not wp.mapID or not wp.x or not wp.y
-        or shownMapID ~= wp.mapID
-        or wp.x < 0 or wp.x > 1 or wp.y < 0 or wp.y > 1 then
-        if questMapPing then questMapPing:Hide() end
-        return
-    end
-    if not questMapPing then
-        questMapPing = CreateFrame("Frame", nil, canvas)
-        questMapPing:SetSize(24, 24)
-        questMapPing:SetFrameStrata("TOOLTIP")
-        local dot = questMapPing:CreateTexture(nil, "ARTWORK")
-        dot:SetAllPoints()
-        dot:SetTexture("Interface\\Minimap\\POIIcons")
-        dot:SetTexCoord(0.125, 0.25, 0.5, 0.625)
-        questMapPing:EnableMouse(true)
-        questMapPing:SetScript("OnEnter", function(self)
-            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-            GameTooltip:AddLine("Forever Leveling Coach", 0.2, 1, 0.6)
-            GameTooltip:AddLine(tostring(self.questLabel or "Quest objective"), 1, 1, 1)
-            GameTooltip:Show()
-        end)
-        questMapPing:SetScript("OnLeave", function() GameTooltip:Hide() end)
-    end
-    if questMapPing:GetParent() ~= canvas then questMapPing:SetParent(canvas) end
-    questMapPing.questLabel = wp.label
-    questMapPing:ClearAllPoints()
-    questMapPing:SetPoint("CENTER", canvas, "TOPLEFT", wp.x * canvas:GetWidth(), -wp.y * canvas:GetHeight())
-    questMapPing:Show()
-end
-
-local questMapPingWatcher = CreateFrame("Frame")
-questMapPingWatcher:SetScript("OnUpdate", function(_, elapsed)
-    questMapPingElapsed = questMapPingElapsed + elapsed
-    if questMapPingElapsed >= 0.35 then
-        questMapPingElapsed = 0
-        refreshQuestMapPing()
-    end
-end)
-
 FLC:RegisterEvent("ADDON_LOADED")
 FLC:RegisterEvent("PLAYER_LOGIN")
 FLC:RegisterEvent("QUEST_LOG_UPDATE")
