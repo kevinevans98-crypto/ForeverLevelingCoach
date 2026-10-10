@@ -1181,6 +1181,14 @@ local function getCompletedTurnInDecision(step, active, quickPickup)
         end
     end
 
+    -- Alpha: finish local field objectives before ordinary quest turn-ins.
+    -- Only defer for an active, unfinished primary objective in this cluster;
+    -- IMPORTANT progression quests retain their existing priority.
+    if (step.tag or "DO") ~= "IMPORTANT"
+        and step.cluster and hasIncompletePrimaryInCluster(step) then
+        return "DEFER TURN-IN", "finish active local quest objectives before grouped turn-ins"
+    end
+
     if step.deferTurnInForQuestIDs then
         for _, deferQuestID in ipairs(step.deferTurnInForQuestIDs) do
             local deferActive = currentByID and currentByID[deferQuestID]
