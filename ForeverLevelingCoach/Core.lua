@@ -4140,29 +4140,10 @@ exportSnapshot = function()
     end)() or 0)
     -- Quest XP comes from the live client, never from estimated database values.
     local pendingQuestXP, pendingQuestXPUnknown = 0, 0
+    -- Only use XP observed from the actual completion dialog.
+    -- The quest-log reward API has an unverified signature on Forever and
+    -- previously returned inconsistent values; never use it for predictions.
     local function getQuestRewardXP(questID)
-        if not questID then return nil end
-        local api = C_QuestLog and C_QuestLog.GetQuestLogRewardXP
-        if type(api) == "function" then
-            local ok, value = pcall(api, questID)
-            if ok and type(value) == "number" and value > 0 then return value end
-        end
-        -- Resolve the log index using the same C_QuestLog API as our quest scanner.
-        if type(GetQuestLogRewardXP) == "function"
-            and C_QuestLog and type(C_QuestLog.GetNumQuestLogEntries) == "function"
-            and type(C_QuestLog.GetInfo) == "function" then
-            local okCount, count = pcall(C_QuestLog.GetNumQuestLogEntries)
-            if okCount and type(count) == "number" then
-                for index = 1, count do
-                    local okInfo, info = pcall(C_QuestLog.GetInfo, index)
-                    if okInfo and info and not info.isHeader and info.questID == questID then
-                        local okXP, xp = pcall(GetQuestLogRewardXP, index)
-                        if okXP and type(xp) == "number" and xp > 0 then return xp end
-                        break
-                    end
-                end
-            end
-        end
         local observed = DB and DB.observedQuestXP and DB.observedQuestXP[questID]
         if type(observed) == "number" and observed > 0 then return observed end
         return nil
