@@ -775,6 +775,22 @@ local function getFastTravelSuggestion(step, travelInstruction)
     local zone = (GetZoneText and GetZoneText()) or ""
     local hearth = getHearthStatus()
 
+    -- Alpha test: suggest an unlearned flight point only while already
+    -- questing in its zone. Keep the active quest and arrow unchanged.
+    -- Do not guess a flight-master coordinate or force a long detour.
+    if DB and DB.knownFlightPaths and zoneMatchesAliases({ "Stonetalon Mountains", "Stonetalon" }) then
+        local learned = false
+        for name, known in pairs(DB.knownFlightPaths) do
+            if known and string.find(string.lower(name), "sun rock", 1, true) then
+                learned = true
+                break
+            end
+        end
+        if not learned then
+            return "FLIGHT PATH CHECK: While questing in Stonetalon, visit the flight master at Sun Rock Retreat when your route passes nearby. Open the flight map to register the node, then resume your current quest. Do not make a long detour.", "flight-discovery"
+        end
+    end
+
     -- A flight-assisted route is easier than crossing Ashenvale on foot.
     -- Always verify reachability at the flight master before promising a flight.
     if step and step.questID == 1483 and zoneMatchesAliases({ "Ashenvale", "Zoram'gar Outpost" }) then
