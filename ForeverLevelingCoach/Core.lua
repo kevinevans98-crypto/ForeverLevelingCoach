@@ -769,6 +769,12 @@ local function getFastTravelSuggestion(step, travelInstruction)
     local zone = (GetZoneText and GetZoneText()) or ""
     local hearth = getHearthStatus()
 
+    -- A flight-assisted route is easier than crossing Ashenvale on foot.
+    -- Always verify reachability at the flight master before promising a flight.
+    if step and step.questID == 1483 and zoneMatchesAliases({ "Ashenvale", "Zoram'gar Outpost" }) then
+        return "TRAVEL OPTION: Check the Zoram'gar flight master for Crossroads. If reachable, fly there, then take the west road into Stonetalon Mountains to Ziz Fizziks in Windshear Crag (59.0, 62.6). Avoid walking through Astranaar.", "flight-check"
+    end
+
     -- Route-specific verified fast-travel advice. We only recommend shortcuts
     -- whose destination is known to be useful for the active route.
     local ratchetRoute = step and (step.questID == 96 or step.questID == 1103 or step.questID == 6981)
