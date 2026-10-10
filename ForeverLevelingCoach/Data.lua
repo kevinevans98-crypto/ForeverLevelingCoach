@@ -3902,6 +3902,20 @@ ForeverLevelingCoach_Data = {
             minLevel = 18,
             maxLevel = 30,
             note = "Alpha: quest-log-verified objective. Collect 10 Gaea Seeds around the Stonetalon questing area. Exact waypoint and turn-in location still need in-game verification.",
+            objectiveTargets = {
+                {
+                    objectiveContains = "Gaea Seed",
+                    role = "Quest objective area",
+                    name = "Gaea Seeds",
+                    zone = "Stonetalon Mountains",
+                    coords = "48.2, 40.9",
+                    locationType = "IN-GAME MAP QUEST MARKER — APPROXIMATE AREA",
+                    instruction = "Travel to the quest marker around 48.2, 40.9 and complete the active objectives. Marker is an area, not an exact spawn.",
+                    action = "COLLECT GAEA SEEDS",
+                    useArrow = true,
+                    waypoint = { mapID = 1442, x = 0.482, y = 0.409, label = "Gaea Seeds" },
+                },
+            },
         },
         {
             questID = 1087,
@@ -3912,6 +3926,20 @@ ForeverLevelingCoach_Data = {
             minLevel = 18,
             maxLevel = 30,
             note = "Alpha: quest-log-verified objective. Defeat 4 Sons of Cenarius, 4 Daughters of Cenarius, and 4 Cenarion Botanists. Exact waypoint and turn-in location still need in-game verification.",
+            objectiveTargets = {
+                {
+                    objectiveContains = "slain",
+                    role = "Quest objective area",
+                    name = "Cenarion enemies",
+                    zone = "Stonetalon Mountains",
+                    coords = "36.0, 12.9",
+                    locationType = "IN-GAME MAP QUEST MARKER — APPROXIMATE AREA",
+                    instruction = "Travel to the quest marker around 36.0, 12.9 and complete the active objectives. Marker is an area, not an exact spawn.",
+                    action = "DEFEAT CENARION ENEMIES",
+                    useArrow = true,
+                    waypoint = { mapID = 1442, x = 0.36, y = 0.129, label = "Cenarion enemies" },
+                },
+            },
         },
         {
             questID = 6282,
@@ -3922,6 +3950,20 @@ ForeverLevelingCoach_Data = {
             minLevel = 18,
             maxLevel = 30,
             note = "Alpha: quest-log-verified objective. Defeat 7 each of Bloodfury Harpies, Ambushers, Slayers, and Roguefeathers. Exact waypoint and turn-in location still need in-game verification.",
+            objectiveTargets = {
+                {
+                    objectiveContains = "Bloodfury",
+                    role = "Quest objective area",
+                    name = "Bloodfury harpies",
+                    zone = "Stonetalon Mountains",
+                    coords = "36.2, 68.8",
+                    locationType = "IN-GAME MAP QUEST MARKER — APPROXIMATE AREA",
+                    instruction = "Travel to the quest marker around 36.2, 68.8 and complete the active objectives. Marker is an area, not an exact spawn.",
+                    action = "DEFEAT BLOODFURY HARPIES",
+                    useArrow = true,
+                    waypoint = { mapID = 1442, x = 0.362, y = 0.688, label = "Bloodfury harpies" },
+                },
+            },
         },
         {
             questID = 86576,
