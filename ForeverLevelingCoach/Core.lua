@@ -954,7 +954,7 @@ local function hasIncompletePrimaryInCluster(step)
     if not step or not step.cluster or not currentByID then return false end
 
     local cluster = Data.clusters and Data.clusters[step.cluster]
-    if not cluster or not cluster.finishBeforeTurnIn then return false end
+    if not cluster then return false end
 
     local level = UnitLevel("player") or 1
     local _, playerClass = UnitClass("player")
