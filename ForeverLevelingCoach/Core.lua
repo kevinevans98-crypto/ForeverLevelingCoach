@@ -48,6 +48,7 @@ local defaults = {
     lastUIVersion = "0.16.1",
     lastCluster = nil,
     pendingHubChain = nil,
+    observedQuestXP = {},
 }
 
 local TAG_LABELS = {
@@ -4131,6 +4132,12 @@ exportSnapshot = function()
             table.concat(item.reasons or {}, " | "))
     end
 
+    -- Rewards captured from the quest completion dialog are stored per quest ID.
+    lines[#lines + 1] = "ObservedQuestXPCount=" .. tostring(DB and DB.observedQuestXP and (function()
+        local n = 0
+        for _ in pairs(DB.observedQuestXP) do n = n + 1 end
+        return n
+    end)() or 0)
     -- Quest XP comes from the live client, never from estimated database values.
     local pendingQuestXP, pendingQuestXPUnknown = 0, 0
     local function getQuestRewardXP(questID)
@@ -4156,6 +4163,8 @@ exportSnapshot = function()
                 end
             end
         end
+        local observed = DB and DB.observedQuestXP and DB.observedQuestXP[questID]
+        if type(observed) == "number" and observed > 0 then return observed end
         return nil
     end
     -- Diagnostic only: report supported XP APIs without assuming their signatures.
@@ -5323,6 +5332,17 @@ FLC:SetScript("OnEvent", function(_, event, arg1)
         flcHandleQuestProgress()
         syncQuests()
     elseif event == "QUEST_COMPLETE" then
+        -- Read reward XP only while the completion dialog is active.
+        -- Zero/failed responses are not trustworthy on custom servers.
+        if DB and type(GetQuestID) == "function" and type(GetRewardXP) == "function" then
+            local okID, questID = pcall(GetQuestID)
+            local okXP, xp = pcall(GetRewardXP)
+            if okID and okXP and type(questID) == "number" and questID > 0
+                and type(xp) == "number" and xp > 0 then
+                DB.observedQuestXP = DB.observedQuestXP or {}
+                DB.observedQuestXP[questID] = xp
+            end
+        end
         flcHandleQuestComplete()
         syncQuests()
     elseif event == "QUEST_TURNED_IN" then
