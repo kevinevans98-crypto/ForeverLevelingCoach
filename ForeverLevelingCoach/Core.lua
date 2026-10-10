@@ -3866,6 +3866,18 @@ exportSnapshot = function()
         "NavigationTarget=" .. tostring(currentNavigationWaypoint and currentNavigationWaypoint.label or "none"),
         "QuestPOIScanStatus=" .. tostring(questPOIScanStatus),
         "QuestPOIScanCount=" .. tostring((function() local n = 0 for _ in pairs(scannedQuestPOIs) do n = n + 1 end return n end)()),
+        "QuestPOIScanMatches:",
+        (function()
+            local lines = {}
+            for _, quest in ipairs(currentQuests or {}) do
+                local poi = scannedQuestPOIs[quest.questID]
+                if poi then
+                    lines[#lines + 1] = string.format("- %d | %s | map=%d | %.4f,%.4f", quest.questID, quest.title or "?", poi.mapID, poi.x, poi.y)
+                end
+            end
+            table.sort(lines)
+            return #lines > 0 and table.concat(lines, "\n") or "- none"
+        end)(),
         "NavigationWaypointSource=" .. tostring(currentNavigationWaypoint and (currentNavigationWaypoint.source or "route-database") or "none"),
         "NavigationStep=" .. tostring(currentNavigationStepIndex and (tostring(currentNavigationStepIndex) .. "/" .. tostring(currentNavigationStepCount or "?")) or "none"),
         "ArrowState=" .. tostring(currentArrowState or "unknown"),
