@@ -4140,6 +4140,14 @@ exportSnapshot = function()
             local ok, value = pcall(api, questID)
             if ok and type(value) == "number" and value >= 0 then return value end
         end
+        -- Legacy quest-log API fallback used by some Classic-derived clients.
+        if type(GetQuestLogIndexByID) == "function" and type(GetQuestLogRewardXP) == "function" then
+            local okIndex, index = pcall(GetQuestLogIndexByID, questID)
+            if okIndex and type(index) == "number" and index > 0 then
+                local okXP, xp = pcall(GetQuestLogRewardXP, index)
+                if okXP and type(xp) == "number" and xp >= 0 then return xp end
+            end
+        end
         return nil
     end
     lines[#lines + 1] = "Quests:"
