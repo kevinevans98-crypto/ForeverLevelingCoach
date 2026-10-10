@@ -4150,6 +4150,20 @@ exportSnapshot = function()
         end
         return nil
     end
+    -- Diagnostic only: report supported XP APIs without assuming their signatures.
+    lines[#lines + 1] = "QuestXPAPIDiagnostics:"
+    local xpAPIs = {
+        {"C_QuestLog.GetQuestLogRewardXP", C_QuestLog and C_QuestLog.GetQuestLogRewardXP},
+        {"C_QuestLog.GetQuestLogQuestXP", C_QuestLog and C_QuestLog.GetQuestLogQuestXP},
+        {"GetQuestLogRewardXP", GetQuestLogRewardXP},
+        {"GetQuestLogQuestXP", GetQuestLogQuestXP},
+        {"GetQuestLogIndexByID", GetQuestLogIndexByID},
+        {"GetQuestRewardXP", GetQuestRewardXP},
+        {"GetRewardXP", GetRewardXP},
+    }
+    for _, entry in ipairs(xpAPIs) do
+        lines[#lines + 1] = "- " .. entry[1] .. "=" .. (type(entry[2]) == "function" and "available" or "unavailable")
+    end
     lines[#lines + 1] = "Quests:"
     for _, q in ipairs(currentQuests) do
         local rewardXP = getQuestRewardXP(q.questID)
