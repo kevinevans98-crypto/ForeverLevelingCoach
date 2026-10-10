@@ -2534,6 +2534,38 @@ local function updateTravelHint(message, state)
     end
 end
 
+-- Alpha: query the game's own quest POI map data; never fabricate coordinates.
+-- The client may omit POIs or expose only approximate quest-area locations.
+local scannedQuestPOIs = {}
+local questPOIScanStatus = "not-scanned"
+local function scanQuestPOIs()
+    local mapID = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player")
+    if not mapID or not C_QuestLog or type(C_QuestLog.GetQuestsOnMap) ~= "function" then
+        questPOIScanStatus = "api-unavailable"
+        return
+    end
+    local ok, entries = pcall(C_QuestLog.GetQuestsOnMap, mapID)
+    if not ok or type(entries) ~= "table" then
+        questPOIScanStatus = "no-map-data"
+        return
+    end
+    local found = {}
+    for _, poi in ipairs(entries) do
+        if type(poi) == "table" and type(poi.questID) == "number"
+            and type(poi.x) == "number" and type(poi.y) == "number"
+            and poi.x >= 0 and poi.x <= 1 and poi.y >= 0 and poi.y <= 1
+            and poi.isQuestStart ~= true then
+            found[poi.questID] = {
+                mapID = mapID, x = poi.x, y = poi.y,
+                label = (C_QuestLog.GetTitleForQuestID and C_QuestLog.GetTitleForQuestID(poi.questID)) or ("Quest " .. poi.questID),
+                source = "game-quest-poi",
+            }
+        end
+    end
+    scannedQuestPOIs = found
+    questPOIScanStatus = "scanned"
+end
+
 local function updateArrow()
     if not DB or DB.arrowVisible == false or not currentRouteStep then
         currentArrowState = "hidden-disabled"
@@ -2548,6 +2580,11 @@ local function updateArrow()
         waypoint = currentNextQuestPickup.waypoint
     elseif currentPersonTarget and currentPersonTarget.useArrow and currentPersonTarget.waypoint then
         waypoint = currentPersonTarget.waypoint
+    end
+    -- Prefer authored, verified waypoints. Use game POIs only when guidance is absent.
+    scanQuestPOIs()
+    if not waypoint and currentRouteStep.questID then
+        waypoint = scannedQuestPOIs[currentRouteStep.questID]
     end
     currentNavigationWaypoint = waypoint
     currentNavigationStepIndex = navIndex
@@ -3827,6 +3864,9 @@ exportSnapshot = function()
         "CurrentSubZone=" .. tostring((GetSubZoneText and GetSubZoneText()) or "?"),
         "CurrentTravelStep=" .. tostring(currentTravelInstruction or "none"),
         "NavigationTarget=" .. tostring(currentNavigationWaypoint and currentNavigationWaypoint.label or "none"),
+        "QuestPOIScanStatus=" .. tostring(questPOIScanStatus),
+        "QuestPOIScanCount=" .. tostring((function() local n = 0 for _ in pairs(scannedQuestPOIs) do n = n + 1 end return n end)()),
+        "NavigationWaypointSource=" .. tostring(currentNavigationWaypoint and (currentNavigationWaypoint.source or "route-database") or "none"),
         "NavigationStep=" .. tostring(currentNavigationStepIndex and (tostring(currentNavigationStepIndex) .. "/" .. tostring(currentNavigationStepCount or "?")) or "none"),
         "ArrowState=" .. tostring(currentArrowState or "unknown"),
         "ArrowMode=" .. tostring(currentArrowState == "active-same-map" and "same-map-safe" or "hidden"),
